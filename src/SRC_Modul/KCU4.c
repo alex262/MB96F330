@@ -18,7 +18,6 @@ void 	(*INIT_BLOK)(void)	=InitKCU;
 void 	(*DRIVER_BLOK)(void)=DriverKCU;
 void	(*SERVICE_PAK_UART)(BYTE, BYTE*, WORD) = ServiceUart;
 
-
 WORD (*STATE_BLOCK) = &Kcu.Info.word;
 
 //====================================================================
@@ -26,10 +25,8 @@ BYTE Convert_8(BYTE n);
 void Read_FO(BYTE *pData);
 void Read_FC(BYTE *pData);
 //====================================================================
-//static TYPE_DATA_TIMER TimerStartBlock = 1000/TIMER_RESOLUTION_MS;
 
 static TYPE_DATA_TIMER TimerWaitOpros	= 0;
-//static BYTE stStartBlock = 1;
 //====================================================================
 static BYTE BuffUart[BUFFER_LEN_UART];
 static WORD CountDataUart = 0;
@@ -46,7 +43,6 @@ void InitKCU()
 	CC1 = 0;
 	CC2 = 0;
 	CC3 = 0;
-
 	
 	DDR00	= 0;
 	DDR01	= 0;
@@ -66,7 +62,6 @@ void InitKCU()
 	DDR09	= 0xFF;
 	//------------------------------------
 	Kcu.Info.word = 0;
-	//add_timer(&TimerStartBlock);
 
 	Kcu.SendPak	= 0;
 	Kcu.Regim = 0;
@@ -140,25 +135,6 @@ void DriverKCU()
 		
 		// только при наличии 27¬ анализируем защиту по току
 	}
-
-
-/* 	// заводилось на управление через COM
-	if(getTimer(&TimerWaitOpros) == 0)
-	{
-		setTimer(&TimerWaitOpros, 50);
-
-		if((Kcu.TmpData&0x01) == 0)	CC1	= 0; else	CC1 = 1;
-		if((Kcu.TmpData&0x02) == 0)	CC2	= 0; else	CC2 = 1;
-		if((Kcu.TmpData&0x04) == 0)	CC3	= 0; else	CC3 = 1;
-		if((Kcu.TmpData&0x08) == 0)	CP1	= 0; else	CP1 = 1;
-		if((Kcu.TmpData&0x10) == 0)	CP2	= 0; else	CP2 = 1;
-		if((Kcu.TmpData&0x20) == 0)	CP3	= 0; else	CP3 = 1;
-
-		Kcu.TmpData1 = PDR09;
-		
-		Read_FO(Kcu.FO);
-		Read_FC(Kcu.FC);
-	}*/
 	//========================================================
 	// обмен данными по COM
 	if (GetRxByte(&i) == FIFO_OK)

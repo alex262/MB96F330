@@ -116,7 +116,6 @@ typedef struct
 	BYTE	TmpData;
 	BYTE	TmpData1;
 
-	 
 	BYTE	SendPak;
 }CKCU;
 

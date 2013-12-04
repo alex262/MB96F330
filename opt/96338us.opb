@@ -1,0 +1,40 @@
+-dt s,d,r,a
+-pl 60
+-pw 132
+-g
+-cwno
+-cpu MB96F338USA
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\ABS\main.abs"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\Start.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\Main.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\vectors.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\mb96338us.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\Timer.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\GLOBAL.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\fifo.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\uart.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\rlt.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\PakUart.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\Terminal.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\can.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\appli.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\canOpenDriver.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\init.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\lifegrd.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\nmtSlave.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\objacces.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\objdict.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\pdo.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\sdo.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\sync.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\KCU4.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\Flash.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\mhx_reader.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\i2c_Func.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\D1Ware.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\ADC8.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\spi.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\ocu.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\FSU29_30.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\NDD22.obj"
+

@@ -1,0 +1,13 @@
+-g
+-w 2
+-linf ON
+-lsrc ON
+-lsec ON
+-lcros ON
+-linc OFF
+-lexp OBJ
+-pl 60
+-pw 100
+-tab 8
+-cwno
+-cpu MB96F338USA

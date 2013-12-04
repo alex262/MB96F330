@@ -1,0 +1,97 @@
+$CPUSERIES-907
+$Prj-Debug
+$0
+-g
+-w 4
+-I "%(PRJPATH)\src\CanOpenMain"
+-I "%(PRJPATH)\SRC"
+-I "%(PRJPATH)\SRC\SRC_modul"
+-I "%(PRJPATH)\SRC\Bootload"
+-O 0
+-model LARGE
+-B
+-Xdof
+-K NOEOPT
+-K NOLIB
+-K NOUNROLL
+$other
+-INF srcin  
+$time
+1379677907
+$end
+$1
+-g
+-w 2
+-linf ON
+-lsrc ON
+-lsec ON
+-lcros ON
+-linc OFF
+-lexp OBJ
+-pl 60
+-pw 100
+-tab 8
+-Xdof
+$other
+$time
+1369723243
+$end
+$2
+-g
+-AL 2
+-ra _INRAM01=0x001240/0x007FFF
+-ra _INRAM02=0x018000/0x018FEF
+-ro _INROM02=0xF80000/0xFFFFFF
+-sc RAMCODE/Code/WORD=_INRAM01
+-sc CONST/Const/BYTE=0xFF8000
+-sc @RAMCODE/Const/BYTE=0xDF6000
+-check_rora
+-check_locate
+-rg 0
+-m
+-mmi
+-xlf
+-slf
+-mlf
+-pl 60
+-pw 132
+-alsf "Flash.lst"
+-alsf "mhx_reader.lst"
+-alrf "Flash.lst"
+-alrf "mhx_reader.lst"
+-Xals
+-Xalr
+-na
+-w 2
+-Xdof
+$other
+-Xset_rora
+$time
+1378297008
+$end
+$3
+-dt s,d,r,a
+-pl 60
+-pw 132
+-g
+-Xdof
+$other
+$time
+1377778106
+$end
+$4
+-S2
+-adjust
+-p 0xFF
+-Xdof
+$other
+$time
+1369114714
+$end
+$5
+$other
+$time
+1349420022
+$end
+$Prjend
+$CPUSERIESEND

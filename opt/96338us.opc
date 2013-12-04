@@ -1,0 +1,13 @@
+-g
+-w 4
+-I "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\src\CanOpenMain"
+-I "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\SRC"
+-I "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\SRC\SRC_modul"
+-I "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\SRC\Bootload"
+-O 0
+-model LARGE
+-B
+-c
+-cwno
+-cpu MB96F338USA
+-INF srcin  

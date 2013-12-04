@@ -1,0 +1,6 @@
+-S2
+-adjust
+-p 0xFF
+-cwno
+-o "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\ABS\main.mhx"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\ABS\main.abs"

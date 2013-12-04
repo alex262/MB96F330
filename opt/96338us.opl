@@ -1,0 +1,68 @@
+-g
+-AL 2
+-ra _INRAM01=0x001240/0x007FFF
+-ra _INRAM02=0x018000/0x018FEF
+-ro _INROM02=0xF80000/0xFFFFFF
+-sc RAMCODE/Code/WORD=_INRAM01
+-sc CONST/Const/BYTE=0xFF8000
+-sc @RAMCODE/Const/BYTE=0xDF6000
+-check_rora
+-check_locate
+-rg 0
+-m "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\LST\main.mp1"
+-mmi
+-xlf "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\LST\main.mpx"
+-slf "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\LST\main.mps"
+-mlf "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\LST\main.mpm"
+-pl 60
+-pw 132
+-alin "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\LST"
+-alout "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\LST"
+-alsf "Flash.lst"
+-alsf "mhx_reader.lst"
+-alrf "Flash.lst"
+-alrf "mhx_reader.lst"
+-Xals
+-Xalr
+-na
+-w 2
+-Xset_rora
+-cwno
+-a
+-cpu MB96F338USA
+-Xset_rora
+-o "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\ABS\main.abs"
+
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\Start.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\Main.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\vectors.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\mb96338us.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\Timer.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\GLOBAL.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\fifo.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\uart.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\rlt.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\PakUart.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\Terminal.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\can.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\appli.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\canOpenDriver.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\init.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\lifegrd.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\nmtSlave.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\objacces.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\objdict.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\pdo.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\sdo.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\sync.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\KCU4.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\Flash.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\mhx_reader.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\i2c_Func.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\D1Ware.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\ADC8.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\spi.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\ocu.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\FSU29_30.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\NDD22.obj"
+

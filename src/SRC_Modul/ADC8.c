@@ -148,7 +148,7 @@ void InitADC8()
 	PDUT11		= 336; 
 	PCN11_CNTE	= 0;
 	
-	GCN12	= 0x5555; // Trigger Source: Reload Timer 1
+	GCN12	= 0x5555;	// Trigger Source: Reload Timer 1
 	TMRLR1	= 120;		// set reload value
 	TMCSR1	= 0x1053;	// prescaler 1:1, no interrupts, output enable 83,3 ns
 	//-------------------------
@@ -232,7 +232,7 @@ void DriverADC8()
 					TarEEPROM[i][j].ofs= TarRam[i][j].ofs;
 				}
 			}
-			if(st == 1)	
+			if(st == 1)
 			{
 				//puts("Write trarrirovki!!!");
 				HighDensPageWrite(0, (BYTE*)(&TarRam), 256);

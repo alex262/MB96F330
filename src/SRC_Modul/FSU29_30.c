@@ -232,8 +232,6 @@ void ServiceUart(BYTE Id, BYTE* pData, WORD Len)
 }
 //====================================================================
 
-
-
 int obmen_spi(BYTE ch, BYTE Send)
 {
 	BYTE  din;

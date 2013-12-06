@@ -1368,16 +1368,16 @@ static UNS8 highestSubIndex_2001 = 10; // number of subindex - 10
 subindex Index2001[] = 
 {
 	{ RO, uint8, sizeof(UNS8), (void*)&highestSubIndex_2001 },
-	{ RO, uint16,sizeof (UNS16), (void*)&Fsu.Info.word},
-	{ RO, uint8, sizeof (UNS8), (void*)&Fsu.OL[0]},	// 1 - обрыв в обмотке реле
-	{ RO, uint8, sizeof (UNS8), (void*)&Fsu.OL[1]},	// 1 - обрыв в обмотке реле
-	{ RO, uint8, sizeof (UNS8), (void*)&Fsu.OL[2]},	// 1 - обрыв в обмотке реле
-	{ RO, uint8, sizeof (UNS8), (void*)&Fsu.Diag[0]},	// 1 - прегрузка либо отключение по перегреву
-	{ RO, uint8, sizeof (UNS8), (void*)&Fsu.Diag[1]},	// 1 - прегрузка либо отключение поп перегреву
-	{ RO, uint8, sizeof (UNS8), (void*)&Fsu.Diag[2]},	// 1 - прегрузка либо отключение поп перегреву
-	{ RO, uint8, sizeof (UNS8), (void*)&Fsu.DiagSum[0]},	// 1 - есть неисправность обобщённая
-	{ RO, uint8, sizeof (UNS8), (void*)&Fsu.DiagSum[1]},	// 1 - есть неисправность обобщённая
-	{ RO, uint8, sizeof (UNS8), (void*)&Fsu.DiagSum[2]}	// 1 - есть неисправность обобщённая
+	{ RO, uint16,sizeof (UNS16), (void*)&Fsu.Info.word},												//	1
+	{ RO, uint8, sizeof (UNS8), (void*)&Fsu.OL[0]},		// 1 - обрыв в обмотке реле						//	2
+	{ RO, uint8, sizeof (UNS8), (void*)&Fsu.OL[1]},		// 1 - обрыв в обмотке реле						//	3
+	{ RO, uint8, sizeof (UNS8), (void*)&Fsu.OL[2]},		// 1 - обрыв в обмотке реле						//	4
+	{ RO, uint8, sizeof (UNS8), (void*)&Fsu.Diag[0]},	// 1 - прегрузка либо отключение по перегреву	//	5
+	{ RO, uint8, sizeof (UNS8), (void*)&Fsu.Diag[1]},	// 1 - прегрузка либо отключение поп перегреву	//	6
+	{ RO, uint8, sizeof (UNS8), (void*)&Fsu.Diag[2]},	// 1 - прегрузка либо отключение поп перегреву	//	7
+	{ RO, uint8, sizeof (UNS8), (void*)&Fsu.DiagSum[0]},// 1 - есть неисправность обобщённая			//	8
+	{ RO, uint8, sizeof (UNS8), (void*)&Fsu.DiagSum[1]},// 1 - есть неисправность обобщённая			//	9
+	{ RO, uint8, sizeof (UNS8), (void*)&Fsu.DiagSum[2]}	// 1 - есть неисправность обобщённая			//	10
 };
 
 #define MANUFACTURER_SPECIFIC_LAST_INDEX 0x2001

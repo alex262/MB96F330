@@ -143,7 +143,12 @@ void DriverNDD()
 			for(i=0; i<4; i++)
 			{
 				ChipSelektDIN(i, CS_ON);
-				write_spi_reg(i, 1, 0, RET_DATA_SPI, FALSE);
+				#ifdef PLATA_NDD22_ 
+					write_spi_reg(i, 1, 0, RET_DATA_SPI, FALSE);
+				#endif	
+				#ifdef PLATA_NDD23_ 
+					write_spi_reg(i, 1, 0xFFFF, RET_DATA_SPI, FALSE);
+				#endif	
 				ChipSelektDIN(i, CS_OFF);
 			}
 			for(i=0; i<4; i++)
@@ -155,7 +160,12 @@ void DriverNDD()
 			for(i=0; i<4; i++)
 			{
 				ChipSelektDIN(i, CS_ON);
-				write_spi_reg(i, 5, 0xFFFF, RET_DATA_SPI, FALSE);
+				#ifdef PLATA_NDD22_ 
+					write_spi_reg(i, 5, 0xFFFF, RET_DATA_SPI, FALSE);
+				#endif
+				#ifdef PLATA_NDD23_ 
+					write_spi_reg(i, 5, 0, RET_DATA_SPI, FALSE);
+				#endif
 				ChipSelektDIN(i, CS_OFF);
 			}
 			for(i=0; i<4; i++)
@@ -179,7 +189,12 @@ void DriverNDD()
 			for(i=0; i<4; i++)
 			{
 				ChipSelektDIN(i, CS_ON);
-				write_spi_reg(i, 10, 0, RET_DATA_SPI, FALSE);
+				#ifdef PLATA_NDD22_ 
+					write_spi_reg(i, 10, 0, RET_DATA_SPI, FALSE);
+				#endif
+				#ifdef PLATA_NDD23_ 
+					write_spi_reg(i, 10, 0xFFFF, RET_DATA_SPI, FALSE);
+				#endif
 				ChipSelektDIN(i, CS_OFF);
 			}
 		}
@@ -416,7 +431,6 @@ void ServiceUart(BYTE Id, BYTE* pData, WORD Len)
 		return;
 	}
 }
-
 //====================================================================
 /*
 void write_sec(BYTE ch, BYTE Len, BYTE * ret, BYTE * send)

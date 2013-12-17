@@ -22,10 +22,10 @@
 #define ADDR_EEPROM_ST_PWR	0xFFF0
 //==============================================================================
 //Выбираем блок для  конкретной реализации
-#define	PLATA_KCU4
+//#define	PLATA_KCU4
 //#define	PLATA_ADC8
 //#define 	PLATA_FSU_29_30
-//#define	PLATA_NDD22
+#define	PLATA_NDD22
 //==============================================================================
 #define BUFFER_LEN_UART		300				//Размер буффера порта
 #define MAX_IN_PAK 			290				//Макcимальна  длина входящего пакета

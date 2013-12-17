@@ -3,8 +3,17 @@
 
 #ifdef 	PLATA_NDD22
 
+//#define PLATA_NDD22_ 
+#define PLATA_NDD23_ 
+
 #define DEVICE_TYPE 1
-#define NAME_MODUL "NDD22"
+
+#ifdef PLATA_NDD22_ 
+	#define NAME_MODUL "NDD22"
+#endif
+#ifdef PLATA_NDD23_ 
+	#define NAME_MODUL "NDD23"
+#endif
 
 extern const char SoftwareVer[20]; 
 

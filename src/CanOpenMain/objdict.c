@@ -1231,7 +1231,6 @@ const subindex Index6405[] =
 {
 	{ RO, uint8, 	sizeof (UNS8), 	(void*)&highestSubIndex_6405},
 	//============================================
-
 	{ RW, real32, sizeof (REAL32),(void*)&TarRam[0][0].ofs},
 	{ RW, real32, sizeof (REAL32),(void*)&TarRam[0][1].ofs},
 	{ RW, real32, sizeof (REAL32),(void*)&TarRam[0][2].ofs},
@@ -1466,8 +1465,8 @@ subindex Index2000[] =
 	{ RW, uint16, sizeof (UNS16), 	(void*)&program.ms},
 	{ RW, uint8, sizeof (UNS8), 	(void*)&program.sec},
 	{ RW, uint8, sizeof (UNS8), 	(void*)&program.min},
-	{ RW, uint8, sizeof (UNS8), 	(void*)&program.hour },
-	{ RW, uint32, sizeof (UNS32), 	(void*)&program.day }
+	{ RW, uint8, sizeof (UNS8), 	(void*)&program.hour},
+	{ RW, uint32, sizeof (UNS32), 	(void*)&program.day}
 };
 
 /********* Index 2001 *********/

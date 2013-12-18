@@ -20,7 +20,6 @@ void 	(*INIT_BLOK)(void)	=InitNDD;
 void 	(*DRIVER_BLOK)(void)=DriverNDD;
 void	(*SERVICE_PAK_UART)(BYTE, BYTE*, WORD) = ServiceUart;
 
-
 WORD (*STATE_BLOCK) = &Ndd.Info.word;
 
 //====================================================================
@@ -31,13 +30,23 @@ static BYTE BuffUart[BUFFER_LEN_UART];
 static WORD CountDataUart = 0;
 static TYPE_DATA_TIMER TimerSpi;
 //====================================================================
+void InitDinReg(BYTE i);
 static BYTE RET_DATA_SPI[10];
 BYTE write_spi_reg(BYTE ch, BYTE Command, WORD Data, BYTE * ret, BYTE Test);
 //void write_sec(BYTE ch, BYTE Len, BYTE * ret, BYTE * send);
 BYTE ReadAdc(BYTE ch);
 void GoWorkAdc(BYTE ch, BYTE st);
 //====================================================================
-
+#define REG_DIN_COUNT 11
+#ifdef PLATA_NDD22_ 							   //   0  1       2       3       4       5       6  7       8       9       10
+	static       WORD	REG_DIN_STATE[REG_DIN_COUNT] = {0, 0,      0xffff, 0xffff, 0xffff, 0xffff, 0, 0xffff, 0xffff, 0xffff, 0};
+	static const BYTE	REG_DIN_WRITE[REG_DIN_COUNT] = {0, 1,      1,      1,      1,      1,      1, 1,      1,      1,      1};
+#endif
+#ifdef PLATA_NDD23_ 							   //   0  1       2       3       4       5       6  7       8       9       10
+	static		 WORD	REG_DIN_STATE[REG_DIN_COUNT] = {0, 0xffff, 0xffff, 0xffff, 0xffff, 0,      0, 0xffff, 0xffff, 0,      0x800};
+	static const BYTE	REG_DIN_WRITE[REG_DIN_COUNT] = {0, 1,      1,      1,      1,      1,      1, 1,      1,      1,      1};
+#endif
+//====================================================================
 void InitNDD()
 {
 	BYTE i, j;
@@ -90,12 +99,12 @@ void InitNDD()
 	Ndd.CurrentPart		= 0;
 	//------------------------------------
 	Ndd.Info.word = 0;
-	add_timer(&TimerStartBlock);
-
+	
 	Ndd.SendPak		= FALSE;
 	Ndd.stWrReg		= FALSE;
 	
 	//-------------------------
+	add_timer(&TimerStartBlock);
 	add_timer(&TimerSpi);
 	//------------------------------------
 	InitSPI_1();
@@ -142,60 +151,7 @@ void DriverNDD()
 			// инициализация регистров DIN
 			for(i=0; i<4; i++)
 			{
-				ChipSelektDIN(i, CS_ON);
-				#ifdef PLATA_NDD22_ 
-					write_spi_reg(i, 1, 0, RET_DATA_SPI, FALSE);
-				#endif	
-				#ifdef PLATA_NDD23_ 
-					write_spi_reg(i, 1, 0xFFFF, RET_DATA_SPI, FALSE);
-				#endif	
-				ChipSelektDIN(i, CS_OFF);
-			}
-			for(i=0; i<4; i++)
-			{
-				ChipSelektDIN(i, CS_ON);
-				write_spi_reg(i, 4, 0xFFFF, RET_DATA_SPI, FALSE);
-				ChipSelektDIN(i, CS_OFF);
-			}
-			for(i=0; i<4; i++)
-			{
-				ChipSelektDIN(i, CS_ON);
-				#ifdef PLATA_NDD22_ 
-					write_spi_reg(i, 5, 0xFFFF, RET_DATA_SPI, FALSE);
-				#endif
-				#ifdef PLATA_NDD23_ 
-					write_spi_reg(i, 5, 0, RET_DATA_SPI, FALSE);
-				#endif
-				ChipSelektDIN(i, CS_OFF);
-			}
-			for(i=0; i<4; i++)
-			{
-				ChipSelektDIN(i, CS_ON);
-				write_spi_reg(i, 7, 0xFFFF, RET_DATA_SPI, FALSE);
-				ChipSelektDIN(i, CS_OFF);
-			}
-			for(i=0; i<4; i++)
-			{
-				ChipSelektDIN(i, CS_ON);
-				write_spi_reg(i, 8, 0xFFFF, RET_DATA_SPI, FALSE);
-				ChipSelektDIN(i, CS_OFF);
-			}
-			for(i=0; i<4; i++)
-			{
-				ChipSelektDIN(i, CS_ON);
-				write_spi_reg(i, 9, 0xFFFF, RET_DATA_SPI, FALSE);	// половину входов переключаем в третье состояние для получения тока 16мА
-				ChipSelektDIN(i, CS_OFF);
-			}
-			for(i=0; i<4; i++)
-			{
-				ChipSelektDIN(i, CS_ON);
-				#ifdef PLATA_NDD22_ 
-					write_spi_reg(i, 10, 0, RET_DATA_SPI, FALSE);
-				#endif
-				#ifdef PLATA_NDD23_ 
-					write_spi_reg(i, 10, 0xFFFF, RET_DATA_SPI, FALSE);
-				#endif
-				ChipSelektDIN(i, CS_OFF);
+				InitDinReg(i);
 			}
 		}
 	}
@@ -211,34 +167,7 @@ void DriverNDD()
 				if((Ndd.Init[i] == TRUE)&&(Ndd.test[i] == VALID_DIN))
 				{
 					Ndd.Init[i] = FALSE;
-					
-					ChipSelektDIN(i, CS_ON);
-					write_spi_reg(i, 1, 0, RET_DATA_SPI, FALSE);
-					ChipSelektDIN(i, CS_OFF);
-					msDelay(1);
-					ChipSelektDIN(i, CS_ON);
-					write_spi_reg(i, 4, 0xFFFF, RET_DATA_SPI, FALSE);
-					ChipSelektDIN(i, CS_OFF);
-					msDelay(1);
-					ChipSelektDIN(i, CS_ON);
-					write_spi_reg(i, 5, 0xFFFF, RET_DATA_SPI, FALSE);
-					ChipSelektDIN(i, CS_OFF);
-					msDelay(1);
-					ChipSelektDIN(i, CS_ON);
-					write_spi_reg(i, 7, 0xFFFF, RET_DATA_SPI, FALSE);
-					ChipSelektDIN(i, CS_OFF);
-					msDelay(1);
-					ChipSelektDIN(i, CS_ON);
-					write_spi_reg(i, 8, 0xFFFF, RET_DATA_SPI, FALSE);
-					ChipSelektDIN(i, CS_OFF);
-					msDelay(1);
-					ChipSelektDIN(i, CS_ON);
-					write_spi_reg(i, 9, 0xFFFF, RET_DATA_SPI, FALSE);	// половину входов переключаем в третье состояние для получения тока 16мА
-					ChipSelektDIN(i, CS_OFF);
-					msDelay(1);
-					ChipSelektDIN(i, CS_ON);
-					write_spi_reg(i, 10, 0, RET_DATA_SPI, FALSE);
-					ChipSelektDIN(i, CS_OFF);
+					InitDinReg(i);
 				}
 			}
 			//----------------------------------------		
@@ -282,13 +211,20 @@ void DriverNDD()
 				Ndd.Term[i] = digit(Ndd.State[i][0],7);
 				if(Ndd.Term[i] != 0) Ndd.test[i] = NOT_VALID_DIN;
 				
-				tmp[0]= digit(Ndd.State[i][0],2) | (digit(Ndd.State[i][0],3)<<1)|(digit(Ndd.State[i][0],4)<<2)|(digit(Ndd.State[i][0],5)<<3)
-						 |(digit(Ndd.State[i][1],6)<<4)|(digit(Ndd.State[i][1],7)<<5)|(digit(Ndd.State[i][0],0)<<6)|(digit(Ndd.State[i][0],1)<<7);
-
-				tmp[1]= digit(Ndd.State[i][2],7) | (digit(Ndd.State[i][1],0)<<1)|(digit(Ndd.State[i][1],1)<<2)|(digit(Ndd.State[i][1],2)<<3)
-						 |(digit(Ndd.State[i][2],0)<<4)|(digit(Ndd.State[i][2],1)<<5)|(digit(Ndd.State[i][2],2)<<6)|(digit(Ndd.State[i][2],3)<<7);
-
-				Ndd.Din[i] = tmp[0]&tmp[1];
+				#ifdef PLATA_NDD22_
+					tmp[0]= digit(Ndd.State[i][0],2) | (digit(Ndd.State[i][0],3)<<1)|(digit(Ndd.State[i][0],4)<<2)|(digit(Ndd.State[i][0],5)<<3)
+							 |(digit(Ndd.State[i][1],6)<<4)|(digit(Ndd.State[i][1],7)<<5)|(digit(Ndd.State[i][0],0)<<6)|(digit(Ndd.State[i][0],1)<<7);
+	
+					tmp[1]= digit(Ndd.State[i][2],7) | (digit(Ndd.State[i][1],0)<<1)|(digit(Ndd.State[i][1],1)<<2)|(digit(Ndd.State[i][1],2)<<3)
+							 |(digit(Ndd.State[i][2],0)<<4)|(digit(Ndd.State[i][2],1)<<5)|(digit(Ndd.State[i][2],2)<<6)|(digit(Ndd.State[i][2],3)<<7);
+	
+					Ndd.Din[i] = tmp[0]&tmp[1];
+				#endif
+				#ifdef PLATA_NDD23_
+					tmp[1]= digit(Ndd.State[i][2],7) | (digit(Ndd.State[i][1],0)<<1)|(digit(Ndd.State[i][1],1)<<2)|(digit(Ndd.State[i][1],2)<<3)
+							 |(digit(Ndd.State[i][2],0)<<4)|(digit(Ndd.State[i][2],1)<<5)|(digit(Ndd.State[i][2],2)<<6)|(digit(Ndd.State[i][2],3)<<7);
+					Ndd.Din[i] = ~tmp[1];
+				#endif
 			}
 				
 		/*		GoWorkAdc(0, TRUE);
@@ -412,6 +348,24 @@ void DriverNDD()
 		CreateAndSend_Pkt_UART0(&Ndd.State[0][0], 24+88, 2, 1);
 	}
 	//----------------------------------------------------
+}
+//====================================================================
+void InitDinReg(BYTE i)
+{
+	BYTE j;
+	
+	if(i>3) return;
+
+	for(j = 0; j < REG_DIN_COUNT; j++)
+	{
+		if(REG_DIN_WRITE[j])
+		{ 
+			ChipSelektDIN(i, CS_ON);
+			write_spi_reg(i, j, REG_DIN_STATE[j], RET_DATA_SPI, FALSE);
+			ChipSelektDIN(i, CS_OFF);
+			msDelay(1);
+		}
+	}
 }
 //====================================================================
 void ServiceUart(BYTE Id, BYTE* pData, WORD Len)
@@ -544,6 +498,9 @@ BYTE write_spi_reg(BYTE ch, BYTE Command, WORD Data, BYTE * ret, BYTE Test)
 	BYTE i, d;
 	
 	SendSeqDin[0] = Command;
+	SendSeqDin[1] = Data>>8;
+	SendSeqDin[2] = (BYTE)Data;
+	
 	if(ch<2)
 	{
 		for(i=0; i<3; i++)
@@ -602,7 +559,7 @@ BYTE write_spi_reg(BYTE ch, BYTE Command, WORD Data, BYTE * ret, BYTE Test)
 				TDR3 = 0;
 				while (SSR3_RDRF == 0);
 				
-				if(TestSeqDin[i] != RDR9)
+				if(TestSeqDin[i] != RDR3)
 					return FALSE;
 			}
 		}

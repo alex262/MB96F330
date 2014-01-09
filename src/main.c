@@ -93,7 +93,7 @@ void main(void)
 			#ifdef CASH_PDO_DATA
 				if(getTimer(&TimerCashCan)==0)
 				{
-					setTimer(&TimerCashCan, 30);	// обновляем данные в объектном словаре 1 раз в 20 мс
+					setTimer(&TimerCashCan, 30);	// обновляем данные в объектном словаре 1 раз в 30 мс
 					for(i=0;i<30;i++) buildPDO_CASH(0x1800+i);
 					
 					if(program.Cnt1WareDev == 0)

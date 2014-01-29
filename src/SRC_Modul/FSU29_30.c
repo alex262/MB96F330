@@ -123,7 +123,7 @@ void DriverFSU()
 	Fsu.Info.bits.Addr	=ADDR;
 	if(stStartBlock == FALSE)
 	{
-		if(getTimer(&TimerStartBlock) == 0)	// если адрес изменился в течение первой секнды то переинициализируем блок
+		if(getTimer(&TimerStartBlock) == 0)	
 		{
 			stStartBlock = TRUE;
 			

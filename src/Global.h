@@ -22,10 +22,11 @@
 #define ADDR_EEPROM_ST_PWR	0xFFF0
 //==============================================================================
 //Выбираем блок для  конкретной реализации
-#define	PLATA_KCU4
+//#define	PLATA_KCU4
 //#define	PLATA_ADC8
 //#define 	PLATA_FSU_29_30
 //#define	PLATA_NDD22
+#define	PLATA_DAC11
 //==============================================================================
 #define BUFFER_LEN_UART		300				//Размер буффера порта
 #define MAX_IN_PAK 			290				//Макcимальна  длина входящего пакета
@@ -57,6 +58,10 @@
 #ifdef 	PLATA_NDD22
 	#define	INCLUDE_H	"NDD22.h"
 	#define POWER_BLOCK_ENABLE
+	#define	NEED_WORK_CAN	2	//необходимое количество работающих CAN - для отображения индикации
+#endif
+#ifdef 	PLATA_DAC11
+	#define	INCLUDE_H		"DAC11.h"
 	#define	NEED_WORK_CAN	2	//необходимое количество работающих CAN - для отображения индикации
 #endif
 //------------------------------------------------------------------------------
@@ -190,7 +195,7 @@ extern WORD TIME_OUT_CAN;
 #define MAX(a,b)				(a>b ? a : b)
 
 extern BYTE	WATCH_DOG_CODE;		
-#define clrwdt 			//WDTCP = WATCH_DOG_CODE; WATCH_DOG_CODE = ~WATCH_DOG_CODE; // очистка WatchDog
+#define clrwdt 			WDTCP = WATCH_DOG_CODE; WATCH_DOG_CODE = ~WATCH_DOG_CODE; // очистка WatchDog
 
 #define RESET 			RCR_SRSTG = 1		//Перезагрузка микроконтроллера
 

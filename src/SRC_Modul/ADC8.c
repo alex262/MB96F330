@@ -202,7 +202,7 @@ void DriverADC8()
 	Adc8.Info.bits.Addr	=ADDR;
 	if(stStartBlock == FALSE)
 	{
-		if(getTimer(&TimerStartBlock) == 0)	// если адрес изменился в течение первой секнды то переинициализируем блок
+		if(getTimer(&TimerStartBlock) == 0)	
 		{
 			del_timer(&TimerStartBlock);
 			stStartBlock = TRUE;
@@ -277,6 +277,7 @@ void DriverADC8()
 			}
 			if(st == 1)
 			{
+				SetWorkChI2C(1);
 				HighDensPageWrite(0, (BYTE*)(&TarEEPROM), 256);
 			}
 		}
@@ -615,7 +616,7 @@ void write_spi_reg(BYTE ch, BYTE Addr, BYTE Len, BYTE * pData)
 	if(ch<2)
 	{
 		while (SSR9_TDRE == 0);		
-  		TDR9 = ADC_WREG | (Addr&0x1F);
+		TDR9 = ADC_WREG | (Addr&0x1F);
 		
 		while (SSR9_TDRE == 0);		
 		TDR9 = ((Len-1)&0x1F);

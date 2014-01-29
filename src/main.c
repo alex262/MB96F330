@@ -34,7 +34,7 @@ void main(void)
 		BYTE i;
 	#endif
 	//===================================
-	//InitWatchDog();
+	InitWatchDog();
 	I2C_Init(0);
 	I2C_Init(1);
 	

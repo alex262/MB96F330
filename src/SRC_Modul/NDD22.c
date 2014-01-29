@@ -143,7 +143,7 @@ void DriverNDD()
 			
 	if(stStartBlock == FALSE)
 	{
-		if(getTimer(&TimerStartBlock) == 0)	// если адрес изменился в течение первой секнды то переинициализируем блок
+		if(getTimer(&TimerStartBlock) == 0)	
 		{
 			//del_timer(&TimerStartBlock);
 			stStartBlock = TRUE;

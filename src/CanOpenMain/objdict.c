@@ -95,34 +95,33 @@ const proceed_info proceed_infos[] =
 	{0x23,		/*"PDO15",*/		proceedPDO},				//35	28
 	{0x24,		/*"PDO15",*/		proceedPDO},				//36	29
 	{0x25,		/*"PDO15",*/		proceedPDO},				//37	30
-	{0x26,		/*"PDO15",*/		proceedPDO}					//38	31
+	{0x26,		/*"PDO15",*/		proceedPDO},				//38	31
 
-  //{0x27,			"Unknown",		0},							//39
-  //{0x28,			"Unknown",		0},							//40
-  //{0x29,			"Unknown",		0},							//41
-  //{0x2A,			"Unknown",		0},							//42
-  //{0x2B,			"Unknown",		0},							//43
-  //{0x2C,			"Unknown",		0},							//44
-  //{0x2D,			"Unknown",		0},							//45
-  //{0x2E,			"Unknown",		0},							//46
-  //{0x2F,			"Unknown",		0},							//47
-
-  //{0x30,			"Unknown",		0},							//48
-  //{0x31,			"Unknown",		0},							//49
-  //{0x32,			"Unknown",		0},							//50
-  //{0x33,			"Unknown",		0},							//51
-  //{0x34,			"Unknown",		0},							//52
-  //{0x35,			"Unknown",		0},							//53
-  //{0x36,			"Unknown",		0},							//54
-  //{0x37,			"Unknown",		0},							//55
-  //{0x38,			"Unknown",		0},							//56
-  //{0x39,			"Unknown",		0},							//57
-  //{0x3A,			"Unknown",		0},							//58
-  //{0x3B,			"Unknown",		0},							//59
-  //{0x3C,			"Unknown",		0},							//60
-  //{0x3D,			"Unknown",		0},							//61
-  //{0x3E,			"Unknown",		0},							//62
-  //{0x3F,			"Unknown",		0},							//63
+	{0x27,	/*	"Unknown",*/		0},							//39
+	{0x28,	/*	"Unknown",*/		0},							//40
+	{0x29,	/*	"Unknown",*/		0},							//41
+	{0x2A,	/*	"Unknown",*/		0},							//42
+	{0x2B,	/*	"Unknown",*/		0},							//43
+	{0x2C,	/*	"Unknown",*/		0},							//44
+	{0x2D,	/*	"Unknown",*/		0},							//45
+	{0x2E,	/*	"Unknown",*/		0},							//46
+	{0x2F,	/*	"Unknown",*/		0},							//47
+	{0x30,	/*	"Unknown",*/		0},							//48
+	{0x31,	/*	"Unknown",*/		0},							//49
+	{0x32,	/*	"Unknown",*/		0},							//50
+	{0x33,	/*	"Unknown",*/		0},							//51
+	{0x34,	/*	"Unknown",*/		0},							//52
+	{0x35,	/*	"Unknown",*/		0},							//53
+	{0x36,	/*	"Unknown",*/		0},							//54
+	{0x37,	/*	"Unknown",*/		0},							//55
+	{0x38,	/*	"Unknown",*/		0},							//56
+	{0x39,	/*	"Unknown",*/		0},							//57
+	{0x3A,	/*	"Unknown",*/		0},							//58
+	{0x3B,	/*	"Unknown",*/		0},							//59
+	{0x3C,	/*	"Unknown",*/		0},							//60
+	{0x3D,	/*	"Unknown",*/		0},							//61
+	{0x3E,	/*	"Unknown",*/		ServiceObmenData},			//62
+	{0x3F,	/*	"Unknown",*/		ServiceMaster}				//63
 };
 const UNS8 Num_Proc_Max=sizeof(proceed_infos)/sizeof(proceed_info)-1;
 

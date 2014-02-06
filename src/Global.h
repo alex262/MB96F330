@@ -237,7 +237,7 @@ typedef struct
 	
 	WORD	COUNT;
 	
-	BYTE	Cnt1WareDev;
+	BYTE	Cnt1WareDev;							// количество найденых устройств
 	BYTE	SN_1Ware_Dev[MAX_COUNT_1WARE_DEV][8];	// серийные номера устройств на шине 1Ware 
 	
 	WORD	WatchDogRam;	

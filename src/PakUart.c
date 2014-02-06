@@ -5,46 +5,48 @@
 
 //--------------------------------------------------------------------------------
 #define TEST_UART_FIFO_RX_SIZE	128
-#define TEST_UART_FIFO_TX_SIZE	128
+#define TEST_UART_FIFO_TX_SIZE	256
 
 #define nOurID 1
 
-static BYTE fifo_rx_test[TEST_UART_FIFO_RX_SIZE];
-static BYTE fifo_tx_test[TEST_UART_FIFO_TX_SIZE];
+static BYTE fifo_rx_buf[TEST_UART_FIFO_RX_SIZE];
+static BYTE fifo_tx_buf[TEST_UART_FIFO_TX_SIZE];
 
-static fifo_desc_t fifo_test_rx;
-static fifo_desc_t fifo_test_tx;
+static fifo_desc_t fifo_rx_desk;
+static fifo_desc_t fifo_tx_desk;
 
 static BYTE sSend0Empty = TRUE;
 
-//--------------------------------------------------------------------------------
+//=======================================================================
 void InitServiceUart0(void)
 {
-	fifo_init(&fifo_test_rx, &fifo_rx_test,TEST_UART_FIFO_RX_SIZE);
-	fifo_flush(&fifo_test_rx);
-	fifo_init(&fifo_test_tx, &fifo_tx_test,TEST_UART_FIFO_TX_SIZE);
-	fifo_flush(&fifo_test_tx);
+	fifo_init(&fifo_rx_desk, &fifo_rx_buf, TEST_UART_FIFO_RX_SIZE);
+	fifo_flush(&fifo_rx_desk);
+	
+	fifo_init(&fifo_tx_desk, &fifo_tx_buf, TEST_UART_FIFO_TX_SIZE);
+	fifo_flush(&fifo_rx_desk);
+	
 	UART_RX_IntSet(0, TRUE);
 	sSend0Empty = TRUE;
 }
-
+//=======================================================================
 void IRQ_RX0(BYTE data)
 {
-	fifo_push_uint8(&fifo_test_rx, data);
+	fifo_push_uint8(&fifo_rx_desk, data);
 }
 #pragma inline IRQ_RX0
-
+//=======================================================================
 BYTE GetRxByte(BYTE * data)
 {
-	return fifo_pull_uint8(&fifo_test_rx, data);
+	return fifo_pull_uint8(&fifo_rx_desk, data);
 }
 #pragma inline GetRxByte
-
+//=======================================================================
 BYTE IRQ_TX0(void)
 {
 	BYTE data;
 	
-	if(fifo_pull_uint8(&fifo_test_tx, &data) == FIFO_OK)
+	if(fifo_pull_uint8(&fifo_tx_desk, &data) == FIFO_OK)
 	{
 		TDR0 = data;	// put ch into buffer
 		return TRUE;
@@ -58,9 +60,35 @@ BYTE IRQ_TX0(void)
 	}
 }
 //=======================================================================
+void StartSend0(void)
+{
+	BYTE data;
+	if(sSend0Empty == TRUE)
+	{
+		if(fifo_pull_uint8(&fifo_tx_desk, &data) == FIFO_OK)
+		{
+			TDR0 = data;	// put ch into buffer
+			sSend0Empty = FALSE;
+			UART_TX_IntSet(0, TRUE); // start send
+		}
+	}
+}
+//=======================================================================
 void AddDataToSend0(BYTE * pData, WORD Len)
 {
 	while(Len>0)
+	{
+		DisInterrupt();
+		if(fifo_push_uint8(&fifo_tx_desk, *pData) == FIFO_OK)
+		{
+			pData++;
+			Len--;
+		}
+		EnInterrupt();
+		clrwdt;
+	}
+	
+	/*while(Len>0)
 	{
 		DisInterrupt();
 		if(sSend0Empty == TRUE)
@@ -71,7 +99,7 @@ void AddDataToSend0(BYTE * pData, WORD Len)
 			Len--;
 		}else
 		{
-			if(fifo_push_uint8(&fifo_test_tx, *pData) == 0)
+			if(fifo_push_uint8(&fifo_tx_desk, *pData) == FIFO_OK)
 			{
 				pData++;
 				Len--;
@@ -80,7 +108,7 @@ void AddDataToSend0(BYTE * pData, WORD Len)
 		}
 		UART_TX_IntSet(0, TRUE);
 		EnInterrupt();
-	}
+	}*/
 }
 //=======================================================================
 WORD Calc(BYTE H,BYTE L)
@@ -90,7 +118,7 @@ WORD Calc(BYTE H,BYTE L)
 	return N;
 }
 #pragma inline Calc
-
+//=======================================================================
 WORD CRC( BYTE *sBuf, WORD nLen )
 {
 	WORD i,CRC = 0;
@@ -102,17 +130,16 @@ WORD CRC( BYTE *sBuf, WORD nLen )
 	return CRC;
 }
 #pragma inline CRC
-
 //=======================================================================
+BYTE tx_pak_uart[6];
 void CreateAndSend_Pkt_UART0(U8 *sDataBuf, U16 nLen, U8 nReceiver, U8 nCodOp)
 {
 	U16 nCRC;
-//	BYTE tx_pak_uart[6];
 		
 	nCRC=nReceiver+(U8)((nLen)&0x00FF)+(U8)(((nLen)&0xFF00)>>8);
 	nCRC+=nCodOp+nOurID+1;
 	
-/*	tx_pak_uart[0] = 0x81;
+	tx_pak_uart[0] = 0x81;
 	tx_pak_uart[1] = nReceiver;			
 	tx_pak_uart[2] = nOurID;			
 	tx_pak_uart[3] = (U8)((nLen+1)&0x00FF);	
@@ -130,57 +157,8 @@ void CreateAndSend_Pkt_UART0(U8 *sDataBuf, U16 nLen, U8 nReceiver, U8 nCodOp)
 	tx_pak_uart[3] = 0x0;	
 
 	AddDataToSend0(tx_pak_uart, 4);
-*/	
-	
-	putch(0x81);
-	putch(nReceiver);			
-	putch(nOurID);			
-	putch((U8)((nLen+1)&0x00FF));	
-	putch((U8)(((nLen+1)&0xFF00)>>8));
-	putch(nCodOp);					
-	
-	nCRC += CRC(sDataBuf,nLen);
-	while(nLen)
-	{
-		putch(*sDataBuf);
-		nLen--;
-		sDataBuf++;
-	}
-	
-	
-	putch((U8)(nCRC&0x00FF));
-	putch((U8)((nCRC&0xFF00)>>8));
-	putch(0x81);						
-	putch(0x0);	
+	StartSend0();
 }
-//=======================================================================
-/*void Send_Pkt(BYTE nCH,BYTE *sDataBuf,WORD nLen,BYTE nReceiver,BYTE nCodOp)
-{
-	WORD nCRC,i;
-	
-	nCRC=nReceiver+(BYTE)((nLen)&0x00FF)+(BYTE)(((nLen)&0xFF00)>>8);
-	nCRC+=nCodOp+nOurID+1;
-	
-	Putch_N(nCH,0x81);				//				[0]
-	Putch_N(nCH,nReceiver);			//Кому			[1]
-	Putch_N(nCH,nOurID);			//Наш адрес		[2]
-	Putch_N(nCH,(BYTE)((nLen+1)&0x00FF));	//		[3]          
-	Putch_N(nCH,(BYTE)(((nLen+1)&0xFF00)>>8));//	[4]   
-    Putch_N(nCH,nCodOp);					//		[5]	
-
-	for(i=0;i<nLen; i++)
-	{
-		Putch_N(nCH,sDataBuf[i]);			//		[6]
-		clrwdt;
-	}
-	nCRC += CRC(sDataBuf,nLen);
-
-	Putch_N(nCH,(BYTE)(nCRC&0x00FF));         	//	[nLen+6]
-	Putch_N(nCH,(BYTE)((nCRC&0xFF00)>>8));  	//	[nLen+7]
-	Putch_N(nCH,0x81);							//	[nLen+8]
-	Putch_N(nCH,0x0);							//	[nLen+9]
-}
-*/
 //=======================================================================
 
 //----------------------------------------------------------------------------------------------
@@ -229,8 +207,6 @@ void GetPak_Uart(WORD * CountByte, BYTE * pData)
 								//=======================================================================================
 								case 0xFE:	// запрос SN
 								{	
-									//program.Cnt1WareDev;
-	
 									CreateAndSend_Pkt_UART0(&program.Cnt1WareDev, 1+8*program.Cnt1WareDev, nOurID, 0xFE);
 									//---------------------
 									(*CountByte)-= nLen;
@@ -296,3 +272,51 @@ void GetPak_Uart(WORD * CountByte, BYTE * pData)
 		}
 	}
 }
+/*void Send_Pkt(BYTE nCH,BYTE *sDataBuf,WORD nLen,BYTE nReceiver,BYTE nCodOp)
+{
+	WORD nCRC,i;
+	
+	nCRC=nReceiver+(BYTE)((nLen)&0x00FF)+(BYTE)(((nLen)&0xFF00)>>8);
+	nCRC+=nCodOp+nOurID+1;
+	
+	Putch_N(nCH,0x81);				//				[0]
+	Putch_N(nCH,nReceiver);			//Кому			[1]
+	Putch_N(nCH,nOurID);			//Наш адрес		[2]
+	Putch_N(nCH,(BYTE)((nLen+1)&0x00FF));	//		[3]          
+	Putch_N(nCH,(BYTE)(((nLen+1)&0xFF00)>>8));//	[4]   
+    Putch_N(nCH,nCodOp);					//		[5]	
+
+	for(i=0;i<nLen; i++)
+	{
+		Putch_N(nCH,sDataBuf[i]);			//		[6]
+		clrwdt;
+	}
+	nCRC += CRC(sDataBuf,nLen);
+
+	Putch_N(nCH,(BYTE)(nCRC&0x00FF));         	//	[nLen+6]
+	Putch_N(nCH,(BYTE)((nCRC&0xFF00)>>8));  	//	[nLen+7]
+	Putch_N(nCH,0x81);							//	[nLen+8]
+	Putch_N(nCH,0x0);							//	[nLen+9]
+}
+	//====================================
+	putch(0x81);
+	putch(nReceiver);			
+	putch(nOurID);			
+	putch((U8)((nLen+1)&0x00FF));	
+	putch((U8)(((nLen+1)&0xFF00)>>8));
+	putch(nCodOp);					
+	
+	nCRC += CRC(sDataBuf,nLen);
+	while(nLen)
+	{
+		putch(*sDataBuf);
+		nLen--;
+		sDataBuf++;
+	}
+	
+	
+	putch((U8)(nCRC&0x00FF));
+	putch((U8)((nCRC&0xFF00)>>8));
+	putch(0x81);						
+	putch(0x0);	*/
+//=======================================================================

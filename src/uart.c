@@ -325,7 +325,7 @@ __interrupt void irq_uart0_rx(void)
 		SCR0_TXE = 1;
 	}
 	ch = RDR0;
-	ESIR0 = 0x01;
+	//ESIR0 = 0x01;
 	
 	IRQ_RX0(ch);
 	//===========================================
@@ -362,7 +362,7 @@ __interrupt void irq_uart1_rx(void)
 		SCR1_TXE = 1;
 	}
 	ch = RDR1;
-	ESIR1 = 0x01;
+	//ESIR1 = 0x01;
 }
 __interrupt void irq_uart2_rx(void)
 {
@@ -375,7 +375,7 @@ __interrupt void irq_uart2_rx(void)
 		SCR2_TXE = 1;
 	}
 	ch = RDR2;
-	ESIR2 = 0x01;
+	//ESIR2 = 0x01;
 }
 __interrupt void irq_uart3_rx(void)
 {
@@ -388,7 +388,7 @@ __interrupt void irq_uart3_rx(void)
 		SCR3_TXE = 1;
 	}
 	ch = RDR3;
-	ESIR3 = 0x01;
+	//ESIR3 = 0x01;
 }
 __interrupt void irq_uart5_rx(void)
 {
@@ -401,7 +401,7 @@ __interrupt void irq_uart5_rx(void)
 		SCR5_TXE = 1;
 	}
 	ch = RDR5;
-	ESIR5 = 0x01;
+	//ESIR5 = 0x01;
 }
 __interrupt void irq_uart7_rx(void)
 {
@@ -414,7 +414,7 @@ __interrupt void irq_uart7_rx(void)
 		SCR7_TXE = 1;
 	}
 	ch = RDR7;
-	ESIR7 = 0x01;
+	//ESIR7 = 0x01;
 }
 __interrupt void irq_uart8_rx(void)
 {
@@ -427,7 +427,7 @@ __interrupt void irq_uart8_rx(void)
 		SCR8_TXE = 1;
 	}
 	ch = RDR8;
-	ESIR8 = 0x01;
+	//ESIR8 = 0x01;
 }
 __interrupt void irq_uart9_rx(void)
 {
@@ -440,7 +440,7 @@ __interrupt void irq_uart9_rx(void)
 		SCR9_TXE = 1;
 	}
 	ch = RDR9;
-	ESIR9 = 0x01;
+//	ESIR9 = 0x01;
 }
 
 /*****************************************************************************

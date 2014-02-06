@@ -38,7 +38,8 @@ void InitSPI_1_inv(void)
 	DDR07_D6	= 1;	// SOT9 = output
 	DDR07_D5	= 1;	// SCLK = output
 
-	BGR9		= 47;	// 1M Baud @ 48 MHz
+	//BGR9		= 47;	// 1M Baud @ 48 MHz
+	BGR9		= 23;	// 2M Baud @ 48 MHz
 	SCR9		= 0x03;	// reception and transmission enable
 	SSR9		= 0x04;	// MSB first, no interrupts
 	SMR9		= 0x83;	// Mode 2, SCLK enable, SOT enable
@@ -73,7 +74,8 @@ void InitSPI_2_inv(void)
 	DDR01_D3	= 1;	// SOT3 = output
 	DDR01_D4	= 1;	// SCLK = output
 
-	BGR3		= 47;	// 1M Baud @ 48 MHz
+	//BGR3		= 47;	// 1M Baud @ 48 MHz
+	BGR3		= 23;	// 2M Baud @ 48 MHz
 	SCR3		= 0x03;	// reception and transmission enable
 	SSR3		= 0x04;	// MSB first, no interrupts
 	SMR3		= 0x83;	// Mode 2, SCLK enable, SOT enable

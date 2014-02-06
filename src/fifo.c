@@ -13,7 +13,7 @@
 
 #include "fifo.h"
 
-void fifo_init(fifo_desc_t *fifo_desc, void *buffer, BYTE size)
+void fifo_init(fifo_desc_t *fifo_desc, void *buffer, WORD size)
 {
 	// Check the size parameter. It must be a 2-power.
 	//Assert ((!size) || (size & (size - 1)));
@@ -98,7 +98,7 @@ uint8_t fifo_is_full(fifo_desc_t *fifo_desc)
  */
 void fifo_push_uint8_nocheck(fifo_desc_t *fifo_desc, uint8_t item)
 {
-	uint8_t write_index;
+	uint16_t write_index;
 
 	write_index = fifo_desc->write_index;
 	fifo_desc->buffer.u8ptr[write_index & (fifo_desc->mask >> 1)] = item;
@@ -123,7 +123,7 @@ void fifo_push_uint8_nocheck(fifo_desc_t *fifo_desc, uint8_t item)
  */
 int8_t fifo_push_uint8(fifo_desc_t *fifo_desc, uint8_t item)
 {
-	uint8_t write_index;
+	uint16_t write_index;
 
 	if (fifo_is_full(fifo_desc)) {
 		return FIFO_ERROR_OVERFLOW;
@@ -149,7 +149,7 @@ int8_t fifo_push_uint8(fifo_desc_t *fifo_desc, uint8_t item)
  */
 void fifo_push_uint16_nocheck(fifo_desc_t *fifo_desc, uint16_t item)
 {
-	uint8_t write_index;
+	uint16_t write_index;
 
 	write_index = fifo_desc->write_index;
 	fifo_desc->buffer.u16ptr[write_index & (fifo_desc->mask >> 1)] = item;
@@ -174,7 +174,7 @@ void fifo_push_uint16_nocheck(fifo_desc_t *fifo_desc, uint16_t item)
  */
 int8_t fifo_push_uint16(fifo_desc_t *fifo_desc, uint16_t item)
 {
-	uint8_t write_index;
+	uint16_t write_index;
 
 	if (fifo_is_full(fifo_desc)) {
 		return FIFO_ERROR_OVERFLOW;
@@ -200,7 +200,7 @@ int8_t fifo_push_uint16(fifo_desc_t *fifo_desc, uint16_t item)
  */
 void fifo_push_uint32_nocheck(fifo_desc_t *fifo_desc, uint32_t item)
 {
-	uint8_t write_index;
+	uint16_t write_index;
 
 	write_index = fifo_desc->write_index;
 	fifo_desc->buffer.u32ptr[write_index & (fifo_desc->mask >> 1)] = item;
@@ -225,7 +225,7 @@ void fifo_push_uint32_nocheck(fifo_desc_t *fifo_desc, uint32_t item)
  */
 int8_t fifo_push_uint32(fifo_desc_t *fifo_desc, uint32_t item)
 {
-	uint8_t write_index;
+	uint16_t write_index;
 
 	if (fifo_is_full(fifo_desc)) {
 		return FIFO_ERROR_OVERFLOW;
@@ -252,7 +252,7 @@ int8_t fifo_push_uint32(fifo_desc_t *fifo_desc, uint32_t item)
  */
 uint8_t fifo_pull_uint8_nocheck(fifo_desc_t *fifo_desc)
 {
-	uint8_t read_index;
+	uint16_t read_index;
 	BYTE item;
 
 	read_index = fifo_desc->read_index;
@@ -280,7 +280,7 @@ uint8_t fifo_pull_uint8_nocheck(fifo_desc_t *fifo_desc)
  */
 int8_t fifo_pull_uint8(fifo_desc_t *fifo_desc, uint8_t *item)
 {
-	uint8_t read_index;
+	uint16_t read_index;
 
 	if (fifo_is_empty(fifo_desc)) {
 		return FIFO_ERROR_UNDERFLOW;
@@ -308,7 +308,7 @@ int8_t fifo_pull_uint8(fifo_desc_t *fifo_desc, uint8_t *item)
  */
 uint16_t fifo_pull_uint16_nocheck(fifo_desc_t *fifo_desc)
 {
-	uint8_t read_index;
+	uint16_t read_index;
 	uint16_t item;
 
 	read_index = fifo_desc->read_index;
@@ -336,7 +336,7 @@ uint16_t fifo_pull_uint16_nocheck(fifo_desc_t *fifo_desc)
  */
 int8_t fifo_pull_uint16(fifo_desc_t *fifo_desc, uint16_t *item)
 {
-	uint8_t read_index;
+	uint16_t read_index;
 
 	if (fifo_is_empty(fifo_desc)) {
 		return FIFO_ERROR_UNDERFLOW;
@@ -363,7 +363,7 @@ int8_t fifo_pull_uint16(fifo_desc_t *fifo_desc, uint16_t *item)
  */
 uint32_t fifo_pull_uint32_nocheck(fifo_desc_t *fifo_desc)
 {
-	uint8_t read_index;
+	uint16_t read_index;
 	uint32_t item;
 
 	read_index = fifo_desc->read_index;
@@ -391,7 +391,7 @@ uint32_t fifo_pull_uint32_nocheck(fifo_desc_t *fifo_desc)
  */
 int8_t fifo_pull_uint32(fifo_desc_t *fifo_desc, uint32_t *item)
 {
-	uint8_t read_index;
+	uint16_t read_index;
 
 	if (fifo_is_empty(fifo_desc)) {
 		return FIFO_ERROR_UNDERFLOW;

@@ -47,29 +47,36 @@ struct fifo_desc {
 		uint16_t	*u16ptr; //!< Pointer to unsigned-16 bits location
 		uint8_t		*u8ptr;  //!< Pointer to unsigned-8 bits location
 	}  buffer;
-	volatile uint8_t read_index;  //!< Read index
-	volatile uint8_t write_index; //!< Write index
-	uint8_t size;                 //!< Size of the FIFO (unit is in number of 'element')
-	uint8_t mask;                 //!< Mask used to speed up FIFO operation (wrapping)
+	volatile uint16_t read_index;  //!< Read index
+	volatile uint16_t write_index; //!< Write index
+	uint16_t size;                 //!< Size of the FIFO (unit is in number of 'element')
+	uint16_t mask;                 //!< Mask used to speed up FIFO operation (wrapping)
 };
 
 typedef struct fifo_desc fifo_desc_t;
 
-/**
- *  \brief Initializes a new software FIFO for a certain 'size'.
- *
- *  \pre Both fifo descriptor and buffer must be allocated by the caller before.
- *
- *  \param fifo_desc  Pointer on the FIFO descriptor.
- *  \param buffer     Pointer on the FIFO buffer.
- *  \param size       Size of the buffer (unit is in number of 'elements').
- *                    It must be a 2-power and <= to 128.
- *
- *  \return Status
- *    \retval FIFO_OK when no error occurred.
- *    \retval FIFO_ERROR when the size is not a 2-power.
- */
-void fifo_init(fifo_desc_t *fifo_desc, void *buffer, uint8_t size);
+void fifo_init(fifo_desc_t *fifo_desc, void *buffer, uint16_t size);
+uint8_t fifo_get_used_size(fifo_desc_t *fifo_desc);
+uint8_t fifo_get_free_size(fifo_desc_t *fifo_desc);
+uint8_t fifo_is_empty(fifo_desc_t *fifo_desc);
+uint8_t fifo_is_full(fifo_desc_t *fifo_desc);
+void fifo_push_uint8_nocheck(fifo_desc_t *fifo_desc, uint8_t item);
+int8_t fifo_push_uint8(fifo_desc_t *fifo_desc, uint8_t item);
+void fifo_push_uint16_nocheck(fifo_desc_t *fifo_desc, uint16_t item);
+int8_t fifo_push_uint16(fifo_desc_t *fifo_desc, uint16_t item);
+void fifo_push_uint32_nocheck(fifo_desc_t *fifo_desc, uint32_t item);
+int8_t fifo_push_uint32(fifo_desc_t *fifo_desc, uint32_t item);
+uint8_t fifo_pull_uint8_nocheck(fifo_desc_t *fifo_desc);
+int8_t fifo_pull_uint8(fifo_desc_t *fifo_desc, uint8_t *item);
+uint16_t fifo_pull_uint16_nocheck(fifo_desc_t *fifo_desc);
+int8_t fifo_pull_uint16(fifo_desc_t *fifo_desc, uint16_t *item);
+uint32_t fifo_pull_uint32_nocheck(fifo_desc_t *fifo_desc);
+int8_t fifo_pull_uint32(fifo_desc_t *fifo_desc, uint32_t *item);
+uint32_t fifo_peek_uint32(fifo_desc_t *fifo_desc);
+uint16_t fifo_peek_uint16(fifo_desc_t *fifo_desc);
+uint8_t fifo_peek_uint8(fifo_desc_t *fifo_desc);
+void fifo_flush(fifo_desc_t *fifo_desc);
+
 
 /*uint8_t fifo_get_used_size(fifo_desc_t *fifo_desc);
 uint8_t fifo_get_free_size(fifo_desc_t *fifo_desc);

@@ -7,22 +7,22 @@
 #include "fifo.h"
 #include "i2c.h"
 #include "spi.h"
-#include "can.h"
 
 #ifdef PLATA_DAC11
 
 #include "dac11.h"
 
 const char SoftwareVer[20] = { __TIME__" " __DATE__}; 
-
 //====================================================================
 static TYPE_DATA_TIMER TimerStartBlock = 1000/TIMER_RESOLUTION_MS;
 static BYTE stStartBlock = FALSE;
 //==============================================================================
 //Максимальное значение которое можно записать в ЦАП 
 //Минимальное значение которое можно записать в ЦАП    
-const static float	MinValueDac[COUNT_DAC_CH] = {4.0,   4.0,  4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0};
-const static float	MaxValueDac[COUNT_DAC_CH] = {20.0, 20.0, 20.0, 20.0,20.0,20.0,20.0,20.0,20.0,20.0,20.0,20.0};
+//const static float	MinValueDac[COUNT_DAC_CH] = {4.0,   4.0,  4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0};
+//const static float	MaxValueDac[COUNT_DAC_CH] = {20.0, 20.0, 20.0, 20.0,20.0,20.0,20.0,20.0,20.0,20.0,20.0,20.0};
+const static float	MinValueDac[COUNT_DAC_CH] = {0,   0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+const static float	MaxValueDac[COUNT_DAC_CH] = {4000.0, 4000.0, 4000.0, 4000.0,4000.0,4000.0,4000.0,4000.0,4000.0,4000.0,4000.0,4000.0};
 //==============================================================================
 CDAC11 Dac11;
 //==============================================================================
@@ -37,25 +37,23 @@ void	(*SERVICE_PAK_UART)(BYTE, BYTE*, WORD) = ServiceUart;
 WORD TIME_WAIT_SELECT_MASTER = 30/TIMER_RESOLUTION_MS;				// Время задержки перед выставлением статуса мастер
 WORD TIME_WAIT_SELECT_MASTER_IF_ERROR = 3000/TIMER_RESOLUTION_MS;	// Время задержки перед выставлением статуса мастер при наличии ощибок и отсутствия другого мастера на шине
 float	dERR_DAC_mA = 0.05;											//Погрешность измерения ЦАП ->АЦП
-
-TTar	TarrRAM_DAC[COUNT_DAC_CH];	// Тарировки ЦАПа скопированные в RAM  
-TTar	TarrEEPROM_DAC[COUNT_DAC_CH];	// тарировки каналов в EEPROM
-
+//==============================================================================
+TTar	TarrRAM[2*COUNT_DAC_CH];		// Тарировки ЦАПа и АЦП скопированные в RAM  
+TTar	TarrEEPROM[2*COUNT_DAC_CH];		// тарировки каналов в EEPROM
+//==============================================================================
+#define SETTING_7	0x57	// настройки цапа
+//==============================================================================
 TPAK_SPI_RM		pak_spi_rm;
 TPAK_SPI_ADC	pak_spi_adc;
 TPAK_SPI_DAC	pak_spi_dac;
-
+//==============================================================================
 BYTE	Spi_Buf_In[20];
 BYTE	Spi_Buf_Out[20];
-
-WORD Wait5ms = 5/TIMER_RESOLUTION_MS;
-WORD Wait1ms = 1/TIMER_RESOLUTION_MS;
-
-WORD PeriodDout	= 2/TIMER_RESOLUTION_MS;
-
-WORD PeriodOprosDin		= 25/TIMER_RESOLUTION_MS;
-WORD PeriodOprosAin		= 20/TIMER_RESOLUTION_MS;
-WORD PeriodOprosTemp	= 1000/TIMER_RESOLUTION_MS;
+//==============================================================================
+const WORD PeriodDout			= 2/TIMER_RESOLUTION_MS;
+const WORD PeriodOprosDin		= 25/TIMER_RESOLUTION_MS;
+const WORD PeriodOprosAin		= 20/TIMER_RESOLUTION_MS;
+const WORD PeriodOprosTemp		= 1000/TIMER_RESOLUTION_MS;
 //==============================================================================
 void Operate_Max1329_DAC_Write(BYTE Num, BYTE ch, WORD data);
 void Operate_Max1329_ADC_Convert(BYTE Num, BYTE Mux, BYTE Gain, BYTE Bip);
@@ -63,13 +61,78 @@ void Operate_Max1329_RegMode(BYTE Num, BYTE RW, BYTE Adr, BYTE Count);
 WORD Operate_Max1329_DAC_Read(BYTE Num, BYTE ch);
 void Operate_Max1329_Reset(BYTE Num);
 void Operate_Max1329_RegMode_Mask(WORD Mask, BYTE Adr, BYTE Count);// только запись
-
+//==============================================================================
 void SelectAll_DAC(void);
 void UnSelectAll_DAC(void);
 void SelectSPI_DAC(BYTE ch);
 void SelectMask_DAC(WORD Mask);
 void SelectMasterDAC(void);
 //------------------------------------------------------------------------------
+static BYTE	SerN[3][8];	// серийные номера тройки блоков, по днулевым индексом свой
+static BYTE CountBl=0;	// количество увиденных блоков, минимум один мы
+static WORD CounterPingBlock[2];
+
+BYTE ServiceMaster(BYTE bus_id, Message *m)
+{
+	BYTE i, st;
+	if(CountBl == 0)
+	{
+		CountBl = 1;
+		if(program.Cnt1WareDev > 0)
+		{
+			for(i=0; i<8; i++)
+				SerN[0][i] = program.SN_1Ware_Dev[0][i];
+		}else
+		{
+			for(i=0; i<8; i++)
+				SerN[0][i] = 0;
+		}
+	}
+	if(m->len == 8)
+	{
+		if(CountBl == 1)
+		{
+			for(i=0; i<8; i++)
+				SerN[CountBl][i] = m->data[i];
+			CountBl++;
+		}
+		if(CountBl == 2)
+		{
+			// сначала проверим с уже принятым серийником
+			st = 0;
+			for(i=0; i<8; i++)
+			{
+				if(SerN[1][i] != m->data[i]) st = 1; 
+			}
+			if(st = 1)
+			{
+				for(i=0; i<8; i++)
+					SerN[CountBl][i] = m->data[i];
+				CountBl++;
+			}
+		}
+		if(CountBl == 3) // контролируем наличие блоков на линии
+		{
+			st = 0;
+			for(i=0; i<8; i++)
+			{
+				if(SerN[1][i] != m->data[i]) st = 1; 
+			}
+			if(st == 0) CounterPingBlock[0]++;	//пришол пинг 
+			st = 0;
+			for(i=0; i<8; i++)
+			{
+				if(SerN[2][i] != m->data[i]) st = 1; 
+			}
+			if(st == 0) CounterPingBlock[1]++;	//пришол пинг 
+		}
+	}
+	return 0;
+}
+BYTE ServiceObmenData(BYTE bus_id, Message *m)
+{
+	return 0;
+}
 //------------------------------------------------------------------------------
 void InitDAC11(void)
 {
@@ -85,10 +148,11 @@ void InitDAC11(void)
 	//==========================================
 	for(i=0;i<COUNT_DAC_CH;i++)
 	{
-		Dac11.fDAC_New[i]	=i;
-		Dac11.fDAC_Set[i]	=COUNT_DAC_CH-i;
+		Dac11.fDAC_New[i]	=0;
+		Dac11.fDAC_Set[i]	=0;
 	}
 	//==========================================
+	Dac11.EnOutDac		= 0;
 	Dac11.Info.word		= 0;
 	Dac11.WriteTar		= 0;
 	Dac11.Master		= false;
@@ -100,16 +164,20 @@ void InitDAC11(void)
 	Dac11.TimerMasterError=0;
 	Dac11.wOldError		= 0;
 	Dac11.wError		= 0;
+	Dac11.DiagDAC		= 0;
 	//==========================================
 	Dac11.SendPak		= FALSE;
 	Dac11.SendPakTar	= FALSE;
 	//==========================================
 	Dac11.TimerDout = 0;
 	Dac11.TimerAin  = 0;
-	TimerStartBlock = 1000/TIMER_RESOLUTION_MS;
+	Dac11.TimerTemp = 100;
+	Dac11.TimerDin	= 0;
 	add_timer(&TimerStartBlock);
 	add_timer(&Dac11.TimerDout);
 	add_timer(&Dac11.TimerAin);
+	add_timer(&Dac11.TimerTemp);
+	add_timer(&Dac11.TimerDin);
 	//==========================================
 	InitSPI_1_inv();
 	InitSPI_2_inv();
@@ -200,7 +268,7 @@ void SelectSPI_DAC(BYTE ch)
 }
 //========================================================================
 //Масштабирование записываемого значения запись в ЦАП     --
-//==========================================================
+//========================================================================
 void WriteNormalDataDac(BYTE ch, float data)
 {
 	float res;
@@ -208,7 +276,7 @@ void WriteNormalDataDac(BYTE ch, float data)
 
 	if(ch>(COUNT_DAC_CH-1)) return;
 
-	res=TarrRAM_DAC[ch].k*data+TarrRAM_DAC[ch].ofs;
+	res=TarrRAM[ch].k*data+TarrRAM[ch].ofs;
 
 	if(res>MAX_COD_DAC) res=(float)MAX_COD_DAC;
 	if(res<MIN_COD_DAC) res=(float)MIN_COD_DAC;
@@ -235,30 +303,35 @@ void DriverDAC11(void)
 			//========================================================
 			// Читаем тарировки из EEPROM в RAM
 			SetWorkChI2C(1);
-			HighDensSequentialRead(0, (BYTE *)(&TarrRAM_DAC),8*COUNT_DAC_CH);
+			HighDensSequentialRead(0, (BYTE *)(&TarrRAM),2*8*COUNT_DAC_CH);
 			st =0;
 			
+			for(i=0; i<2*COUNT_DAC_CH; i++)
+			{
+				if((check_NaN_Inf(TarrRAM[i].k)) == TRUE)
+				{
+					TarrRAM[i].k = 1.0;
+					st = 1;
+				}
+				if(check_NaN_Inf(TarrRAM[i].ofs) == TRUE)
+				{
+					TarrRAM[i].ofs = 0.0;
+					st = 1;
+				}
+				TarrEEPROM[i].k		= TarrRAM[i].k;
+				TarrEEPROM[i].ofs	= TarrRAM[i].ofs;
+			}
+			
+			if(st == 1)	HighDensPageWrite(0, (BYTE*)(&TarrRAM), 2*8*COUNT_DAC_CH);
+			
+			//=============================================================
+			// если хотябы один цап имеет ед тарировки разрешаем коммм реле
+			Dac11.TarrStatus		=true;
 			for(i=0; i<COUNT_DAC_CH; i++)
 			{
-				if((check_NaN_Inf(TarrRAM_DAC[i].k)) == TRUE)
-				{
-					TarrRAM_DAC[i].k = 1.0;
-					st = 1;
-				}
-				if(check_NaN_Inf(TarrRAM_DAC[i].ofs) == TRUE)
-				{
-					TarrRAM_DAC[i].ofs = 0.0;
-					st = 1;
-				}
-				TarrEEPROM_DAC[i].k		= TarrRAM_DAC[i].k;
-				TarrEEPROM_DAC[i].ofs	= TarrRAM_DAC[i].ofs;
+				if(TarrRAM[i].k == 1.0)
+					Dac11.TarrStatus = false;
 			}
-			if(st == 1)
-			{
-				HighDensPageWrite(0, (BYTE*)(&TarrRAM_DAC), 8*COUNT_DAC_CH);
-				Dac11.TarrStatus		=false;
-			}
-			//========================================================
 			//=============================================================
 			// Reset всех ЦАПов
 			Operate_Max1329_Reset(0xFF);
@@ -276,17 +349,20 @@ void DriverDAC11(void)
 			
 			
 			// инициализируем АЦП
-			Spi_Buf_Out[0]=0x17;
+			//Spi_Buf_Out[0]=0x17;
+			Spi_Buf_Out[0]=0xF7;
 			Operate_Max1329_RegMode(0xFF, WRITE_MODE_SPI, 0x0,1);
-			Spi_Buf_Out[0]=0x16;
+			Spi_Buf_Out[0]=0x0E;
 			Operate_Max1329_RegMode(0xFF, WRITE_MODE_SPI, 0x1,1);
 			
 			// инициализируем ЦАП 
-			Spi_Buf_Out[0] = 0x57;		
+			Spi_Buf_Out[0] = SETTING_7;		
 			Operate_Max1329_RegMode(0xFF, WRITE_MODE_SPI, 0x7,1);
 			
 			Operate_Max1329_DAC_Write(0xFF, 0, 0);
-			Operate_Max1329_DAC_Write(0xFF, 1, 0);
+			Operate_Max1329_DAC_Write(0xFF, 1, 100);
+			
+			Operate_Max1329_ADC_Convert(0xFF,1, 3, 0);
 		}
 	}
 	//========================================================
@@ -295,23 +371,23 @@ void DriverDAC11(void)
 		if(Dac11.WriteTar == 1)
 		{
 			st = 0;
-			for(i=0; i<COUNT_DAC_CH; i++)
+			for(i=0; i<2*COUNT_DAC_CH; i++)
 			{
-				if(TarrEEPROM_DAC[i].k	!= TarrRAM_DAC[i].k)
+				if(TarrEEPROM[i].k	!= TarrRAM[i].k)
 				{
 					st = 1;
-					TarrEEPROM_DAC[i].k	= TarrRAM_DAC[i].k;
+					TarrEEPROM[i].k	= TarrRAM[i].k;
 				}
-				if(TarrEEPROM_DAC[i].ofs	!= TarrRAM_DAC[i].ofs)
+				if(TarrEEPROM[i].ofs	!= TarrRAM[i].ofs)
 				{
 					st = 1;
-					TarrEEPROM_DAC[i].ofs = TarrRAM_DAC[i].ofs;
+					TarrEEPROM[i].ofs = TarrRAM[i].ofs;
 				}
 			}
 			if(st == 1)
 			{
 				SetWorkChI2C(1);
-				HighDensPageWrite(0, (BYTE*)(&TarrEEPROM_DAC), 8*COUNT_DAC_CH);
+				HighDensPageWrite(0, (BYTE*)(&TarrEEPROM), 2*8*COUNT_DAC_CH);
 			}
 		}
 		//=======================================================================================
@@ -349,9 +425,9 @@ void DriverDAC11(void)
 		//===================================================
 		// Опрашиваем АЦП 
 		//===================================================
-		/*if(getTimer(&Dac11.TimerAin) == 0)	
+		if(getTimer(&Dac11.TimerAin) == 0)	
 		{
-			setTimer(&Dac11.TimerAin, 50);
+			setTimer(&Dac11.TimerAin, PeriodOprosAin);
 			for(i=0;i<COUNT_DAC_CH;i++)
 			{
 				Operate_Max1329_RegMode(i, READ_MODE_SPI, 2,2);
@@ -361,10 +437,70 @@ void DriverDAC11(void)
 					
 				iData = wData&0xFFF;
 				
-				Dac11.fADC[i] = iData;//TarrRAM_ADC[i].k*(float)iData + TarrRAM_ADC[i].ofs;
-				//Operate_Max1329_ADC_Convert(i, 1, 3, 0);
+				Dac11.fADC[i] = TarrRAM[COUNT_DAC_CH+i].k*(float)iData + TarrRAM[COUNT_DAC_CH+i].ofs;
 			}
-			Operate_Max1329_ADC_Convert(0xFF, 1, 3, 0);	
+		}
+		//=============================
+		// Запись в ЦАП по изменениям
+		//=============================
+		if((Dac11.fDAC_New[0] != Dac11.fDAC_Set[0])||(Dac11.fDAC_New[1] != Dac11.fDAC_Set[1]))
+		{
+			if(Dac11.TarrStatus == false)
+			{
+				Dac11.fDAC_Set[0] = Dac11.fDAC_New[0];
+				WriteNormalDataDac(0, Dac11.fDAC_Set[0]);
+			}else
+			{
+				{
+					fData = Dac11.fDAC_New[0];
+						
+					if(fData>MaxValueDac[0])	fData = MaxValueDac[0];
+					if(fData<MinValueDac[0])	fData = MinValueDac[0];
+					if(fData != Dac11.fDAC_Set[0])
+					{
+						Dac11.fDAC_Set[0] = fData;
+						WriteNormalDataDac(0, fData);
+					}
+				}	
+			}
+		}
+		//=============================================================================================
+		// Опрашиваем дискретные входы
+		//=============================================================================================
+		if(getTimer(&Dac11.TimerDin) == 0)
+		{
+			setTimer(&Dac11.TimerDin, PeriodOprosDin);
+			for(i=0;i<COUNT_DAC_CH;i++)
+			{
+				Operate_Max1329_RegMode(i, READ_MODE_SPI, 0x11,1);
+				bData = Spi_Buf_In[0];
+							
+				if((bData&1) == 1) SETBIT(Dac11.DiagRele,i);
+				else CLEARBIT(Dac11.DiagRele,i);
+				
+				Operate_Max1329_RegMode(i, READ_MODE_SPI, 0x7,1);
+				if(Spi_Buf_In[0] == SETTING_7) SETBIT(Dac11.DiagDAC, i);
+				else CLEARBIT(Dac11.DiagDAC, i);
+			}
+		}		//===================================================
+		// Опрашиваем температурные датчики
+		/*if(getTimer(&Dac11.TimerTemp) == 0)
+		{
+			setTimer(&Dac11.TimerTemp, PeriodOprosTemp);
+			
+			
+			Operate_Max1329_RegMode(0,READ_MODE_SPI, 2,2);
+			
+			tmp		= Spi_Buf_In[0];
+			wData	= (tmp<<4)&0x0FF0;
+			wData	|= (Spi_Buf_In[1]>>4)&0xF;
+			
+			iData = ConvertADCtoINT(wData);
+			
+			Dac11.Temperature[i] = iData*0.125;
+			//Dac11.fADC[0] = iData*0.125;
+			
+			Operate_Max1329_ADC_Convert(0xFF,0x8, 0, 0);
 		}*/
 		
 	}
@@ -381,85 +517,15 @@ void DriverDAC11(void)
 	
 	if(Dac11.SendPak == TRUE)
 	{
-		Dac11.SendPak	= 0;
-		CreateAndSend_Pkt_UART0((U8 *)(&Dac11.fDAC_Set), COUNT_DAC_CH*4*2, 2, 1);
+		Dac11.SendPak	= FALSE;
+		CreateAndSend_Pkt_UART0((U8 *)(&Dac11.fDAC_Set), COUNT_DAC_CH*4*2+2+2+2, 2, 1);
 	}
 	if(Dac11.SendPakTar == TRUE)
 	{
 		Dac11.SendPakTar = FALSE;
-		CreateAndSend_Pkt_UART0((U8 *)(&TarrRAM_DAC), COUNT_DAC_CH*4*2, 2, 2);
+		CreateAndSend_Pkt_UART0((U8 *)(&TarrRAM), COUNT_DAC_CH*4*2*2, 2, 2);
 	}
 	//----------------------------------------------------
-
-
-/*
-	for(i=0;i<COUNT_DAC_CH;i++)
-	{
-		//=============================
-		// Запись в ЦАП по изменениям
-		//=============================
-		if(Dac11.fDAC_New[i] != Dac11.fDAC_Set[i])
-		{
-			
-			if(Dac11.TarrStatus == false)
-			{
-				Dac11.fDAC_Set[i] = Dac11.fDAC_New[i];
-				WriteNormalDataDac(i, Dac11.fDAC_Set[i]);
-			}else
-			{
-				{
-					fData = Dac11.fDAC_New[i];
-						
-					if(fData>MaxValueDac[i])	fData = MaxValueDac[i];
-					if(fData<MinValueDac[i])	fData = MinValueDac[i];
-					if(fData != Dac11.fDAC_Set[i])
-					{
-						Dac11.fDAC_Set[i] = fData;
-						WriteNormalDataDac(i, fData);
-					}
-				}	
-			}
-		}
-		//=============================================================================================
-		// Опрашиваем дискретные входы
-		//=============================================================================================
-		if(Dac11.TimerDin >= PeriodOprosDin)
-		{
-			Operate_Max1329_RegMode(i, READ_MODE_SPI, 0x11,1);
-			bData = Spi_Buf_In[0]&0x0F;
-			Dac11.DIN[i] = bData;
-			
-			if((bData&8) == 0) SETBIT(Dac11.DiagRele,i);
-			else CLEARBIT(Dac11.DiagRele,i);
-			
-			if((bData&5) != 5) SETBIT(Dac11.wError,i);
-			
-			
-			
-			if(i == (COUNT_DAC_CH-1))
-				Dac11.TimerDin = 0;
-		}
-		//===================================================
-		// Опрашиваем температурные датчики
-		/*if(Dac11.TimerTemp >= PeriodOprosTemp)
-		{
-			
-			Operate_Max1329_RegMode(i,READ_MODE_SPI, 2,2);
-			
-			tmp		= Spi_Buf_In[0];
-			wData	= (tmp<<4)&0x0FF0;
-			wData	|= (Spi_Buf_In[1]>>4)&0xF;
-			
-			iData = ConvertADCtoINT(wData);
-			
-			Dac11.Temperature[i] = iData*0.125;
-			
-			//Operate_Max1329_ADC_Convert(i,0x8, 0, 0);
-			
-			if(i == (COUNT_MAX1329-1))
-				Dac11.TimerTemp = 0;
-		}*/
-	//}
 }
 //========================================================================
 void ServiceUart(BYTE Id, BYTE* pData, WORD Len)
@@ -467,6 +533,7 @@ void ServiceUart(BYTE Id, BYTE* pData, WORD Len)
 	TTar *pTar;
 	TPak3 *pPak3;
 	BYTE i;
+	WORD *pW;
 	
 	if(Id == 0x01)
 	{	
@@ -476,26 +543,28 @@ void ServiceUart(BYTE Id, BYTE* pData, WORD Len)
 	{
 		Dac11.SendPakTar = TRUE;
 	}
-	if(Id == 0x03)
+	if(Id == 0x03)	// Запись тарировок
 	{
 		pTar = (TTar *)pData;
-		for(i=0; i<COUNT_DAC_CH; i++)
+		for(i=0; i<2*COUNT_DAC_CH; i++)
 		{
-			TarrRAM_DAC[i].k	= pTar[i].k;
-			TarrRAM_DAC[i].ofs	= pTar[i].ofs;
+			TarrRAM[i].k	= pTar[i].k;
+			TarrRAM[i].ofs	= pTar[i].ofs;
 		}
 		Dac11.WriteTar = 1;
 	}
-	if(Id == 0x04)
+	if(Id == 0x04)	// запись в ЦАП
 	{
 		pPak3 = (TPak3 *)pData;
-		//BYTE	DOUT;
-		//BYTE	Control1;
-		//BYTE	Control2;
-		//float	fWriteDAC;// Значение записываемое в ЦАП
-		Dac11.Master = true;
-		Dac11.EnOutDac = ((WORD)1)<<pPak3->SelectDAC;
-
+		if(pPak3->SelectDAC<COUNT_DAC_CH)
+			Dac11.fDAC_New[pPak3->SelectDAC] =  pPak3->fWriteDAC;
+			
+	}
+	if(Id == 0x05)	// Коммутируе реле ЦАПа
+	{
+		pW = (WORD *)pData;
+		
+		Dac11.EnOutDac = *pW;
 	}
 }
 //========================================================================
@@ -640,14 +709,14 @@ void Operate_Max1329_RegMode_Mask(WORD Mask, BYTE Adr, BYTE Count)// только запи
 	pak_spi_rm.data = 0;
 	pak_spi_rm.bits.RW	= WRITE_MODE_SPI;;
 	pak_spi_rm.bits.adr	= Adr;
-	Send_SIO(0, pak_spi_rm.data);
-	Send_SIO(6, pak_spi_rm.data);
+	if(Mask&0x03F) Send_SIO(0, pak_spi_rm.data);
+	if(Mask&0xFC0) Send_SIO(6, pak_spi_rm.data);
 		
-		for(i=0;i<Count;i++)
-		{
-			Send_SIO(0, Spi_Buf_Out[i]);
-			Send_SIO(6, Spi_Buf_Out[i]);
-		}
+	for(i=0;i<Count;i++)
+	{
+		if(Mask&0x03F) Send_SIO(0, Spi_Buf_Out[i]);
+		if(Mask&0xFC0) Send_SIO(6, Spi_Buf_Out[i]);
+	}
 	
 	EnInterrupt();
 	UnSelectAll_DAC();

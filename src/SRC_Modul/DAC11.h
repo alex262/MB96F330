@@ -3,6 +3,9 @@
 
 #ifdef 	PLATA_DAC11
 
+#include "can.h"
+
+
 #define DEVICE_TYPE 8
 #define NAME_MODUL "DAC11"
 
@@ -12,8 +15,10 @@ extern void (*INIT_BLOK)(void);		//Указатель на функции инициализации блока
 extern void (*DRIVER_BLOK)(void);	//Указатель на функции драйвера блока
 extern void	(*SERVICE_PAK_UART)(BYTE, BYTE*, WORD);// Указатель на функции обработки входящих пакетов по UART
 
-extern WORD (*STATE_BLOCK);			//Уазатель на поле Info блока
+BYTE ServiceMaster(BYTE bus_id, Message *m);
+BYTE ServiceObmenData(BYTE bus_id, Message *m);
 
+extern WORD (*STATE_BLOCK);			//Уазатель на поле Info блока
 //=============================================================
 #define MAX_COD_DAC		0xFFF	//Максимальное значение которое можно записать в ЦАП
 #define MIN_COD_DAC		0		//Минимальное значение которое можно записать в ЦАП    
@@ -23,7 +28,8 @@ extern WORD (*STATE_BLOCK);			//Уазатель на поле Info блока
 #define READ_MODE_SPI	1 
 #define WRITE_MODE_SPI	0 
 //=============================================================
-
+#define NUM_CAN_FOR_SELECT_MASTER	0 	// номер can по которому блоки будут определять мастера
+//=============================================================
 #define ADDR10	PDR07_P0
 #define ADDR11	PDR07_P1
 #define ADDR12	PDR07_P2
@@ -123,7 +129,10 @@ typedef struct
 	float	fDAC_New[COUNT_DAC_CH];
 	float	fDAC_Set[COUNT_DAC_CH];
 	float	fADC[COUNT_DAC_CH];
-	BYTE	DIN[COUNT_DAC_CH];
+	WORD	DiagRele;		// диагностика состояния реле
+	WORD	EnOutDac;		// используются первые 12 бит, 1 - выход цапа коммутируется
+	WORD	DiagDAC;		// диагностика наличия микросхем MAX
+	
 	//--------------------------------------------------------
 	TInfo	Info;	
 	BYTE	SendPak;
@@ -137,10 +146,7 @@ typedef struct
 	BYTE	ValReg;
 	//--------------------------------------------------------
 	WORD	wOldError;		// старые ошибки
-	WORD	EnOutDac;		// используются первые 12 бит, 1 - выход цапа коммутируется
-	WORD	DiagRele;		// диагностика состояния реле
 	WORD	wError;			// неисправность выхода цапа 1 - выход неисправен
-
 	BYTE	HiLo;			// выдача меанднра для выдачи ЦАП
 	BYTE	HiLoDec;		// HiLo изменился 
 	BYTE	Master;			//Является ли данный ЦАП мастером
@@ -151,6 +157,7 @@ typedef struct
 	TYPE_DATA_TIMER	TimerDout;		
 	TYPE_DATA_TIMER	TimerDin;
 	TYPE_DATA_TIMER	TimerAin;
+	TYPE_DATA_TIMER	TimerTemp;
 	//--------------------------------------------------------
 	BYTE	WriteTar;		// 1 - при изменении тарировки прописываются в EEPROM
 	BYTE	TarrStatus;		//Оттарирован блок или нет, если не оттарирован то можно выставить мастера
@@ -163,6 +170,8 @@ void ServiceUart(BYTE Id, BYTE* pData, WORD Len);
 
 extern CDAC11 Dac11;
 extern TTar TarRam[COUNT_DAC_CH];	// тарировки каналов в ОЗУ
+
+
 
 #endif
 #endif

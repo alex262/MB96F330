@@ -351,12 +351,12 @@ U8 CAN0_SendMessage(U8 msgBox, Message *msg)
 	//putch('S');	putch('0');
 	// Prepare Arbitration Interface Register 
 	IF1ARB0 = MSG2STD(msg->cob_id);		// <<< MSG2STD: 11bit ID / MSG2EXT: 29bit ID 
-	IF1ARB0_XTD    = 0;			// <<< 0: 11bit ID / 1: 29bit ID 
+	IF1ARB0_XTD    = 0;					// <<< 0: 11bit ID / 1: 29bit ID 
 	if(msg->rtr == 0)
-		IF1ARB0_DIR    = 1;			// <<< 0: RX Buffer / 1: TX Buffer 
+		IF1ARB0_DIR    = 1;				// <<< 0: RX Buffer / 1: TX Buffer 
 	else
-		IF1ARB0_DIR    = 0;			// <<< 0: RX Buffer / 1: TX Buffer 
-	IF1ARB0_MSGVAL = 1;			// <<< 0: Buffer invalid / 1: Buffer valid 
+		IF1ARB0_DIR    = 0;				// <<< 0: RX Buffer / 1: TX Buffer 
+	IF1ARB0_MSGVAL = 1;					// <<< 0: Buffer invalid / 1: Buffer valid 
 
 	// Prepare Mask Interface Register 
 //	IF1MSK0			= 0x1FFFFFFF;// <<< Setup Mask corresponding to your application 

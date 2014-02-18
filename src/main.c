@@ -28,6 +28,16 @@
 	TYPE_DATA_TIMER TimerCashCan=0;
 #endif
 
+void wait_(unsigned long a)
+{
+	unsigned long i;
+	
+	for (i = 0; i < a; i++)
+	{
+		__wait_nop();
+	}
+}
+
 void main(void)
 {
 	#ifdef CAN_OPEN_ENABLE
@@ -66,7 +76,7 @@ void main(void)
 	puts("===============================================================================\r\n");
 	puts("                        Terminal Fujitsu MB96F338                              \r\n");
 	puts("===============================================================================\r\n$>");
-	
+				
 	while(1)
 	{
 		//========================================

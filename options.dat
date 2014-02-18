@@ -2,7 +2,7 @@ $CPUSERIES-907
 $Prj-Debug
 $0
 -g
--w 4
+-w 3
 -I "%(PRJPATH)\src\CanOpenMain"
 -I "%(PRJPATH)\SRC"
 -I "%(PRJPATH)\SRC\SRC_modul"
@@ -17,7 +17,7 @@ $0
 $other
 -INF srcin  
 $time
-1379677907
+1391672183
 $end
 $1
 -g

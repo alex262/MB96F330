@@ -4,8 +4,8 @@
 
 
 //--------------------------------------------------------------------------------
-#define TEST_UART_FIFO_RX_SIZE	128
-#define TEST_UART_FIFO_TX_SIZE	256
+#define TEST_UART_FIFO_RX_SIZE	256
+#define TEST_UART_FIFO_TX_SIZE	512
 
 #define nOurID 1
 
@@ -216,7 +216,6 @@ void GetPak_Uart(WORD * CountByte, BYTE * pData)
 								//=======================================================================================
 								case 0xFD:// Read/Write EEPROM
 								{	
-	
 									program.RW_EEPROM	= pData[6];
 									program.Addr		= pData[7];
 									program.Addr		|= pData[8]<<8;
@@ -226,7 +225,7 @@ void GetPak_Uart(WORD * CountByte, BYTE * pData)
 									if(program.RW_EEPROM == 1) // запись
 										memmove(program.BufEEPROM, &pData[11], program.Len);
 									
-									program.StEEPROM = 1;
+									program.StEEPROM = TRUE;
 									//---------------------
 									(*CountByte)-= nLen;
 									memmove(pData,pData+nLen,BUFFER_LEN_UART-nLen);

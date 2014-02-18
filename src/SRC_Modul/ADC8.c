@@ -29,17 +29,29 @@ static BYTE stStartBlock = FALSE;
 static BYTE BuffUart[BUFFER_LEN_UART];
 static WORD CountDataUart = 0;
 static TYPE_DATA_TIMER TimerSpi;
-TTar TarEEPROM[ADC_CHIP_COUNT][ADC_CH_ON_CHIP];	// тарировки каналов в EEPROM
-TTar TarRam[ADC_CHIP_COUNT][ADC_CH_ON_CHIP];	// тарировки каналов в ОЗУ
+
+TTar TarEEPROM[ADC_CH];	// тарировки каналов в EEPROM
+TTar TarRam[ADC_CH];	// тарировки каналов в ОЗУ
 
 const BYTE RegDefADC[12] = {0x01, 0x60, 0x40, 0x00, 0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10};
+// сопосталение номеров каналов 
+						//	0  1  2  3  4   5    6  7    8   9  10  11 12 13  14  15 |+16   17
+const BYTE ChipToCh[32] =  {0, 2, 4, 6, 8,  10, 12, 14, 15, 13, 11, 9, 7,  5,  3,  1,   16, 18, 20, 22, 24,  26, 28, 30, 31, 29, 27, 25, 23,  21,  19,  17};
 //====================================================================
 BYTE read_spi_rdata(BYTE ch, DWORD *status, WORD * pDataADC);
 void write_spi_reg(BYTE ch, BYTE Addr, BYTE Len, BYTE * pData);
 void read_spi_reg(BYTE ch, BYTE Addr, BYTE Len, BYTE * pData);
 void StopContMode(BYTE ch);
 //====================================================================
-
+BYTE ServiceMaster(BYTE bus_id, Message *m)
+{
+	return 0;
+}
+BYTE ServiceObmenData(BYTE bus_id, Message *m)
+{
+	return 0;
+}
+//====================================================================
 void InitADC8()
 {
 	BYTE i, j;
@@ -197,6 +209,8 @@ void DriverADC8()
 	BYTE *pData, st;
 	float input;
 	TTar *pTar;
+	
+	BYTE NumCh;
 	//------------------------------------------------
 	// обновление адреса блока
 	Adc8.Info.bits.Addr	=ADDR;
@@ -213,24 +227,22 @@ void DriverADC8()
 			pData = (BYTE*)(&TarRam);
 			st =0;
 			
-			for(i=0; i<ADC_CHIP_COUNT; i++)
+			for(i=0; i<ADC_CH; i++)
 			{
 				clrwdt;
-				for(j=0; j<ADC_CH_ON_CHIP; j++)
+				Adc8.f_adc_data[i] = 0;
+				if((check_NaN_Inf(TarRam[i].k)) == TRUE)
 				{
-					if((check_NaN_Inf(TarRam[i][j].k)) == TRUE)
-					{
-						TarRam[i][j].k = 1.0;
-						st = 1;
-					}
-					if(check_NaN_Inf(TarRam[i][j].ofs) == TRUE)
-					{
-						TarRam[i][j].ofs = 0.0;
-						st = 1;
-					}
-					TarEEPROM[i][j].k	= TarRam[i][j].k;
-					TarEEPROM[i][j].ofs= TarRam[i][j].ofs;
+					TarRam[i].k = 1.0;
+					st = 1;
 				}
+				if(check_NaN_Inf(TarRam[i].ofs) == TRUE)
+				{
+					TarRam[i].ofs = 0.0;
+					st = 1;
+				}
+				TarEEPROM[i].k	= TarRam[i].k;
+				TarEEPROM[i].ofs= TarRam[i].ofs;
 			}
 			if(st == 1)
 			{
@@ -243,7 +255,7 @@ void DriverADC8()
 			for(j=0;j<ADC_CHIP_COUNT;j++)	// прописываем значение регистров по умолчанию
 			{
 				ChipSelekt(j, CS_ON);
-				write_spi_reg(j, 1, 12, &RegDefADC[0]);
+				write_spi_reg(j, 1, 12,(BYTE *)(&RegDefADC[0]));
 				ChipSelekt(j, CS_OFF);
 				msDelay(1);
 				ChipSelekt(j, CS_ON);
@@ -259,20 +271,17 @@ void DriverADC8()
 		if(Adc8.WriteTar == 1)
 		{
 			st = 0;
-			for(i=0; i<ADC_CHIP_COUNT; i++)
+			for(i=0; i<ADC_CH; i++)
 			{
-				for(j=0; j<ADC_CH_ON_CHIP; j++)
+				if(TarEEPROM[i].k	!= TarRam[i].k)
 				{
-					if(TarEEPROM[i][j].k	!= TarRam[i][j].k)
-					{
-						st = 1;
-						TarEEPROM[i][j].k	= TarRam[i][j].k;
-					}
-					if(TarEEPROM[i][j].ofs	!= TarRam[i][j].ofs)
-					{
-						st = 1;
-						TarEEPROM[i][j].ofs = TarRam[i][j].ofs;
-					}
+					st = 1;
+					TarEEPROM[i].k	= TarRam[i].k;
+				}
+				if(TarEEPROM[i].ofs	!= TarRam[i].ofs)
+				{
+					st = 1;
+					TarEEPROM[i].ofs = TarRam[i].ofs;
 				}
 			}
 			if(st == 1)
@@ -363,29 +372,28 @@ void DriverADC8()
 				st = read_spi_rdata(j, &Adc8.stADC[j], &w_adc_data[0]);
 				
 				ChipSelekt(j, CS_OFF);
-			
-				
 				
 				if((st == TRUE)&&(Adc8.stADC[j]&0xF00000) == 0xC00000)
 				{
 					for(i=0;i<ADC_CH_ON_CHIP;i++)
 					{
 						input = (float)ConvertCodToInt(w_adc_data[i]);
-						pTar = &TarRam[j][i];
+						NumCh = ChipToCh[j*ADC_CH_ON_CHIP+i];
+						pTar = &TarRam[NumCh];
 						
 						if(Adc8.adc_mux_set[j][i] == MUX_INPUT)	// работа по измерению входного напряжения
 						{
-							Adc8.f_adc_data[j][i] = pTar->k*input + pTar->ofs;
+							Adc8.f_adc_data[NumCh] = pTar->k*input + pTar->ofs;
 						}else
 							{
 							if(Adc8.adc_mux_set[j][i] == MUX_TEMPERATURE)// измерение температуры
 							{
-								Adc8.f_adc_data[j][i] = (input*2.5)/(32767*0.00049) - (0.145300/0.00049)+25.0;
+								Adc8.f_adc_data[NumCh] = (input*2.5)/(32767*0.00049) - (0.145300/0.00049)+25.0;
 							}else
 							{
 								if(Adc8.adc_mux_set[j][i] == MUX_TEST) // тестовый вход
 								{
-									Adc8.f_adc_data[j][i] = input*(2.5/32767);
+									Adc8.f_adc_data[NumCh] = input*(2.5/32767);
 								}else
 								{
 									if(Adc8.adc_mux_set[j][i] == MUX_MVDD) // напряжение питания микросхемы
@@ -393,16 +401,16 @@ void DriverADC8()
 										input *= (2.5/32767);
 										if((i == 2)||(i == 3))
 										{
-											Adc8.f_adc_data[j][i] = input*4.0;
+											Adc8.f_adc_data[NumCh] = input*4.0;
 										}else
 										{
-											Adc8.f_adc_data[j][i] = input*2.0;
+											Adc8.f_adc_data[NumCh] = input*2.0;
 										}
 									}else
 									{
 										if(Adc8.adc_mux_set[j][i] == MUX_INPUT_SHORTED) // закорачиваем входы
 										{
-											Adc8.f_adc_data[j][i] = input;
+											Adc8.f_adc_data[NumCh] = input;
 										}
 									}
 								}
@@ -461,24 +469,21 @@ void DriverADC8()
 		pData = (BYTE*)(&TarRam);
 		st =0;
 			
-		for(i=0; i<ADC_CHIP_COUNT; i++)
+		for(i=0; i<ADC_CH; i++)
 		{
 			clrwdt;
-			for(j=0; j<ADC_CH_ON_CHIP; j++)
+			if((check_NaN_Inf(TarRam[i].k)) == TRUE)
 			{
-				if((check_NaN_Inf(TarRam[i][j].k)) == TRUE)
-				{
-					TarRam[i][j].k = 1.0;
-					st = 1;
-				}
-				if(check_NaN_Inf(TarRam[i][j].ofs) == TRUE)
-				{
-					TarRam[i][j].ofs = 0.0;
-					st = 1;
-				}
-				TarEEPROM[i][j].k	= TarRam[i][j].k;
-				TarEEPROM[i][j].ofs= TarRam[i][j].ofs;
+				TarRam[i].k = 1.0;
+				st = 1;
 			}
+			if(check_NaN_Inf(TarRam[i].ofs) == TRUE)
+			{
+				TarRam[i].ofs = 0.0;
+				st = 1;
+			}
+			TarEEPROM[i].k	= TarRam[i].k;
+			TarEEPROM[i].ofs= TarRam[i].ofs;
 		}
 	}
 	//--------------------------------------------------

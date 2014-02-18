@@ -2,6 +2,7 @@
 #define __ADC8__
 
 #ifdef 	PLATA_ADC8
+#include "can.h"
 
 #define DEVICE_TYPE 4
 #define NAME_MODUL "ADC8"
@@ -14,9 +15,13 @@ extern void	(*SERVICE_PAK_UART)(BYTE, BYTE*, WORD);// Указатель на функции обраб
 
 extern WORD (*STATE_BLOCK);			//Уазатель на поле Info блока
 
+BYTE ServiceMaster(BYTE bus_id, Message *m);
+BYTE ServiceObmenData(BYTE bus_id, Message *m);
+
 //=============================================================
 #define ADC_CHIP_COUNT	4
 #define ADC_CH_ON_CHIP	8
+#define ADC_CH			32
 
 #define ADC_RDATA	0x12
 #define ADC_RDATAC	0x10
@@ -87,11 +92,10 @@ typedef struct
 	BYTE	setPPG1ch_en;
 	BYTE	setPPG2ch_en;
 
-	float	f_adc_data[ADC_CHIP_COUNT][ADC_CH_ON_CHIP];
+	float	f_adc_data[ADC_CH];	// -> can
 	DWORD	stADC[ADC_CHIP_COUNT];
 	
-	BYTE	reg_adc[ADC_CHIP_COUNT][16];
-	
+	BYTE	reg_adc[ADC_CHIP_COUNT][16];	// регистры АЦП ->can
 	//--------------------------------------------------------
 	BYTE	SendPak;
 	BYTE	RecvPak[20];
@@ -105,10 +109,10 @@ typedef struct
 	//BYTE	UpdTar
 	//--------------------------------------------------------
 	BYTE	adc_mux_set[ADC_CHIP_COUNT][ADC_CH_ON_CHIP];
-	BYTE	adc_mux_new[ADC_CHIP_COUNT][ADC_CH_ON_CHIP];
+	BYTE	adc_mux_new[ADC_CHIP_COUNT][ADC_CH_ON_CHIP];	// -> can
 	//--------------------------------------------------------
-	BYTE	reg_adc_set[ADC_CHIP_COUNT][13];	// для записи по CAN
-	BYTE	reg_adc_new[ADC_CHIP_COUNT][13];
+	BYTE	reg_adc_set[ADC_CHIP_COUNT][13];	
+	BYTE	reg_adc_new[ADC_CHIP_COUNT][13];	// -> can
 	BYTE	WriteTar;	// 1 - при изменении тарировки прописываются в EEPROM
 }CADC8;
 
@@ -117,7 +121,7 @@ void InitADC8();
 void ServiceUart(BYTE Id, BYTE* pData, WORD Len);
 
 extern CADC8 Adc8;
-extern TTar TarRam[ADC_CHIP_COUNT][ADC_CH_ON_CHIP];	// тарировки каналов в ОЗУ
+extern TTar TarRam[ADC_CH];	// тарировки каналов в ОЗУ
 
 #endif
 #endif

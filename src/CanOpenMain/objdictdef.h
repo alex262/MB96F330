@@ -393,6 +393,7 @@ extern __far const dict_cste dict_cstes;
 #define GET_NODE_ID(m)         		(m.cob_id & 0x1f)
 #define GET_FUNCTION_CODE(m)    	(m.cob_id >> 7)|((m.cob_id >> 1)&0x30)	//(m.cob_id >> 7)
 #define GET_FUNCTION_CODE_ptr(m)    (m->cob_id >> 7)|((m->cob_id >> 1)&0x30)//(m.cob_id >> 7)
+#define KF_TO_COB_ID(kf)       		(((kf<<7)&0x780)|((kf<<1)&0x60))
 
 
 #endif // __objdictdef_h__

@@ -5,7 +5,7 @@
 
 
 
-#define COUNT_USER_TIMERS	10
+#define COUNT_USER_TIMERS	15
 //#define TYPE_DATA_TIMER		WORD
 
 typedef struct

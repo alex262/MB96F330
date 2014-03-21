@@ -7,7 +7,6 @@
 #include "fifo.h"
 #include "i2c.h"
 #include "spi.h"
-#include "can.h"
 
 #ifdef PLATA_NDD22
 #include "NDD22.h"
@@ -46,6 +45,15 @@ void GoWorkAdc(BYTE ch, BYTE st);
 	static		 WORD	REG_DIN_STATE[REG_DIN_COUNT] = {0, 0xffff, 0xffff, 0xffff, 0xffff, 0,      0, 0xffff, 0xffff, 0,      0x800};
 	static const BYTE	REG_DIN_WRITE[REG_DIN_COUNT] = {0, 1,      1,      1,      1,      1,      1, 1,      1,      1,      1};
 #endif
+//====================================================================
+BYTE ServiceMaster(BYTE bus_id, Message *m)
+{
+	return 0;
+}
+BYTE ServiceObmenData(BYTE bus_id, Message *m)
+{
+	return 0;
+}
 //====================================================================
 void InitNDD()
 {

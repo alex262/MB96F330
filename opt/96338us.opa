@@ -3,7 +3,7 @@
 -linf ON
 -lsrc ON
 -lsec ON
--lcros ON
+-lcros OFF
 -linc OFF
 -lexp OBJ
 -pl 60

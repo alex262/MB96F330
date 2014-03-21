@@ -7,7 +7,6 @@
 #include "fifo.h"
 #include "i2c.h"
 #include "spi.h"
-#include "can.h"
 
 #ifdef PLATA_FSU_29_30
 #include "FSU29_30.h"
@@ -35,6 +34,15 @@ static TYPE_DATA_TIMER TimerSpi;
 int obmen_spi(BYTE ch, BYTE Send);
 
 static BYTE NumPak=0;
+//====================================================================
+BYTE ServiceMaster(BYTE bus_id, Message *m)
+{
+	return 0;
+}
+BYTE ServiceObmenData(BYTE bus_id, Message *m)
+{
+	return 0;
+}
 //====================================================================
 
 void InitFSU()

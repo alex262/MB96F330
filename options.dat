@@ -17,7 +17,7 @@ $0
 $other
 -INF srcin  
 $time
-1391672183
+1396866994
 $end
 $1
 -g
@@ -25,7 +25,7 @@ $1
 -linf ON
 -lsrc ON
 -lsec ON
--lcros ON
+-lcros OFF
 -linc OFF
 -lexp OBJ
 -pl 60
@@ -34,7 +34,7 @@ $1
 -Xdof
 $other
 $time
-1369723243
+1396863955
 $end
 $2
 -g

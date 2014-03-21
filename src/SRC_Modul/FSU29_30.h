@@ -3,10 +3,12 @@
 
 #ifdef 	PLATA_FSU_29_30
 
+#include "can.h"
+
 #define DEVICE_TYPE 2
 
-//#define NAME_MODUL "FSU29"
-#define NAME_MODUL "FSU30"
+#define NAME_MODUL "FSU29"
+//#define NAME_MODUL "FSU30"
 
 extern const char SoftwareVer[20]; 
 
@@ -104,6 +106,9 @@ typedef struct
 void DriverFSU();
 void InitFSU();
 void ServiceUart(BYTE Id, BYTE* pData, WORD Len);
+//====================================================================
+BYTE ServiceMaster(BYTE bus_id, Message *m);
+BYTE ServiceObmenData(BYTE bus_id, Message *m);
 
 extern CFSU Fsu;
 

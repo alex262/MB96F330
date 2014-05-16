@@ -24,18 +24,28 @@
 
 #pragma section DCONST=DCONST_BOOT,		attr=CONST,	locate=0xDF7900
 #pragma section FAR_DCONST=DCONST_BOOT,	attr=CONST,	locate=0xDF7900
+
+#pragma section INIT=INIT_MHX, 		attr=DATA, locate=0x18F00
+#pragma section FAR_INIT=INIT_MHX,	attr=DATA, locate=0x18F00
+#pragma section DATA=DATA_MHX, 		attr=DATA, locate=0x18F20
+#pragma section FAR_DATA=DATA_MHX, 	attr=DATA, locate=0x18F20
+
 //------------------------------------------------------------------------------------------------------------------
-static const char ASCII[] = "0123456789ABCDEF";
+const char ASCII_[] = "0123456789ABCDEF";
 const char START_BOOT[] = {'B','O','O','T','L','O','A','D','E','R'};
 //------------------------------------------------------------------------------------------------------------------
 static U16	ID_BOOT;	// ID для обмена с УСО
 static U8	CAN_BUS;	// номер CAN по которому идёт обмен
+static BYTE BufferCAN[50];	// буфер 
 //------------------------------------------------------------------------------------------------------------------
 #define SWAP_USHORT(x) ( ((x) >> 8) | ((x) << 8) )	// Swap 2 bytes of a word
 //------------------------------------------------------------------------------------------------------------------
+static BYTE	WATCH_DOG_CODE_ = 0x55;		
+
+#define clrwdt_ 			WDTCP = WATCH_DOG_CODE_; WATCH_DOG_CODE_ = ~WATCH_DOG_CODE_; // очистка WatchDog
+//------------------------------------------------------------------------------------------------------------------
 void SendCanBuf(U8 *buf, U8 len);
 U8 CanReciveMsg(TMsgCan *msg);
-static BYTE BufferCAN[50];
 //------------------------------------------------------------------------------------------------------------------
 int get_ch_ (char * ch)
 {
@@ -80,11 +90,11 @@ void puthex_(unsigned long n, char digits)
 	for (i=0; i<digits; i++)
 	{
 		ch = (n >> div) & 0xF;	/* get hex-digit value */
-		putch_(ASCII[ch]);		/* prompt to terminal as ASCII */
+		putch_(ASCII_[ch]);		/* prompt to terminal as ASCII */
 		div-=4;					/* next digit shift */
 	}
 }
-
+//------------------------------------------------------------------------------------------------------------------
 void conv_hex(unsigned long n, char digits)
 {
 	char i,ch,div=0;
@@ -94,24 +104,42 @@ void conv_hex(unsigned long n, char digits)
 	for (i=0; i<digits; i++)
 	{
 		ch = (n >> div) & 0xF;	/* get hex-digit value */
-		BufferCAN[i] =ASCII[ch];		/* prompt to terminal as ASCII */
+		BufferCAN[i] =ASCII_[ch];		/* prompt to terminal as ASCII */
 		div-=4;					/* next digit shift */
 	}
 }
-
 //------------------------------------------------------------------------------------------------------------------
 void buf_8bit_hex_(U8 num, U8 n)
 {
-	BufferCAN[num]		= ASCII[(n>>4)&0xF];
-	BufferCAN[num+1]	= ASCII[n&0xF];
-}
-
-void put_8bit_hex_(unsigned char n)
-{
-	putch_(ASCII[(n>>4)&0xF]);
-	putch_(ASCII[n&0xF]);
+	BufferCAN[num]		= ASCII_[(n>>4)&0xF];
+	BufferCAN[num+1]	= ASCII_[n&0xF];
 }
 //------------------------------------------------------------------------------------------------------------------
+void put_8bit_hex_(unsigned char n)
+{
+	putch_(ASCII_[(n>>4)&0xF]);
+	putch_(ASCII_[n&0xF]);
+}
+//------------------------------------------------------------------------------------------------------------------
+BYTE OstatokDiv10(uint32_t x)
+{
+	while(x >= 10)
+	{
+		x-=10;
+	}
+	return x;
+}
+uint32_t  Div10(uint32_t x)
+{
+	uint32_t ret=0;
+	
+	while(x >= 10)
+	{
+		x-=10;
+		ret++;
+	}
+	return ret;
+}
 void putdec_(uint32_t x)
 {
 	int16_t i;
@@ -125,8 +153,10 @@ void putdec_(uint32_t x)
 
 	for (i=8; i>0; i--) 
 	{
-		buf[i-1] = ASCII[x % 10];
-		x = x/10;
+		//buf[i-1] = ASCII_[x % 10];
+		buf[i-1] = ASCII_[OstatokDiv10(x)];
+		x = Div10(x);
+		//x = x/10;
 	}
 
 	for (i=0; buf[i]=='0'; i++)	// no print16_t of zero 
@@ -135,7 +165,7 @@ void putdec_(uint32_t x)
 	}
 	puts_(buf);					/* send string */
 }
-
+//------------------------------------------------------------------------------------------------------------------
 void conv_dec(uint32_t x)
 {
 	int16_t i;
@@ -144,8 +174,10 @@ void conv_dec(uint32_t x)
 
 	for (i=8; i>0; i--) 
 	{
-		buf[i-1] = ASCII[x % 10];
-		x = x/10;
+		//buf[i-1] = ASCII_[x % 10];
+		buf[i-1] = ASCII_[OstatokDiv10(x)];
+		x = Div10(x);
+		//x = x/10;
 	}
 
 	for (i=0; buf[i]=='0'; i++)	// no print16_t of zero 
@@ -266,8 +298,8 @@ void flashResetVector( void )
 }
 //------------------------------------------------------------------------------------------------------------------
 #define COUNT_MEM_PART				2
-static unsigned long ADDR_START_MEM[COUNT_MEM_PART]	= {0xDF0000,0xF80000};
-static unsigned long ADDR_END_MEM[COUNT_MEM_PART]	= {0xDF7FFF,0xFFFFFF};
+const static unsigned long ADDR_START_MEM[COUNT_MEM_PART]	= {0xDF0000,0xF80000};
+const static unsigned long ADDR_END_MEM[COUNT_MEM_PART]	= {0xDF7FFF,0xFFFFFF};
 
 #define CMD_NONE					0x00
 #define CMD_EXIT					0x01
@@ -448,6 +480,27 @@ static const char_t STR_OK[10] = {'O','K',0,0,0,0,0,0,0,0};
 static const char_t STR_OK_A[5] = {'O','K',' ','A',0};
 static const char_t STR_OK_B[5] = {'O','K',' ','B',0};
 
+void wait1mks()
+{
+	__wait_nop();
+	__wait_nop();
+	__wait_nop();
+	__wait_nop();
+	__wait_nop();
+	__wait_nop();
+	__wait_nop();
+	__wait_nop();
+	__wait_nop();
+	__wait_nop();
+	__wait_nop();
+}
+
+void wait_mks(WORD n)
+{
+	WORD i;
+	for(i=0; i<n; i++) wait1mks;
+}
+
 // par1 - номер CAN U16 - ID CAN сообщения 
 void ObrCmd(BYTE TypeInterf)
 {
@@ -489,21 +542,21 @@ void ObrCmd(BYTE TypeInterf)
 			nerase(0xDF4000);	// NOT erases SA2
 			nerase(0xDF6000);	// NOT erases SA3
 			erase((__far unsigned int *)0xF80000);	// erases SA32
-			clrwdt;
+			clrwdt_;
 			erase((__far unsigned int *)0xF90000);	// erases SA33
-			clrwdt;
+			clrwdt_;
 			erase((__far unsigned int *)0xFA0000);	// erases SA34
-			clrwdt;
+			clrwdt_;
 			erase((__far unsigned int *)0xFB0000);	// erases SA35
-			clrwdt;
+			clrwdt_;
 			erase((__far unsigned int *)0xFC0000);	// erases SA36
-			clrwdt;
+			clrwdt_;
 			erase((__far unsigned int *)0xFD0000);	// erases SA37
-			clrwdt;
+			clrwdt_;
 			erase((__far unsigned int *)0xFE0000); 	// erases SA38
-			clrwdt;
+			clrwdt_;
 			erase((__far unsigned int *)0xFF0000);	// erases SA39
-			clrwdt;
+			clrwdt_;
 			//flashResetVector(); // прописываем обратно RESET VECTOR
 			//EnInterrupt();				// enables interrupts after flash erase
 			if(TypeInterf == TYPE_UART)
@@ -591,6 +644,9 @@ void ObrCmd(BYTE TypeInterf)
 						{
 							buf_8bit_hex_(0, crc);
 							SendCanBuf(BufferCAN, 2);
+							//------------------------
+							// add timeout for MP3
+							wait_mks(2000);
 						}
 					}
 					if(adr >= ADDR_END_MEM[i]) break;
@@ -638,7 +694,7 @@ void ObrCmd(BYTE TypeInterf)
 			}
 			while(1)
 			{
-				clrwdt;					// обнуление WatchDog таймера 
+				clrwdt_;					// обнуление WatchDog таймера 
 				if(TypeInterf == TYPE_UART)
 				{
 					if(get_ch_(&ch) == 1) BufferReadCom[CountReadComm++] = ch;
@@ -656,9 +712,7 @@ void ObrCmd(BYTE TypeInterf)
 				}
 				if(CountReadComm == 44)
 				{
-					//DisInterrupt();				// disables interrupts - needed for erasing flash
 					ret = write_MHX_com(BufferReadCom);
-					//EnInterrupt();
 					if(ret<0)
 					{
 						if(TypeInterf == TYPE_UART)
@@ -728,7 +782,7 @@ void ServiceBootloadUart (void)
 
 	while(1)
 	{
-		clrwdt;					// обнуление WatchDog таймера 
+		clrwdt_;					// обнуление WatchDog таймера 
 		
 		if(get_ch_(&ch)>=0) 
 		{
@@ -1242,7 +1296,7 @@ void SendCanBuf(U8 *buf, U8 len)
 	{
 		while(len>0)
 		{
-			clrwdt;	// обнуление WatchDog таймера 
+			clrwdt_;	// обнуление WatchDog таймера 
 			
 			if(len>8) msg.len = 8;
 			else msg.len = len;
@@ -1264,7 +1318,6 @@ BYTE ServiceBootloadCan(BYTE bus_id, TMsgCan *m)
 	
 	TMsgCan msg;
 	U8 i;
-	WORD tmp;
 	
 	/* =============================================================== */
 	// проверяем сообщение 
@@ -1283,13 +1336,13 @@ BYTE ServiceBootloadCan(BYTE bus_id, TMsgCan *m)
 	/* =============================================================== */
 	/*    НАСТРАИВАЕМ CAN ДЛЯ ПРОГРАММАТОРА                            */
 	/* =============================================================== */
-	ID_BOOT	= getNodeId()|(((WORD)0xD)<<7);
+	//ID_BOOT	= getNodeId()|(((WORD)0xD)<<7);
+	ID_BOOT	= ADDR|(((WORD)0xD)<<7);
 	CAN_BUS = bus_id;
 	CAN_ConfigMsgBox_(bus_id);	// Конфигурим наш CAN на прием сообщений с нашим адресом .. младшие 5 бит адресс остальные нули
 	/* =============================================================== */
-	SetError(ind_RESET);
-	tmp = 0;
-	Indicate(&tmp, 0);
+	LEDR_ON;
+	LEDG_OFF;
 	/* =============================================================== */
 	/* Enable Sectors for FLASH writing and erasing                    */
 	/* =============================================================== */
@@ -1301,7 +1354,7 @@ BYTE ServiceBootloadCan(BYTE bus_id, TMsgCan *m)
 	
 	while(1)// принимаем сообщения 
 	{
-		clrwdt;					// обнуление WatchDog таймера 
+		clrwdt_;					// обнуление WatchDog таймера 
 		//----------------------------------------------------
 		if(CanReciveMsg(&msg) == TRUE)	
 		{// приняли сообщение, обрабатываем

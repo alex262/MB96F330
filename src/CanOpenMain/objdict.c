@@ -1575,7 +1575,7 @@ __far const indextable digitalInputTable[] =
 //=================================================================================================
 
 
-UNS8 count_sync[2][MAX_COUNT_OF_PDO_TRANSMIT];
+UNS8 count_sync[NB_LINE_CAN][MAX_COUNT_OF_PDO_TRANSMIT];
 
 #define COMM_PROFILE_LAST 0x1018
 

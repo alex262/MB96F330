@@ -86,7 +86,7 @@ enum e_accessAttribute { RW, WO, RO};
 
 /** count the number of SYNC messages */
 
-extern UNS8 count_sync[2][31];
+extern UNS8 count_sync[NB_LINE_CAN][31];
 
 /************************ STRUCTURES ****************************/
 

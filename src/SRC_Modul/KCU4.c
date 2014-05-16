@@ -31,6 +31,14 @@ static TYPE_DATA_TIMER TimerWaitOpros	= 0;
 static BYTE BuffUart[BUFFER_LEN_UART];
 static WORD CountDataUart = 0;
 //====================================================================
+BYTE ServiceMaster(BYTE bus_id, Message *m)
+{
+	return 0;
+}
+BYTE ServiceObmenData(BYTE bus_id, Message *m)
+{
+	return 0;
+}
 //====================================================================
 void InitKCU()
 {
@@ -140,7 +148,7 @@ void DriverKCU()
 	if (GetRxByte(&i) == FIFO_OK)
 	{
 		BuffUart[CountDataUart] = i;
-		if(CountDataUart < BUFFER_LEN_UART-1)	
+		if(CountDataUart < (BUFFER_LEN_UART-1))	
 			CountDataUart++;
 	} 
 	

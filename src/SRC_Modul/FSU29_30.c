@@ -206,7 +206,7 @@ void DriverFSU()
 	}	
 	//========================================================
 	// обмен данными по COM
-	/*if (GetRxByte(&i) == FIFO_OK)
+	if (GetRxByte(&i) == FIFO_OK)
 	{
 		BuffUart[CountDataUart] = i;
 		if(CountDataUart < BUFFER_LEN_UART-1)	
@@ -219,7 +219,7 @@ void DriverFSU()
 	{
 		Fsu.SendPak	= FALSE;
 		CreateAndSend_Pkt_UART0(&Fsu.K[0], 15, NumPak++, 1);
-	}*/
+	}
 	//--------------------------------------------------
 }
 //====================================================================

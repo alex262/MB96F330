@@ -2,6 +2,7 @@
 #define __KCU__
 
 #ifdef 	PLATA_KCU4
+#include "can.h"
 
 #define DEVICE_TYPE 3
 #define NAME_MODUL "KCU4"
@@ -122,6 +123,9 @@ typedef struct
 void DriverKCU();
 void InitKCU();
 void ServiceUart(BYTE Id, BYTE* pData, WORD Len);
+
+BYTE ServiceMaster(BYTE bus_id, Message *m);
+BYTE ServiceObmenData(BYTE bus_id, Message *m);
 
 
 extern CKCU Kcu;

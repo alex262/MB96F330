@@ -25,7 +25,6 @@ BYTE Convert_8(BYTE n);
 void Read_FO(BYTE *pData);
 void Read_FC(BYTE *pData);
 //====================================================================
-
 static TYPE_DATA_TIMER TimerWaitOpros	= 0;
 //====================================================================
 static BYTE BuffUart[BUFFER_LEN_UART];

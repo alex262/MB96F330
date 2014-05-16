@@ -2,14 +2,16 @@
 #include "timer.h"
 #include "appli.h"
 #include "global.h"
+
+#ifdef PLATA_DAC11
+
 #include "uart.h"
 #include "pakuart.h"
 #include "fifo.h"
 #include "i2c.h"
 #include "spi.h"
 
-#ifdef PLATA_DAC11
-
+#include "objdictdef.h"
 #include "dac11.h"
 
 const char SoftwareVer[20] = { __TIME__" " __DATE__}; 
@@ -17,12 +19,15 @@ const char SoftwareVer[20] = { __TIME__" " __DATE__};
 static TYPE_DATA_TIMER TimerStartBlock = 1000/TIMER_RESOLUTION_MS;
 static BYTE stStartBlock = FALSE;
 //==============================================================================
+// макимальное значение отклонения ЦАПа от значения АЦП
+#define	MAX_ERROR_DAC_mA	0.5
+//==============================================================================
 //Максимальное значение которое можно записать в ЦАП 
 //Минимальное значение которое можно записать в ЦАП    
-//const static float	MinValueDac[COUNT_DAC_CH] = {4.0,   4.0,  4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0};
-//const static float	MaxValueDac[COUNT_DAC_CH] = {20.0, 20.0, 20.0, 20.0,20.0,20.0,20.0,20.0,20.0,20.0,20.0,20.0};
-const static float	MinValueDac[COUNT_DAC_CH] = {0,   0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-const static float	MaxValueDac[COUNT_DAC_CH] = {4000.0, 4000.0, 4000.0, 4000.0,4000.0,4000.0,4000.0,4000.0,4000.0,4000.0,4000.0,4000.0};
+const static float	MinValueDac[COUNT_DAC_CH] = {4.0,   4.0,  4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0};
+const static float	MaxValueDac[COUNT_DAC_CH] = {20.0, 20.0, 20.0, 20.0,20.0,20.0,20.0,20.0,20.0,20.0,20.0,20.0};
+//const static float	MinValueDac[COUNT_DAC_CH] = {0,   0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+//const static float	MaxValueDac[COUNT_DAC_CH] = {4000.0, 4000.0, 4000.0, 4000.0,4000.0,4000.0,4000.0,4000.0,4000.0,4000.0,4000.0,4000.0};
 //==============================================================================
 CDAC11 Dac11;
 //==============================================================================
@@ -36,11 +41,12 @@ void	(*SERVICE_PAK_UART)(BYTE, BYTE*, WORD) = ServiceUart;
 //==============================================================================
 WORD TIME_WAIT_SELECT_MASTER = 30/TIMER_RESOLUTION_MS;				// Время задержки перед выставлением статуса мастер
 WORD TIME_WAIT_SELECT_MASTER_IF_ERROR = 3000/TIMER_RESOLUTION_MS;	// Время задержки перед выставлением статуса мастер при наличии ощибок и отсутствия другого мастера на шине
-float	dERR_DAC_mA = 0.05;											//Погрешность измерения ЦАП ->АЦП
 //==============================================================================
-TTar	TarrRAM[2*COUNT_DAC_CH];		// Тарировки ЦАПа и АЦП скопированные в RAM  
-TTar	TarrEEPROM[2*COUNT_DAC_CH];		// тарировки каналов в EEPROM
+TTar	TarrRAM[2*COUNT_DAC_CH];									// Тарировки ЦАПа и АЦП скопированные в RAM  
+TTar	TarrEEPROM[2*COUNT_DAC_CH];									// тарировки каналов в EEPROM
 //==============================================================================
+#define SETTING_0	0xF7	
+#define SETTING_1	0xFF	
 #define SETTING_7	0x57	// настройки цапа
 //==============================================================================
 TPAK_SPI_RM		pak_spi_rm;
@@ -54,6 +60,11 @@ const WORD PeriodDout			= 2/TIMER_RESOLUTION_MS;
 const WORD PeriodOprosDin		= 25/TIMER_RESOLUTION_MS;
 const WORD PeriodOprosAin		= 20/TIMER_RESOLUTION_MS;
 const WORD PeriodOprosTemp		= 1000/TIMER_RESOLUTION_MS;
+const WORD PeriodPing			= 50/TIMER_RESOLUTION_MS;
+
+const WORD PeriodTimeoutADC		= 40/TIMER_RESOLUTION_MS; // задержка измерения АЦП после выдачи нового значения в ЦАП или Коммутация канала
+
+#define MAX_COUNT_PING_LOST		(5)	// максимальное количество потеряных пингов после чего блок считаем исключеным из системы
 //==============================================================================
 void Operate_Max1329_DAC_Write(BYTE Num, BYTE ch, WORD data);
 void Operate_Max1329_ADC_Convert(BYTE Num, BYTE Mux, BYTE Gain, BYTE Bip);
@@ -67,70 +78,105 @@ void UnSelectAll_DAC(void);
 void SelectSPI_DAC(BYTE ch);
 void SelectMask_DAC(WORD Mask);
 void SelectMasterDAC(void);
+void ClearErrorDAC(BYTE ch, BYTE n);
 //------------------------------------------------------------------------------
-static BYTE	SerN[3][8];	// серийные номера тройки блоков, по днулевым индексом свой
-static BYTE CountBl=0;	// количество увиденных блоков, минимум один мы
-static WORD CounterPingBlock[2];
-
 BYTE ServiceMaster(BYTE bus_id, Message *m)
 {
-	BYTE i, st;
-	if(CountBl == 0)
+	BYTE i, st, j;
+	if(Dac11.StNeigbor[0] == FALSE)
 	{
-		CountBl = 1;
 		if(program.Cnt1WareDev > 0)
 		{
+			Dac11.StNeigbor[0]	= TRUE;
+			Dac11.PingBlock[0]	= 0;	//пришол пинг 
 			for(i=0; i<8; i++)
-				SerN[0][i] = program.SN_1Ware_Dev[0][i];
+				Dac11.SerN[0][i] = program.SN_1Ware_Dev[0][i];
 		}else
 		{
 			for(i=0; i<8; i++)
-				SerN[0][i] = 0;
+				Dac11.SerN[0][i] = 0;
 		}
 	}
 	if(m->len == 8)
 	{
-		if(CountBl == 1)
+		st = 0;
+		for(i=1; i<3; i++)
 		{
-			for(i=0; i<8; i++)
-				SerN[CountBl][i] = m->data[i];
-			CountBl++;
-		}
-		if(CountBl == 2)
-		{
-			// сначала проверим с уже принятым серийником
-			st = 0;
-			for(i=0; i<8; i++)
+			if(Dac11.StNeigbor[i] == TRUE) // если блок на связи
 			{
-				if(SerN[1][i] != m->data[i]) st = 1; 
-			}
-			if(st = 1)
-			{
-				for(i=0; i<8; i++)
-					SerN[CountBl][i] = m->data[i];
-				CountBl++;
+				for(j=0; j<8; j++)
+					if(Dac11.SerN[i][j] != m->data[j]) st = 1; 
+				if(st == 0)	// если это этот блок
+				{
+					Dac11.PingBlock[i]	= 0;	//пришол пинг 
+					Dac11.StNeigbor[i]	= TRUE;
+					st = 2;
+					break;
+				}		
 			}
 		}
-		if(CountBl == 3) // контролируем наличие блоков на линии
+		if(st != 2) // данный блок пропадал со связи либо ещё не добавлен
 		{
-			st = 0;
-			for(i=0; i<8; i++)
+			for(i=1; i<3; i++)
 			{
-				if(SerN[1][i] != m->data[i]) st = 1; 
-			}
-			if(st == 0) CounterPingBlock[0]++;	//пришол пинг 
-			st = 0;
-			for(i=0; i<8; i++)
-			{
-				if(SerN[2][i] != m->data[i]) st = 1; 
-			}
-			if(st == 0) CounterPingBlock[1]++;	//пришол пинг 
+				if(Dac11.StNeigbor[i] == FALSE) //место свободно
+				{
+					for(j=0; j<8; j++)
+						Dac11.SerN[i][j] = m->data[j];
+					Dac11.PingBlock[i]	= 0;	//пришол пинг 
+					Dac11.StNeigbor[i]			= TRUE;
+					break;
+				}	
+			}	
 		}
 	}
+	bus_id;
 	return 0;
 }
 BYTE ServiceObmenData(BYTE bus_id, Message *m)
 {
+	DWORD dwData;
+	BYTE n, addr;
+	
+	if(m->len != 8) return 0;
+	
+	addr = m->data[0];
+	
+	if(addr == Dac11.AddrBl[0]) // если произошол сбой в формировании адреса(кто-то неверно назначил адрес) 
+	{
+		return 0;	
+	}
+	
+	if(addr > 2) // некорректный адрес
+	{
+		return 0;	
+	}
+	// ищем индекс в нашей базе с таким адресом
+	if((Dac11.AddrBl[1] == addr)||(Dac11.AddrBl[1] == addr))
+	{
+		if(Dac11.AddrBl[1] == addr) n = 1;
+		if(Dac11.AddrBl[2] == addr) n = 2;
+	}else
+	{
+		return 0;
+	}
+	
+	dwData = m->data[1];
+	dwData |= ((DWORD)(m->data[2]))<<8;
+	dwData |= ((DWORD)(m->data[3]))<<16;
+	
+	Dac11.ErrorDAC[n]		= dwData;
+	Dac11.StNeigborData[n]	= TRUE;
+	Dac11.PingDataBlock[n]	= 0;
+			
+	Dac11.OutDac[n] = m->data[4];
+	Dac11.OutDac[n] |=((WORD)(m->data[5]))<<8;
+			
+	Dac11.Master[n] = m->data[6];
+	Dac11.Master[n] |=((WORD)(m->data[7]))<<8;
+	
+	bus_id;
+	
 	return 0;
 }
 //------------------------------------------------------------------------------
@@ -151,20 +197,32 @@ void InitDAC11(void)
 		Dac11.fDAC_New[i]	=0;
 		Dac11.fDAC_Set[i]	=0;
 	}
+	for(i=0; i<3; i++)
+	{
+		Dac11.PingBlock[i]			= MAX_COUNT_PING_LOST;
+		Dac11.PingDataBlock[i]		= MAX_COUNT_PING_LOST;	
+		Dac11.StNeigbor[i]			= FALSE;
+		Dac11.StNeigborData[i]		= FALSE;
+		Dac11.AddrBl[i]				= 0;
+		Dac11.StNeigborData[i]		= FALSE;
+		Dac11.ErrorDAC[i]			= 0;
+		Dac11.Master[i]				= 0;
+		Dac11.OutDac[i]				= 0;
+	}
 	//==========================================
 	Dac11.EnOutDac		= 0;
 	Dac11.Info.word		= 0;
 	Dac11.WriteTar		= 0;
-	Dac11.Master		= false;
 	Dac11.StatusMaster	= 0;
 	Dac11.HiLoDec		= false;
 	Dac11.HiLo			= 0;
 	Dac11.DiagRele		= 0;
 	Dac11.ErrorSet		= false;
 	Dac11.TimerMasterError=0;
-	Dac11.wOldError		= 0;
-	Dac11.wError		= 0;
-	Dac11.DiagDAC		= 0;
+	Dac11.DiagMAX		= 0;
+	Dac11.ErrorUP		= 0;
+	Dac11.ErrorDOWN		= 0;
+	Dac11.NewOutDac		= 0;
 	//==========================================
 	Dac11.SendPak		= FALSE;
 	Dac11.SendPakTar	= FALSE;
@@ -173,11 +231,13 @@ void InitDAC11(void)
 	Dac11.TimerAin  = 0;
 	Dac11.TimerTemp = 100;
 	Dac11.TimerDin	= 0;
+	Dac11.TimerPingNeighbor = 0;
 	add_timer(&TimerStartBlock);
 	add_timer(&Dac11.TimerDout);
 	add_timer(&Dac11.TimerAin);
 	add_timer(&Dac11.TimerTemp);
 	add_timer(&Dac11.TimerDin);
+	add_timer(&Dac11.TimerPingNeighbor);
 	//==========================================
 	InitSPI_1_inv();
 	InitSPI_2_inv();
@@ -202,18 +262,18 @@ int ConvertADCtoINT(WORD d)
 // Выбор SPI 
 void SelectMask_DAC(WORD Mask)
 {
-	if(Mask&0x0001) CS11 = CS_ON;
-	if(Mask&0x0002) CS12 = CS_ON;
-	if(Mask&0x0004) CS13 = CS_ON;
-	if(Mask&0x0008) CS14 = CS_ON;
-	if(Mask&0x0010) CS15 = CS_ON;
-	if(Mask&0x0020) CS16 = CS_ON;
-	if(Mask&0x0040) CS21 = CS_ON;
-	if(Mask&0x0080) CS22 = CS_ON;
-	if(Mask&0x0100) CS23 = CS_ON;
-	if(Mask&0x0200) CS24 = CS_ON;
-	if(Mask&0x0400) CS25 = CS_ON;
-	if(Mask&0x0800) CS26 = CS_ON;
+	if(Mask&0x0001) {CS11 = CS_ON; return;}
+	if(Mask&0x0002) {CS12 = CS_ON; return;}
+	if(Mask&0x0004) {CS13 = CS_ON; return;}
+	if(Mask&0x0008) {CS14 = CS_ON; return;}
+	if(Mask&0x0010) {CS15 = CS_ON; return;}
+	if(Mask&0x0020) {CS16 = CS_ON; return;}
+	if(Mask&0x0040) {CS21 = CS_ON; return;}
+	if(Mask&0x0080) {CS22 = CS_ON; return;}
+	if(Mask&0x0100) {CS23 = CS_ON; return;}
+	if(Mask&0x0200) {CS24 = CS_ON; return;}
+	if(Mask&0x0400) {CS25 = CS_ON; return;}
+	if(Mask&0x0800) {CS26 = CS_ON; return;}
 }
 
 void SelectAll_DAC(void)
@@ -288,7 +348,7 @@ void WriteNormalDataDac(BYTE ch, float data)
 void DriverDAC11(void)
 {
 	BYTE	i, st, bData;
-	WORD	wData, tmp;
+	WORD	tmp, wData;
 	float	fData;
 	int		iData;
 	//------------------------------------------------
@@ -330,7 +390,10 @@ void DriverDAC11(void)
 			for(i=0; i<COUNT_DAC_CH; i++)
 			{
 				if(TarrRAM[i].k == 1.0)
+				{
 					Dac11.TarrStatus = false;
+					break;
+				}
 			}
 			//=============================================================
 			// Reset всех ЦАПов
@@ -350,9 +413,9 @@ void DriverDAC11(void)
 			
 			// инициализируем АЦП
 			//Spi_Buf_Out[0]=0x17;
-			Spi_Buf_Out[0]=0xF7;
+			Spi_Buf_Out[0] = SETTING_0;
 			Operate_Max1329_RegMode(0xFF, WRITE_MODE_SPI, 0x0,1);
-			Spi_Buf_Out[0]=0x0E;
+			Spi_Buf_Out[0] = SETTING_1;
 			Operate_Max1329_RegMode(0xFF, WRITE_MODE_SPI, 0x1,1);
 			
 			// инициализируем ЦАП 
@@ -368,6 +431,11 @@ void DriverDAC11(void)
 	//========================================================
 	if(stStartBlock == TRUE)
 	{
+		//=======================================================================================
+		// определение кто какими каналами будет управлять
+		SelectMasterDAC();
+		//=======================================================================================
+		// Запись тарировок по изменениям
 		if(Dac11.WriteTar == 1)
 		{
 			st = 0;
@@ -403,22 +471,23 @@ void DriverDAC11(void)
 			Dac11.HiLo = ~Dac11.HiLo;
 		}
 		
-		if(Dac11.wOldError != Dac11.wError)
+		if(Dac11.EnOutDac != Dac11.NewOutDac)
 		{
-			setTimer(&Dac11.TimerMasterError, TIME_WAIT_SELECT_MASTER_IF_ERROR);
-			Dac11.ErrorSet = true;
+			Dac11.EnOutDac = Dac11.NewOutDac;
+			setTimer(&Dac11.TimerAin, PeriodTimeoutADC);// задержка измерения АЦП после выдачи нового значения в ЦАП или Коммутация канала
 		}
-		wData = Dac11.EnOutDac&(~Dac11.wError);
-		if((Dac11.Master == true)||(Dac11.TarrStatus==false))
+	
+		Dac11.OutDac[0] = Dac11.Master[0]&Dac11.EnOutDac;
+		if(Dac11.OutDac[0] != 0)
 		{
-			if((wData != 0)&&(Dac11.HiLoDec == true))
+			if(Dac11.HiLoDec == true)
 			{
 				if(Dac11.HiLo == 0)
 					Spi_Buf_Out[0]=0;
 				else
 					Spi_Buf_Out[0]=8;
 					
-				Operate_Max1329_RegMode_Mask(wData, 0x11,1);
+				Operate_Max1329_RegMode_Mask(Dac11.OutDac[0], 0x11,1);
 			}
 		}
 		Dac11.HiLoDec = false;
@@ -428,6 +497,7 @@ void DriverDAC11(void)
 		if(getTimer(&Dac11.TimerAin) == 0)	
 		{
 			setTimer(&Dac11.TimerAin, PeriodOprosAin);
+			
 			for(i=0;i<COUNT_DAC_CH;i++)
 			{
 				Operate_Max1329_RegMode(i, READ_MODE_SPI, 2,2);
@@ -438,34 +508,57 @@ void DriverDAC11(void)
 				iData = wData&0xFFF;
 				
 				Dac11.fADC[i] = TarrRAM[COUNT_DAC_CH+i].k*(float)iData + TarrRAM[COUNT_DAC_CH+i].ofs;
+				
+				if(digit(Dac11.OutDac[0], i) == 1) // если соответствующий выход скомутирован наружу
+				{
+					if(Dac11.fADC[i]>(Dac11.fDAC_Set[i]+MAX_ERROR_DAC_mA)) SETBIT(Dac11.ErrorUP, i); else CLEARBIT(Dac11.ErrorUP, i);
+					if(Dac11.fADC[i]<(Dac11.fDAC_Set[i]-MAX_ERROR_DAC_mA)) SETBIT(Dac11.ErrorDOWN, i); else CLEARBIT(Dac11.ErrorDOWN, i);
+				}
 			}
 		}
 		//=============================
 		// Запись в ЦАП по изменениям
 		//=============================
-		if((Dac11.fDAC_New[0] != Dac11.fDAC_Set[0])||(Dac11.fDAC_New[1] != Dac11.fDAC_Set[1]))
+		for(i=0;i<COUNT_DAC_CH;i++)
 		{
-			if(Dac11.TarrStatus == false)
+			if(Dac11.fDAC_New[i] != Dac11.fDAC_Set[i])
 			{
-				Dac11.fDAC_Set[0] = Dac11.fDAC_New[0];
-				WriteNormalDataDac(0, Dac11.fDAC_Set[0]);
-			}else
-			{
+				if(Dac11.TarrStatus == false)
 				{
-					fData = Dac11.fDAC_New[0];
-						
-					if(fData>MaxValueDac[0])	fData = MaxValueDac[0];
-					if(fData<MinValueDac[0])	fData = MinValueDac[0];
-					if(fData != Dac11.fDAC_Set[0])
+					Dac11.fDAC_Set[i] = Dac11.fDAC_New[i];
+					WriteNormalDataDac(i, Dac11.fDAC_Set[i]);
+					setTimer(&Dac11.TimerAin, PeriodTimeoutADC);// задержка измерения АЦП после выдачи нового значения в ЦАП или Коммутация канала
+				}else
+				{
 					{
-						Dac11.fDAC_Set[0] = fData;
-						WriteNormalDataDac(0, fData);
+						fData = Dac11.fDAC_New[i];
+							
+						if(fData>MaxValueDac[i])	fData = MaxValueDac[i];
+						if(fData<MinValueDac[i])	fData = MinValueDac[i];
+						if(fData != Dac11.fDAC_Set[i])
+						{
+							Dac11.fDAC_Set[i] = fData;
+							WriteNormalDataDac(i, fData);
+							setTimer(&Dac11.TimerAin, PeriodTimeoutADC);
+						}
 					}
-				}	
+				}
 			}
 		}
+		//---------------------------------------------
+		// собираем все ошибки
+		Dac11.ErrorDAC[0] = 0;
+		for(i=0;i<COUNT_DAC_CH;i++)
+		{
+			st = 0;
+			if(digit(Dac11.ErrorUP, i)   == 1) { Dac11.ErrorDAC[0]|= ((DWORD)ERROR_KZ)<<(2*i); st = 1;}
+			if(digit(Dac11.ErrorDOWN, i) == 1) { Dac11.ErrorDAC[0]|= ((DWORD)ERROR_ZERO)<<(2*i); st = 2;}
+			if(digit(Dac11.DiagMAX, i)   == 0) { Dac11.ErrorDAC[0]|= ((DWORD)ERROR_MAX)<<(2*i); st = 3;}
+			if( st == 0) ClearErrorDAC(0, i);
+
+		}
 		//=============================================================================================
-		// Опрашиваем дискретные входы
+		// Опрашиваем дискретные входы/ определяем состояние выходных реле
 		//=============================================================================================
 		if(getTimer(&Dac11.TimerDin) == 0)
 		{
@@ -479,10 +572,12 @@ void DriverDAC11(void)
 				else CLEARBIT(Dac11.DiagRele,i);
 				
 				Operate_Max1329_RegMode(i, READ_MODE_SPI, 0x7,1);
-				if(Spi_Buf_In[0] == SETTING_7) SETBIT(Dac11.DiagDAC, i);
-				else CLEARBIT(Dac11.DiagDAC, i);
+				if(Spi_Buf_In[0] == SETTING_7) SETBIT(Dac11.DiagMAX, i); else CLEARBIT(Dac11.DiagMAX, i);
 			}
-		}		//===================================================
+			Dac11.StNeigborData[0]	= TRUE;
+			Dac11.PingDataBlock[0]	= 0;
+		}		
+		//===================================================
 		// Опрашиваем температурные датчики
 		/*if(getTimer(&Dac11.TimerTemp) == 0)
 		{
@@ -518,7 +613,7 @@ void DriverDAC11(void)
 	if(Dac11.SendPak == TRUE)
 	{
 		Dac11.SendPak	= FALSE;
-		CreateAndSend_Pkt_UART0((U8 *)(&Dac11.fDAC_Set), COUNT_DAC_CH*4*2+2+2+2, 2, 1);
+		CreateAndSend_Pkt_UART0((U8 *)(&Dac11.fDAC_Set), 176, 2, 1);
 	}
 	if(Dac11.SendPakTar == TRUE)
 	{
@@ -534,6 +629,8 @@ void ServiceUart(BYTE Id, BYTE* pData, WORD Len)
 	TPak3 *pPak3;
 	BYTE i;
 	WORD *pW;
+
+	Len;
 	
 	if(Id == 0x01)
 	{	
@@ -564,9 +661,374 @@ void ServiceUart(BYTE Id, BYTE* pData, WORD Len)
 	{
 		pW = (WORD *)pData;
 		
-		Dac11.EnOutDac = *pW;
+		Dac11.NewOutDac = *pW;
 	}
 }
+//========================================================================
+BYTE GetErrorDAC(BYTE ch, BYTE n)
+{
+	DWORD Err;
+	
+	Err = Dac11.ErrorDAC[ch];
+	Err = Err>>(2*n);
+	Err = Err&3;
+	
+	return (BYTE)Err;
+} 
+void ClearErrorDAC(BYTE ch, BYTE n)
+{
+	DWORD t=3;
+	Dac11.ErrorDAC[ch] &= ~(t<<(2*n));
+}
+//========================================================================
+BYTE Max3(BYTE a, BYTE b, BYTE c)
+{	
+	if ((a>b) && (a>c)) return 1;
+	if ((b>a) && (b>c)) return 2;
+	if ((c>a) && (c>b)) return 3;
+	return 0;
+}
+	
+// Процедура по выбору мастера из 3х ЦАПов
+static BYTE	StartFindMaster = 0;
+void SelectMasterDAC(void)
+{
+	BYTE	i, addr, n, err, err1, err2;
+	Message	msg;
+	//WORD	wData;
+	//========================================================
+	// если тарировки не прописаны разрешаем замыкание реле
+//	if(Dac11.TarrStatus == false)	
+//	{
+//		Dac11.Master[0] = 0xFFF;
+//		return;
+//	}
+	//========================================================
+	// Если нет связи с УСО выходим 
+//	if((getTimer(&program.TimerCan1)>=TIME_OUT_CAN)&&(getTimer(&program.TimerCan2)>=TIME_OUT_CAN))
+//	{
+//		Dac11.Master[0] = 0;
+//		return;
+//	}
+	//========================================================
+	// Если блок не проинициализирован УСО выходим 
+//	if(getState() != Operational)
+//	{
+//		Dac11.Master[0] = 0;
+//		return;
+//	}
+	//========================================================
+	if(getTimer(&Dac11.TimerPingNeighbor) == 0) // пришло время выдать пинг соседям
+	{
+		setTimer(&Dac11.TimerPingNeighbor, PeriodPing);
+		StartFindMaster++;
+		
+		for(i=1; i<3; i++)
+		{
+			Dac11.PingBlock[i]++;
+			if(Dac11.PingBlock[i] >= MAX_COUNT_PING_LOST)
+			{
+				Dac11.PingBlock[i] = MAX_COUNT_PING_LOST;
+				Dac11.StNeigbor[i] = FALSE;
+			}
+			//--------------------------------------------
+			Dac11.PingDataBlock[i]++;
+			if(Dac11.PingDataBlock[i] >= MAX_COUNT_PING_LOST)
+			{
+				Dac11.PingDataBlock[i] = MAX_COUNT_PING_LOST;
+				Dac11.StNeigborData[i] = FALSE;
+			}
+		}
+		
+		msg.cob_id	= KF_TO_COB_ID(((WORD)0x3F))|ADDR_NODE;
+			
+		msg.rtr 	= 0;
+		msg.len 	= 8;
+		
+		if(program.Cnt1WareDev > 0)
+		{
+			for(i=0; i<8; i++) msg.data[i] = program.SN_1Ware_Dev[0][i];
+		}else
+		{
+			for(i=0; i<8; i++) msg.data[i] = 0;
+		}
+				
+		CAN_SendMessage(NUM_CAN_FOR_SELECT_MASTER, &msg);
+		//===============================================================
+		// назначем адраеса блокам
+		if(StartFindMaster >= 3)
+		{
+			Dac11.AddrBl[0] = 0;
+			Dac11.AddrBl[1] = 0;
+			Dac11.AddrBl[2] = 0;
+			
+			if((Dac11.StNeigbor[1]|Dac11.StNeigbor[2]) == TRUE) // если мы видим хотябы одного соседа назначаем адреса
+			{
+				if(Dac11.StNeigbor[0] == TRUE) // если мы знаем свой серийник то учавствуем назначении приоритета
+				{
+					if((Dac11.StNeigbor[1] == TRUE)&&(Dac11.StNeigbor[2] == TRUE)) // оба соседа видны
+					{
+						addr = 2;
+						for(i=1; i<8; i++)
+						{
+							if(addr == 2)
+							{
+								n = Max3(Dac11.SerN[0][i], Dac11.SerN[1][i], Dac11.SerN[2][i]);
+								if(n>0)
+								{
+									Dac11.AddrBl[n-1] = 0;
+									addr = 1;
+								}
+							}
+							if(addr == 1)
+							{
+								if(n == 1)
+								{
+									if(Dac11.SerN[1][i]> Dac11.SerN[2][i])
+									{
+										Dac11.AddrBl[1] = 1;
+										Dac11.AddrBl[2] = 2;
+										addr = 0;
+										break;
+									}else
+									{
+										if(Dac11.SerN[1][i]< Dac11.SerN[2][i])
+										{
+											Dac11.AddrBl[1] = 2;
+											Dac11.AddrBl[2] = 1;
+											addr = 0;
+											break;
+										}	
+									}
+								}
+								if(n == 2)
+								{
+									if(Dac11.SerN[0][i]> Dac11.SerN[2][i])
+									{
+										Dac11.AddrBl[0] = 1;
+										Dac11.AddrBl[2] = 2;
+										addr = 0;
+										break;
+									}else
+									{
+										if(Dac11.SerN[0][i] < Dac11.SerN[2][i])
+										{
+											Dac11.AddrBl[0] = 2;
+											Dac11.AddrBl[2] = 1;
+											addr = 0;
+											break;
+										}
+									}
+								}
+								if(n == 3)
+								{
+									if(Dac11.SerN[0][i]> Dac11.SerN[1][i])
+									{
+										Dac11.AddrBl[0] = 1;
+										Dac11.AddrBl[1] = 2;
+										addr = 0;
+										break;
+									}else
+									{
+										if(Dac11.SerN[0][i] < Dac11.SerN[1][i])
+										{
+											Dac11.AddrBl[0] = 2;
+											Dac11.AddrBl[1] = 1;
+											addr = 0;
+											break;
+										}	
+									}
+								}
+							}
+						}
+					}else
+					{// виден только один сосед
+						if(Dac11.StNeigbor[1] == FALSE) Dac11.AddrBl[1] = 2; else n = 1;
+						if(Dac11.StNeigbor[2] == FALSE) Dac11.AddrBl[2] = 2; else n = 2;
+					
+						for(i=1; i<8; i++)
+						{
+							if(Dac11.SerN[0][i]> Dac11.SerN[n][i])
+							{
+								Dac11.AddrBl[0] = 0;
+								Dac11.AddrBl[n] = 1;
+								break;
+							}else
+							{
+								if(Dac11.SerN[0][i]< Dac11.SerN[n][i])
+								{
+									Dac11.AddrBl[0] = 1;
+									Dac11.AddrBl[n] = 0;
+									addr = 0;
+									break;
+								}	
+							}
+						}
+					}
+				}else
+				{// если видны соседи а наш серийник не определился то мы рулим в последнюю очередь
+					Dac11.AddrBl[0] = 2;
+					Dac11.AddrBl[1] = 1;
+					Dac11.AddrBl[2] = 0;
+				}
+			}else
+			{// мы никого невидим значит будем рулить сами
+				Dac11.AddrBl[0] = 0;
+				Dac11.AddrBl[1] = 1;
+				Dac11.AddrBl[2] = 2;
+			}
+			//==============================================================
+			// отправляем данные о своем состоянии (реле, ошибки)
+			if((Dac11.AddrBl[0]+Dac11.AddrBl[1]+Dac11.AddrBl[2])>0)	// если расставелны адреса блокам
+			{
+				msg.cob_id	= KF_TO_COB_ID(((WORD)0x3E))|ADDR_NODE;
+				msg.rtr 	= 0;
+				msg.len 	= 8;
+				
+				msg.data[0] = Dac11.AddrBl[0];
+				
+				msg.data[1] = Dac11.ErrorDAC[0];
+				msg.data[2] = Dac11.ErrorDAC[0]>>8;
+				msg.data[3] = Dac11.ErrorDAC[0]>>16;
+				
+				msg.data[4] = Dac11.OutDac[0];
+				msg.data[5] = Dac11.OutDac[0]>>8;		
+				
+				msg.data[6] = Dac11.Master[0];
+				msg.data[7] = Dac11.Master[0]>>8;		
+				CAN_SendMessage(NUM_CAN_FOR_SELECT_MASTER, &msg);
+			}
+			//==============================================================
+			//==============================================================
+			// захват управления каналами
+			//WORD	DiagRele;			// диагностика состояния реле	читаем через дискретные входы				//2
+			if(StartFindMaster >= 6)
+			{
+				StartFindMaster = 6;
+				
+				for(i=0; i<COUNT_DAC_CH; i++)
+				{
+					if(digit(Dac11.Master[0], i) == 0) // если мы не управляем данным каналом, проверим можноли захватить уравление
+					{
+						//Если ни один из каналов который на связи не захватил управление данным каналом
+						if((Dac11.StNeigborData[1] == FALSE)||((Dac11.StNeigborData[1] == TRUE)&&(digit(Dac11.Master[1], i) == 0)))
+						{
+							if((Dac11.StNeigborData[2] == FALSE)||((Dac11.StNeigborData[2] == TRUE)&&(digit(Dac11.Master[2], i) == 0)))
+							{
+								err = GetErrorDAC(0,i);	// Запрос ошибки выхода
+								if(err == ERROR_OK)		// у нас канал рабочий
+								{
+									if(Dac11.AddrBl[0] == 0) // если мы мастер забираем канал без вопросов
+									{
+										SETBIT(Dac11.Master[0], i);
+									}else
+									{ // если мы не мастер забираем только по приоритету, если у высоко приоритетного ошибка
+										err1 = GetErrorDAC(1,i); // Запрос ошибки выхода
+										err2 = GetErrorDAC(2,i); // Запрос ошибки выхода
+										
+										if((Dac11.StNeigborData[1] == TRUE)&&(err1 == ERROR_OK)&&(Dac11.AddrBl[1]<Dac11.AddrBl[0]))
+										{// блок 1 имеет больше преимуществ на захват канала
+											
+										}else 
+										{
+											if((Dac11.StNeigborData[2] == TRUE)&&(err1 == ERROR_OK)&&(Dac11.AddrBl[2]<Dac11.AddrBl[0]))
+											{// блок 2 имеет больше преимуществ на захват канала
+											
+											}else 
+											{ // Мы можем забрать управление каналом
+												SETBIT(Dac11.Master[0], i);
+											}
+										}
+									}
+								}else // есть ошибки 
+								{
+									if(err == ERROR_ZERO) // проседание тока не критично может нет питания
+									{
+										//если мы управляем каналом отдаем управление
+										//если только по остальным каналам нет ошибок любых
+										err1 = GetErrorDAC(1,i); // Запрос ошибки выхода
+										err2 = GetErrorDAC(2,i); // Запрос ошибки выхода
+										if(((Dac11.StNeigborData[1] == TRUE)&&(err1 == 0))||(((Dac11.StNeigborData[2] == TRUE)&&(err2 == 0))))
+										{// если хотябы один блок на связи и исправен то управление не забираем
+											
+										}else// блоки либо на связи и с ошибкими, или нет на связи
+										{// Забираем управление
+											SETBIT(Dac11.Master[0], i);
+										}
+									}
+									if(err == ERROR_KZ) // превышение тока критичная ошибка канал не забираем
+									{
+										
+									}
+									if(err == ERROR_MAX) // не видна микросхема соответсвенно не забираем управление
+									{
+										
+									}
+								}
+							}else 
+							{	// канал захвачен блоком 2 
+								// если блок 2 скомутирован наружу и у него нет ошибки ERROR_ZERO сбрасываем у себя эту ошибку если она есть
+								if((Dac11.StNeigborData[2] == TRUE)&&(digit(Dac11.Master[2], i) == 1))
+								{
+									if(digit(Dac11.OutDac[2], i) == 1)
+									{
+										if(GetErrorDAC(2,i) == 0)
+										{
+											if(GetErrorDAC(0, i) == ERROR_ZERO)
+											{
+												ClearErrorDAC(0, i);
+												CLEARBIT(Dac11.ErrorDOWN, i);
+											}
+										}
+									}
+								}
+							}
+						}else
+						{	// канал захвачен блоком 1
+							// если блок 1 скомутирован наружу и у него нет ошибки ERROR_ZERO сбрасываем у себя эту ошибку если она есть
+							if((Dac11.StNeigborData[1] == TRUE)&&(digit(Dac11.Master[1], i) == 1))
+							{
+								if(digit(Dac11.OutDac[1], i) == 1)
+								{
+									if(GetErrorDAC(1,i) == 0)
+									{
+										if(GetErrorDAC(0, i) == ERROR_ZERO)
+										{
+											ClearErrorDAC(0, i);
+											CLEARBIT(Dac11.ErrorDOWN, i);
+										}
+									}
+								}
+							}
+						}
+					}else // мы управляем данным каналом
+					{
+						err = GetErrorDAC(0,i); // Запрос ошибки выхода
+						if(err == ERROR_ZERO)	// проседание тока не критично может нет питания
+						{						// проверяем если у других блоков данный канал работает отдаем управление	
+							err1 = GetErrorDAC(1,i); // Запрос ошибки выхода
+							err2 = GetErrorDAC(2,i); // Запрос ошибки выхода
+							if(((Dac11.StNeigborData[1] == TRUE)&&(err1 == 0))||(((Dac11.StNeigborData[2] == TRUE)&&(err2 == 0))))
+							{// если хотябы один блок на связи и исправен то управление отдаем
+								CLEARBIT(Dac11.Master[0], i);
+							}	
+						}	
+						if(err == ERROR_KZ) // превышение тока критичная ошибка ОТДАЕМ УПРАВЛЕНИЕ В любом случае
+						{
+							CLEARBIT(Dac11.Master[0], i);
+						}
+						if(err == ERROR_MAX) // ПРОПАЛА  связь с микросхемой отдаем управление
+						{
+							CLEARBIT(Dac11.Master[0], i);
+						}
+					}
+				}
+			}
+		}	
+		//===============================================================
+	}
+}
+//========================================================================
 //========================================================================
 BYTE Send_SIO(BYTE ch, BYTE data)
 {
@@ -737,81 +1199,5 @@ void Operate_Max1329_Reset(BYTE Num)
 	UnSelectAll_DAC();
 }
 
-//========================================================================
-// Процедура по выбору мастера из 3х ЦАПов
-void SelectMasterDAC(void)
-{
-/*
-	//-------------------------------------------------
-	// Проверяем есть ли в данный момент мастер на шине
-	if(DAC_STATUS_NEIGHBOUR != 3)
-	{
-		// Мастер на шине уже есть выходим из процедуры определения мастера
-		Dac11.Master=false;
-		DAC_MASTER_SET_OFF;
-		Dac11.TimerMasterError = 0;
-		return;
-	}
-	// Если хотя бы по одному выходу есть проблемы, с выдачей команд, то данный цап не может быть мастером
-	if(Dac11.ErrorSet == true)	
-	{
-		if(Dac11.TimerMasterError<TIME_WAIT_SELECT_MASTER_IF_ERROR)// скорее всего есть ошибки по и в других канала поэтом выбираем хотябы одного мастера
-		{
-			Dac11.wOldError = Dac11.wError;
-			Dac11.Master=false;
-			DAC_MASTER_SET_OFF;	
-			return;	
-		}
-		Dac11.TimerMasterError = TIME_WAIT_SELECT_MASTER_IF_ERROR+1;
-		
-	}
-	//-------------------------------------------------
-	// Если нет связи с УСО выходим 
-	if((program.TimerCan0>=TIME_OUT_CAN)&&(program.TimerCan1>=TIME_OUT_CAN))
-	{
-		Dac11.Master=false;
-		DAC_MASTER_SET_OFF;
-		return;
-	}
-	//-------------------------------------------------
-	// Если блок не проинициализирован УСО выходим 
-	if(getState() != Operational)
-	{
-		Dac11.Master=false;
-		DAC_MASTER_SET_OFF;
-		return;
-	}
-	//-------------------------------------------------
-	// Если данный блок уже является мастером то выходим из процедуры выявления мастера
-	if(Dac11.Master == true)
-	{
-		return;
-	}
-	//-----------------------------------------------------------------
-	// БЛОК НЕ ЯВЛЯЕТСЯ МАСТЕРОМ, И В ДАННЫЙ МОМЕНТ НА ШИНЕ НЕТ МАСТЕРА
-	//-----------------------------------------------------------------
-	if(Dac11.StatusMaster == 0)
-	{
-		DAC_MASTER_SET_ON;
-		Dac11.TimerMaster=0;
-		Dac11.StatusMaster = 1;
-		return;	
-	}
-	if(Dac11.StatusMaster == 1)
-	{
-		if(Dac11.TimerMaster<TIME_WAIT_SELECT_MASTER)
-		{	// выжидаем реакции соседей
-			return;
-		}
-		//==============================
-		// Блок можем стать мастером
-		Dac11.Master = true;
-		Dac11.StatusMaster = 0;
-		return;	
-	}
-	//-----------------------------------------------------------------
-	*/
-}
-//========================================================================
 
 #endif

@@ -30,6 +30,11 @@ extern WORD (*STATE_BLOCK);			//Уазатель на поле Info блока
 //=============================================================
 #define NUM_CAN_FOR_SELECT_MASTER	0 	// номер can по которому блоки будут определять мастера
 //=============================================================
+#define ERROR_OK	0	// ошибок по каналу нет
+#define ERROR_ZERO	1	// по диагностике значение тока упало
+#define ERROR_KZ	2	// по диагностике значение тока превышает выдаваемое значение
+#define ERROR_MAX	3	// не видна микросхема 
+//=============================================================
 #define ADDR10	PDR07_P0
 #define ADDR11	PDR07_P1
 #define ADDR12	PDR07_P2
@@ -111,15 +116,15 @@ typedef union
 }TPAK_SPI_ADC;
 typedef union
 {
-    BYTE    data[2];
-    struct  
-    {
-        WORD   dac		:12;
-        WORD   ch		:1;
-        WORD   rw		:1;
-        WORD   d1		:1;
-        WORD   start	:1;
-    }bits;
+	BYTE    data[2];
+	struct  
+	{
+		WORD   dac		:12;
+		WORD   ch		:1;
+		WORD   rw		:1;
+		WORD   d1		:1;
+		WORD   start	:1;
+	}bits;
 }TPAK_SPI_DAC;
 //==============================================================
 
@@ -127,13 +132,28 @@ typedef struct
 {
 	//--------------------------------------------------------
 	float	fDAC_New[COUNT_DAC_CH];
-	float	fDAC_Set[COUNT_DAC_CH];
-	float	fADC[COUNT_DAC_CH];
-	WORD	DiagRele;		// диагностика состояния реле
-	WORD	EnOutDac;		// используются первые 12 бит, 1 - выход цапа коммутируется
-	WORD	DiagDAC;		// диагностика наличия микросхем MAX
-	
 	//--------------------------------------------------------
+	float	fDAC_Set[COUNT_DAC_CH];																			//48
+	float	fADC[COUNT_DAC_CH];																				//48	
+	WORD	DiagRele;			// диагностика состояния реле	читаем через дискретные входы				//2
+	WORD	EnOutDac;			// используются первые 12 бит, 1 - выход цапа необходимо коммутировать		//2
+	WORD	DiagMAX;			// диагностика наличия микросхем MAX										//2
+	WORD	Master[3];			// побитно указывается какими мы каналами управляем какими нет				//2
+	BYTE	TarrStatus;			// Оттарирован блок или нет, если не оттарирован то можно выставить мастера	//1
+	BYTE	SerN[3][8];			// серийные номера тройки блоков, по днулевым индексом свой					//24
+	BYTE	res1;																							//1
+	BYTE	PingBlock[3];		// пинг от соседей															//3
+	BYTE	PingDataBlock[3];	// таймеры данных от соседей												//3
+	BYTE	StNeigbor[3];		// true - сосед виден, false-соседа не видим								//3
+	BYTE	AddrBl[3];			// назначенные адреса блоков, в 0 индексе наш адрес							//3
+	WORD	ErrorUP;			// ошибка по превышению значения 											//2
+	WORD	ErrorDOWN;			// ошибка по падению измеряемого тока 										//2
+	DWORD	ErrorDAC[3];		// неисправность выхода ЦАП(два бита на канал), в 0 индексе наши данные		//12
+	WORD	OutDac[3];			// используются первые 12 бит, 1 - выход цапа скомутированы					//6
+	BYTE	StNeigborData[3];	// true - наличие данных от соседей
+	//--------------------------------------------------------
+	WORD	NewOutDac;			// сюда приходят новые значения для управления реле
+	
 	TInfo	Info;	
 	BYTE	SendPak;
 	BYTE	SendPakTar;
@@ -145,22 +165,19 @@ typedef struct
 	BYTE	NumReg;
 	BYTE	ValReg;
 	//--------------------------------------------------------
-	WORD	wOldError;		// старые ошибки
-	WORD	wError;			// неисправность выхода цапа 1 - выход неисправен
 	BYTE	HiLo;			// выдача меанднра для выдачи ЦАП
 	BYTE	HiLoDec;		// HiLo изменился 
-	BYTE	Master;			//Является ли данный ЦАП мастером
 	BYTE	StatusMaster;	//Статус выбора
 	BYTE	ErrorSet;		// 1- били ошибки при включении реле больше не пытаемся стать мастером
 	
 	TYPE_DATA_TIMER	TimerMasterError;		//Таймер для выбора мастера
+	TYPE_DATA_TIMER	TimerPingNeighbor;		// таймер выдачи пинга соседям		
 	TYPE_DATA_TIMER	TimerDout;		
 	TYPE_DATA_TIMER	TimerDin;
 	TYPE_DATA_TIMER	TimerAin;
 	TYPE_DATA_TIMER	TimerTemp;
 	//--------------------------------------------------------
 	BYTE	WriteTar;		// 1 - при изменении тарировки прописываются в EEPROM
-	BYTE	TarrStatus;		//Оттарирован блок или нет, если не оттарирован то можно выставить мастера
 
 }CDAC11;
 

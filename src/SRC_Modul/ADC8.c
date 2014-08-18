@@ -250,8 +250,14 @@ void DriverADC8()
 				HighDensPageWrite(0, (BYTE*)(&TarRam), 256);
 			}
 			//------------------------------------
-			SRTA	= 1;	// запуск конвертации всех АЦП
-			msDelay(2);
+			msDelay(100);
+			RES1A	= 0;
+			RES2A	= 0;
+			msDelay(5);
+			RES1A	= 1;
+			RES2A	= 1;
+			msDelay(5);
+			
 			for(j=0;j<ADC_CHIP_COUNT;j++)	// прописываем значение регистров по умолчанию
 			{
 				ChipSelekt(j, CS_ON);
@@ -262,6 +268,8 @@ void DriverADC8()
 				StopContMode(j);
 				ChipSelekt(j, CS_OFF);
 			}
+			msDelay(2);
+			SRTA	= 1;	// запуск конвертации всех АЦП
 			//========================================================
 		}
 	}

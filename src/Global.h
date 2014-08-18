@@ -24,8 +24,8 @@
 //Выбираем блок для  конкретной реализации
 //#define	PLATA_KCU4
 //#define	PLATA_ADC8
-#define 	PLATA_FSU_29_30
-//#define	PLATA_NDD22
+//#define 	PLATA_FSU_29_30
+#define	PLATA_NDD22
 //#define	PLATA_DAC11
 //==============================================================================
 #define BUFFER_LEN_UART		300				//Размер буффера порта
@@ -206,7 +206,7 @@ extern BYTE	WATCH_DOG_CODE;
 #define RST_RSTPIN		0x4			//от внешнего и точника
 #define RST_RSTBIT		0x5			//RST bit
 
-#define	ON1_PWR		PDR14_P7
+#define	ON1_PWR		PDR14_P7		// 0 - вкл блоков питания, 1 - выкл
 #define	ON2_PWR		PDR00_P4
 #define	ON1_PWR_OFF	ON1_PWR=1;
 #define	ON2_PWR_OFF	ON2_PWR=1;
@@ -268,7 +268,9 @@ typedef struct
 	BYTE	setPPG1ch_en;
 	BYTE	setPPG2ch_en;
 	DWORD	EE_StPwr;
-	DWORD	StPwr;
+	DWORD	StPwr; //3 - блок питания не включаем есть неисправность 
+				   //2 - блок питания включился
+				   //1 - идет процесс включения
 #endif
 
 }TProgram;

@@ -44,9 +44,9 @@ void main(void)
 		BYTE i;
 	#endif
 	//===================================
-	#if ((BUFFER_LEN_UART>1000)||(COUNT_UART_BUF>4))
+	//#if ((BUFFER_LEN_UART>1000)||(COUNT_UART_BUF>4))
 	InitWatchDog();
-	#endif
+	//#endif
 	
 	I2C_Init(0);
 	I2C_Init(1);

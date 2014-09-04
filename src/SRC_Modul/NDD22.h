@@ -5,8 +5,8 @@
 
 #include "can.h"
 
-#define PLATA_NDD22_ 
-//#define PLATA_NDD23_ 
+//#define PLATA_NDD22_ 
+#define PLATA_NDD23_ 
 
 #define DEVICE_TYPE 1
 
@@ -54,7 +54,6 @@ typedef union
 	{
 		WORD Addr	:5;	
 		WORD Mode	:4;
-		
 		WORD Can3	:1;
 		WORD Res1	:1;
 		WORD Can1	:1;
@@ -71,13 +70,16 @@ typedef struct
 	//------------------------------------------------
 	BYTE	State[4][3];	// три байта ответа микросхемы
 	BYTE	Din[4];			// состояние дискретных входов полученые по схеме "и"
-	BYTE	test[4];		// достоверность сигналов
+	BYTE	valid[4];		// достоверность сигналов обобщенная
 	BYTE	Term[4];		// флаг перегрева в ответе, учитываем его в достоверности сигналов
 	BYTE	ADC[4][22];		// опрос входов используя АЦП
 	BYTE	CurrentAmuxSet; //
 	BYTE	CurrentSelect;  // выбор изм тока 0 - high-impedance; 1 - 2mA; 2 - 16mA
 	BYTE	CurrentPart;  	// текущая половина 0 - первая 1 - вторая
 	BYTE	Init[4];  		// TRUE необходимо заново инициализировать микросхемы
+	
+	BYTE	Link[4];		// отображает только наличие связи с микросхемой
+	BYTE	Reboot[2];		// нужно перезапустить питание 3.3 V
 	
 	//-------------------------------------------------------- 
 	BYTE	SendPak;

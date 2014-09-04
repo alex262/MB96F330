@@ -23,7 +23,13 @@ WORD (*STATE_BLOCK) = &Ndd.Info.word;
 
 //====================================================================
 static TYPE_DATA_TIMER TimerStartBlock = 1000/TIMER_RESOLUTION_MS;
+static TYPE_DATA_TIMER TimerReboot1;
+static TYPE_DATA_TIMER TimerReboot2;
+static BYTE StatusReboot1 = 0;
+static BYTE StatusReboot2 = 0;
+
 static BYTE stStartBlock = FALSE;
+static BYTE stStartValid = FALSE;
 //====================================================================
 static BYTE BuffUart[BUFFER_LEN_UART];
 static WORD CountDataUart = 0;
@@ -32,6 +38,8 @@ static TYPE_DATA_TIMER TimerSpi;
 void InitDinReg(BYTE i);
 static BYTE RET_DATA_SPI[10];
 BYTE write_spi_reg(BYTE ch, BYTE Command, WORD Data, BYTE * ret, BYTE Test);
+void ResetDinReg(BYTE i);
+
 //void write_sec(BYTE ch, BYTE Len, BYTE * ret, BYTE * send);
 BYTE ReadAdc(BYTE ch);
 void GoWorkAdc(BYTE ch, BYTE st);
@@ -94,14 +102,21 @@ void InitNDD()
 	CS22	= CS_OFF;
 	CS23	= CS_OFF;
 	//------------------------------------
+	Ndd.Reboot[0] = FALSE;
+	Ndd.Reboot[1] = FALSE;
+	
 	for(i=0; i<4; i++)
 	{
 		Ndd.Din[i] = 0;
-		Ndd.test[i] = NOT_VALID_DIN;
+		Ndd.Link[i] = FALSE;
+		Ndd.valid[i] = NOT_VALID_DIN;
 		Ndd.Init[i] = FALSE;		
 		for(j=0; j<3; j++)
 			Ndd.State[i][j] = 0;
 	}
+	TimerReboot1 = 0;
+	TimerReboot2 = 0;
+	
 	Ndd.CurrentAmuxSet	= 0;
 	Ndd.CurrentSelect	= 2;  // выбор изм тока 0 - high-impedance; 1 - 2mA; 2 - 16mA
 	Ndd.CurrentPart		= 0;
@@ -153,7 +168,6 @@ void DriverNDD()
 	{
 		if(getTimer(&TimerStartBlock) == 0)	
 		{
-			//del_timer(&TimerStartBlock);
 			stStartBlock = TRUE;
 			//----------------------------------
 			// инициализация регистров DIN
@@ -170,13 +184,87 @@ void DriverNDD()
 		{
 			setTimer(&TimerStartBlock,20);
 			//--------------------------------------
-			for(i=0; i<4; i++)
+			// определяем необходимио ли перезапустить блок питания
+			if((Ndd.Init[0] == TRUE)&&(Ndd.Init[1] == TRUE)) // пропадало питание по 27В нужно перезапустить соответствующий блок питания
 			{
-				if((Ndd.Init[i] == TRUE)&&(Ndd.test[i] == VALID_DIN))
+				Ndd.Reboot[0]	= TRUE;
+				Ndd.Init[0]		= FALSE;
+				Ndd.Init[1]		= FALSE;
+				StatusReboot1 = 0;
+			}
+			if((Ndd.Init[2] == TRUE)&&(Ndd.Init[3] == TRUE)) // пропадало питание по 27В нужно перезапустить соответствующий блок питания
+			{
+				Ndd.Reboot[1]	= TRUE;
+				Ndd.Init[2]		= FALSE;
+				Ndd.Init[3]		= FALSE;
+				StatusReboot2 = 0;
+			}
+			
+			if((Ndd.Reboot[0] == TRUE)&&((Ndd.Link[0] == TRUE)||(Ndd.Link[1] == TRUE))) // есть необходимость перезапуска первой пары и есть связь хотябы с одной
+			{
+				if(StatusReboot1 == 0)
 				{
-					Ndd.Init[i] = FALSE;
-					InitDinReg(i);
+					TimerReboot1 = 1000;
+					add_timer(&TimerReboot1);
+					ON1_PWR_OFF;
+					StatusReboot1 = 1;
 				}
+				if(StatusReboot1 == 1)
+				{
+					if(getTimer(&TimerReboot1) == 0)
+					{
+						ON1_PWR_ON;
+						msDelay(5);
+						InitDinReg(0);
+						InitDinReg(1);
+						setTimer(&TimerReboot1,100);
+						StatusReboot1 = 2;
+					}
+				}
+				if(StatusReboot1 == 2)
+				{
+					if(getTimer(&TimerReboot1) == 0)
+					{
+						StatusReboot1 = 0;
+						del_timer(&TimerReboot1);
+						Ndd.valid[0]= VALID_DIN;
+						Ndd.valid[1]= VALID_DIN;
+						Ndd.Reboot[0] == FALSE;
+					}
+				}	
+			}
+			if((Ndd.Reboot[1] == TRUE)&&((Ndd.Link[2] == TRUE)||(Ndd.Link[3] == TRUE))) // есть необходимость перезапуска второй пары и есть связь хотябы с одной
+			{
+				if(StatusReboot2 == 0)
+				{
+					TimerReboot2 = 1000;
+					add_timer(&TimerReboot2);
+					ON2_PWR_OFF;
+					StatusReboot2 = 1;
+				}
+				if(StatusReboot2 == 1)
+				{
+					if(getTimer(&TimerReboot2) == 0)
+					{
+						ON2_PWR_ON;
+						msDelay(5);
+						InitDinReg(2);
+						InitDinReg(3);
+						setTimer(&TimerReboot2,100);
+						StatusReboot2 = 2;
+					}
+				}
+				if(StatusReboot2 == 2)
+				{
+					if(getTimer(&TimerReboot2) == 0)
+					{
+						StatusReboot2 = 0;
+						del_timer(&TimerReboot2);
+						Ndd.valid[2]= VALID_DIN;
+						Ndd.valid[3]= VALID_DIN;
+						Ndd.Reboot[1] == FALSE;
+					}
+				}	
 			}
 			//----------------------------------------		
 			if(Ndd.stWrReg	== TRUE)
@@ -194,16 +282,26 @@ void DriverNDD()
 				}
 			}
 			//-------------------------------------------
+			if(stStartValid == FALSE)
+			{
+				stStartValid = TRUE;
+				for(i=0; i<4; i++)
+					Ndd.valid[i]= VALID_DIN;
+			}
+			
 			for(i=0; i<4; i++)
 			{
 				ChipSelektDIN(i, CS_ON);
 				if(write_spi_reg(i, 0, 0, RET_DATA_SPI, TRUE) == FALSE)	// нет связи
 				{
-					Ndd.test[i] = NOT_VALID_DIN;
+					Ndd.valid[i]= NOT_VALID_DIN;
+					Ndd.Link[i] = FALSE;
 					Ndd.Init[i] = TRUE;
 				}
 				else
-					Ndd.test[i] = VALID_DIN;
+				{
+					Ndd.Link[i] = TRUE;
+				}
 				
 				ChipSelektDIN(i, CS_OFF);
 				
@@ -217,7 +315,8 @@ void DriverNDD()
 				tmp[1]= 0;
 				
 				Ndd.Term[i] = digit(Ndd.State[i][0],7);
-				if(Ndd.Term[i] != 0) Ndd.test[i] = NOT_VALID_DIN;
+				if(Ndd.Term[i] != 0) Ndd.valid[i]= NOT_VALID_DIN;
+					
 				
 				#ifdef PLATA_NDD22_
 					tmp[0]= digit(Ndd.State[i][0],2) | (digit(Ndd.State[i][0],3)<<1)|(digit(Ndd.State[i][0],4)<<2)|(digit(Ndd.State[i][0],5)<<3)
@@ -363,7 +462,10 @@ void InitDinReg(BYTE i)
 	BYTE j;
 	
 	if(i>3) return;
-
+	
+	ResetDinReg(i);
+	msDelay(2);
+	
 	for(j = 0; j < REG_DIN_COUNT; j++)
 	{
 		if(REG_DIN_WRITE[j])
@@ -375,6 +477,17 @@ void InitDinReg(BYTE i)
 		}
 	}
 }
+void ResetDinReg(BYTE i)
+{
+	BYTE j;
+	
+	if(i>3) return;
+
+	ChipSelektDIN(i, CS_ON);
+	write_spi_reg(i, 0x7F, 0, RET_DATA_SPI, FALSE);
+	ChipSelektDIN(i, CS_OFF);
+}
+
 //====================================================================
 void ServiceUart(BYTE Id, BYTE* pData, WORD Len)
 {

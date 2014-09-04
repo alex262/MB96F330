@@ -1398,10 +1398,10 @@ subindex Index6200[] =
 static UNS8 highestSubIndex_6201 = 3; // number of subindex - 1
 subindex Index6201[] = 
 {
-	{ RW, uint8, sizeof (UNS8), (void*)&highestSubIndex_6201},
-	{ RW, uint8, sizeof (UNS8), (void*)&Fsu.SetData[0]},
-	{ RW, uint8, sizeof (UNS8), (void*)&Fsu.SetData[1]},
-	{ RW, uint8, sizeof (UNS8), (void*)&Fsu.SetData[2]}
+	{ RO, uint8, sizeof (UNS8), (void*)&highestSubIndex_6201},
+	{ RO, uint8, sizeof (UNS8), (void*)&Fsu.SetData[0]},
+	{ RO, uint8, sizeof (UNS8), (void*)&Fsu.SetData[1]},
+	{ RO, uint8, sizeof (UNS8), (void*)&Fsu.SetData[2]}
 };
 /********* Index 6209 *********/
 static UNS8 highestSubIndex_6209 = 3; // number of subindex - 1
@@ -1502,10 +1502,10 @@ static UNS8 highestSubIndex_6009 = 4; // number of subindex - 1
 subindex Index6009[] = 
 {
 	{ RO, uint8, sizeof (UNS8), (void*)&highestSubIndex_6009},
-	{ RO, uint8, sizeof (UNS8), (void*)&Ndd.test[0]},
-	{ RO, uint8, sizeof (UNS8), (void*)&Ndd.test[1]},
-	{ RO, uint8, sizeof (UNS8), (void*)&Ndd.test[2]},
-	{ RO, uint8, sizeof (UNS8), (void*)&Ndd.test[3]}
+	{ RO, uint8, sizeof (UNS8), (void*)&Ndd.valid[0]},
+	{ RO, uint8, sizeof (UNS8), (void*)&Ndd.valid[1]},
+	{ RO, uint8, sizeof (UNS8), (void*)&Ndd.valid[2]},
+	{ RO, uint8, sizeof (UNS8), (void*)&Ndd.valid[3]}
 };
 
 #define DIGITAL_INPUT_LAST_TABLE_INDEX 0x6009

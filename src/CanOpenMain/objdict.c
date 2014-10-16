@@ -70,7 +70,7 @@ const proceed_info proceed_infos[] =
 	{PDO8,		/*"PDO4rx",*/		proceedPDO},				//10	8
 	{SDOtx,		/*"SDOtx",*/		proceedSDO},				//11
 	{SDOrx,		/*"SDOrx",*/		proceedSDO},				//12
-	{0xD,		/*"BOOTLOADER",*/	ServiceBootloadCan},		//13
+	{0xD,		/*"BOOTLOADER",*/	ServiceBootloadUpd},		//13
 	{NODE_GUARD,/*"NODE GUARD",*/	proceedNMTerror},			//14
 	{0xF,		/*"Unknown",*/		0},							//15
 	{0x10,		/*"PDO5",*/			proceedPDO},				//16	9
@@ -1522,20 +1522,229 @@ __far const indextable digitalInputTable[] =
 	{ NULL, 0 },
 	DeclareIndexTableEntry(Index6009)
 };
+#endif
+//==================================================================================================================================================================================================
+//==================================================================================================================================================================================================
+//==================================================================================================================================================================================================
+//                                                                                                                                                      
+//                                                                                                                                                      
+//  ######   ######        #####        #################                               #####             ######                                        
+//  ######   ######      #########      #################                             #######           ########                                        
+//  ######   ######     ###########     ######     ######                          ##########        ###########                                        
+//  ######   ######   ######   ######   ######     ######                         ###########      #############                                        
+//  ######   ######   ######   ######   ######     ######                               #####             ######                                        
+//  ######   ######   ######   ######   ######     ######      ###############          #####             ######                                        
+//  ######   ######   ######   ######   ######     ######      ###############          #####             ######                                        
+//  ######   ######   ###############   ######     ######                               #####             ######                                        
+//  ######   ######   ###############   ######     ######                               #####             ######                                        
+//  ######   ######   ######   ######   ######     ######                               #####             ######                                        
+//  ################# ######   ######   ######     ######                               #####             ######                                        
+//  ################# ######   ######   ######     ######                               #####             ######                                        
+//             ######                                                                                                                                   
+//              ####                                                                                                                                    
+//                                                                                                                                                      
+//==================================================================================================================================================================================================
+#ifdef 	PLATA_DAC11
+/********* Index 2000 *********/
+static const UNS8 highestSubIndex_2000 = 11; // number of subindex - 1
+subindex Index2000[] = 
+{
+	{ RO, uint8,  sizeof(UNS8), 	(void*)&highestSubIndex_2000 },	//0
+	{ RW, uint16, sizeof(UNS16), 	(void*)&program.ms},			//1
+	{ RW, uint8,  sizeof(UNS8), 	(void*)&program.sec},			//2
+	{ RW, uint8,  sizeof(UNS8), 	(void*)&program.min},			//3
+	{ RW, uint8,  sizeof(UNS8), 	(void*)&program.hour},			//4
+	{ RW, uint32, sizeof(UNS32), 	(void*)&program.day},			//5
+	{ RW, uint8,  sizeof(UNS8), 	(void*)&Dac11.WriteTar},		//6
+	{ RO, uint32, sizeof(UNS32), 	(void*)&Dac11.ErrorDAC[0]},		//7
+	{ RO, uint16, sizeof(UNS16), 	(void*)&Dac11.Master[0]},		//8
+	{ RW, uint16, sizeof (UNS16), 	(void*)&Dac11.NewOutDac},		//9
+	{ RO, uint16, sizeof (UNS16), 	(void*)&Dac11.EnOutDac},		//10
+	{ RO, uint16, sizeof (UNS16), 	(void*)&Dac11.DiagRele}			//11
+};
+/********* Index 2001 *********/
+static UNS8 highestSubIndex_2001 = 1; // number of subindex - 10
+subindex Index2001[] = 
+{
+	{ RO, uint8,	sizeof(UNS8),	(void*)&highestSubIndex_2001 },
+	{ RO, uint16,	sizeof(UNS16),	(void*)&Dac11.Info.word}
+};
+#define MANUFACTURER_SPECIFIC_LAST_INDEX 0x2001
+__far const indextable manufacturerProfileTable[] = 
+{
+	DeclareIndexTableEntry(Index2000),
+	DeclareIndexTableEntry(Index2001)
+};
+
+/********* Index 6413 *********/
+static UNS8 highestSubIndex_6413 = 12; // number of subindex - 1
+subindex Index6413[] = 
+{
+	{ RO, uint8,  sizeof (UNS8), (void*)&highestSubIndex_6413},
+	{ WO, real32, sizeof (REAL32),(void*)&Dac11.fDAC_New[0]},
+	{ WO, real32, sizeof (REAL32),(void*)&Dac11.fDAC_New[1]},
+	{ WO, real32, sizeof (REAL32),(void*)&Dac11.fDAC_New[2]},
+	{ WO, real32, sizeof (REAL32),(void*)&Dac11.fDAC_New[3]},
+	{ WO, real32, sizeof (REAL32),(void*)&Dac11.fDAC_New[4]},
+	{ WO, real32, sizeof (REAL32),(void*)&Dac11.fDAC_New[5]},
+	{ WO, real32, sizeof (REAL32),(void*)&Dac11.fDAC_New[6]},
+	{ WO, real32, sizeof (REAL32),(void*)&Dac11.fDAC_New[7]},
+	{ WO, real32, sizeof (REAL32),(void*)&Dac11.fDAC_New[8]},
+	{ WO, real32, sizeof (REAL32),(void*)&Dac11.fDAC_New[9]},
+	{ WO, real32, sizeof (REAL32),(void*)&Dac11.fDAC_New[10]},
+	{ WO, real32, sizeof (REAL32),(void*)&Dac11.fDAC_New[11]}
+};
+static UNS8 highestSubIndex_6417 = 12; // number of subindex - 1
+subindex Index6417[] = 
+{
+  { RO, uint8, 	sizeof (UNS8), 	(void*)&highestSubIndex_6417},
+  { RO, real32, sizeof (REAL32),(void*)&Dac11.fDAC_Set[0]},
+  { RO, real32, sizeof (REAL32),(void*)&Dac11.fDAC_Set[1]},
+  { RO, real32, sizeof (REAL32),(void*)&Dac11.fDAC_Set[2]},
+  { RO, real32, sizeof (REAL32),(void*)&Dac11.fDAC_Set[3]},
+  { RO, real32, sizeof (REAL32),(void*)&Dac11.fDAC_Set[4]},
+  { RO, real32, sizeof (REAL32),(void*)&Dac11.fDAC_Set[5]},
+  { RO, real32, sizeof (REAL32),(void*)&Dac11.fDAC_Set[6]},
+  { RO, real32, sizeof (REAL32),(void*)&Dac11.fDAC_Set[7]},
+  { RO, real32, sizeof (REAL32),(void*)&Dac11.fDAC_Set[8]},
+  { RO, real32, sizeof (REAL32),(void*)&Dac11.fDAC_Set[9]},
+  { RO, real32, sizeof (REAL32),(void*)&Dac11.fDAC_Set[10]},
+  { RO, real32, sizeof (REAL32),(void*)&Dac11.fDAC_Set[11]}
+};
+
+static UNS8 highestSubIndex_6418 = 12; // number of subindex - 1
+const subindex Index6418[] = 
+{
+  { RO, uint8, 	sizeof (UNS8), 	(void*)&highestSubIndex_6418},
+  { RW, real32, sizeof (REAL32),(void*)&TarRam[0].ofs},
+  { RW, real32, sizeof (REAL32),(void*)&TarRam[1].ofs},
+  { RW, real32, sizeof (REAL32),(void*)&TarRam[2].ofs},
+  { RW, real32, sizeof (REAL32),(void*)&TarRam[3].ofs},
+  { RW, real32, sizeof (REAL32),(void*)&TarRam[4].ofs},
+  { RW, real32, sizeof (REAL32),(void*)&TarRam[5].ofs},
+  { RW, real32, sizeof (REAL32),(void*)&TarRam[6].ofs},
+  { RW, real32, sizeof (REAL32),(void*)&TarRam[7].ofs},
+  { RW, real32, sizeof (REAL32),(void*)&TarRam[8].ofs},
+  { RW, real32, sizeof (REAL32),(void*)&TarRam[9].ofs},
+  { RW, real32, sizeof (REAL32),(void*)&TarRam[10].ofs},
+  { RW, real32, sizeof (REAL32),(void*)&TarRam[11].ofs}
+};
+static UNS8 highestSubIndex_6419 = 12; // number of subindex - 1
+const subindex Index6419[] = 
+{
+  { RO, uint8, 	sizeof (UNS8), 	(void*)&highestSubIndex_6419},
+  { RW, real32, sizeof (REAL32),(void*)&TarRam[0].k},
+  { RW, real32, sizeof (REAL32),(void*)&TarRam[1].k},
+  { RW, real32, sizeof (REAL32),(void*)&TarRam[2].k},
+  { RW, real32, sizeof (REAL32),(void*)&TarRam[3].k},
+  { RW, real32, sizeof (REAL32),(void*)&TarRam[4].k},
+  { RW, real32, sizeof (REAL32),(void*)&TarRam[5].k},
+  { RW, real32, sizeof (REAL32),(void*)&TarRam[6].k},
+  { RW, real32, sizeof (REAL32),(void*)&TarRam[7].k},
+  { RW, real32, sizeof (REAL32),(void*)&TarRam[8].k},
+  { RW, real32, sizeof (REAL32),(void*)&TarRam[9].k},
+  { RW, real32, sizeof (REAL32),(void*)&TarRam[10].k},
+  { RW, real32, sizeof (REAL32),(void*)&TarRam[11].k}
+};
+
+#define ANALOG_OUTPUT_LAST_TABLE_INDEX 0x6419
+
+__far const indextable analogOutputTable[] = 
+{
+	{ NULL, 0 },//0
+	{ NULL, 0 },//1
+	{ NULL, 0 },//2
+	DeclareIndexTableEntry(Index6413),
+	{ NULL, 0 },//4
+	{ NULL, 0 },//5
+	{ NULL, 0 },//6
+	DeclareIndexTableEntry(Index6417),
+	DeclareIndexTableEntry(Index6418),
+	DeclareIndexTableEntry(Index6419)
+};
+
+/********* Index 6403 ******************************************************/
+static UNS8 highestSubIndex_6403 = 12; // number of subindex - 1
+
+const subindex Index6403[] = 
+{
+	{ RO, uint8, 	sizeof (UNS8), 	(void*)&highestSubIndex_6403},
+
+	{ RO, real32, sizeof (REAL32),(void*)&Dac11.fADC[0]},
+	{ RO, real32, sizeof (REAL32),(void*)&Dac11.fADC[1]},
+	{ RO, real32, sizeof (REAL32),(void*)&Dac11.fADC[2]},
+	{ RO, real32, sizeof (REAL32),(void*)&Dac11.fADC[3]},
+	{ RO, real32, sizeof (REAL32),(void*)&Dac11.fADC[4]},
+	{ RO, real32, sizeof (REAL32),(void*)&Dac11.fADC[5]},
+	{ RO, real32, sizeof (REAL32),(void*)&Dac11.fADC[6]},
+	{ RO, real32, sizeof (REAL32),(void*)&Dac11.fADC[7]},
+	{ RO, real32, sizeof (REAL32),(void*)&Dac11.fADC[8]},
+	{ RO, real32, sizeof (REAL32),(void*)&Dac11.fADC[9]},
+	{ RO, real32, sizeof (REAL32),(void*)&Dac11.fADC[10]},
+	{ RO, real32, sizeof (REAL32),(void*)&Dac11.fADC[11]}
+};
+static UNS8 highestSubIndex_6405 = 12; // number of subindex - 1
+const subindex Index6405[] = 
+{
+	{ RO, uint8, 	sizeof (UNS8), 	(void*)&highestSubIndex_6405},
+	//============================================
+	{ RW, real32, sizeof (REAL32),(void*)&TarRam[12].ofs},
+	{ RW, real32, sizeof (REAL32),(void*)&TarRam[13].ofs},
+	{ RW, real32, sizeof (REAL32),(void*)&TarRam[14].ofs},
+	{ RW, real32, sizeof (REAL32),(void*)&TarRam[15].ofs},
+	{ RW, real32, sizeof (REAL32),(void*)&TarRam[16].ofs},
+	{ RW, real32, sizeof (REAL32),(void*)&TarRam[17].ofs},
+	{ RW, real32, sizeof (REAL32),(void*)&TarRam[18].ofs},
+	{ RW, real32, sizeof (REAL32),(void*)&TarRam[19].ofs},
+	{ RW, real32, sizeof (REAL32),(void*)&TarRam[20].ofs},
+	{ RW, real32, sizeof (REAL32),(void*)&TarRam[21].ofs},
+	{ RW, real32, sizeof (REAL32),(void*)&TarRam[22].ofs},
+	{ RW, real32, sizeof (REAL32),(void*)&TarRam[23].ofs}
+};
+static UNS8 highestSubIndex_6406 = 12; // number of subindex - 1
+const subindex Index6406[] = 
+{
+	{ RO, uint8, 	sizeof (UNS8), 	(void*)&highestSubIndex_6406},
+	
+	{ RW, real32, sizeof (REAL32),(void*)&TarRam[12].k},
+	{ RW, real32, sizeof (REAL32),(void*)&TarRam[13].k},
+	{ RW, real32, sizeof (REAL32),(void*)&TarRam[14].k},
+	{ RW, real32, sizeof (REAL32),(void*)&TarRam[15].k},
+	{ RW, real32, sizeof (REAL32),(void*)&TarRam[16].k},
+	{ RW, real32, sizeof (REAL32),(void*)&TarRam[17].k},
+	{ RW, real32, sizeof (REAL32),(void*)&TarRam[18].k},
+	{ RW, real32, sizeof (REAL32),(void*)&TarRam[19].k},
+	{ RW, real32, sizeof (REAL32),(void*)&TarRam[20].k},
+	{ RW, real32, sizeof (REAL32),(void*)&TarRam[21].k},
+	{ RW, real32, sizeof (REAL32),(void*)&TarRam[22].k},
+	{ RW, real32, sizeof (REAL32),(void*)&TarRam[23].k}
+};
+
+#define ANALOG_INPUT_LAST_TABLE_INDEX 0x6406
+__far const indextable analogInputTable[] = 
+{
+	{ NULL, 0 },
+	{ NULL, 0 },
+	{ NULL, 0 },
+	DeclareIndexTableEntry(Index6403),
+	{ NULL, 0 },
+	DeclareIndexTableEntry(Index6405),
+	DeclareIndexTableEntry(Index6406)
+};
+
 
 
 
 #endif
-//=================================================================================================
-//=================================================================================================
-//=================================================================================================
-//=================================================================================================
-//=================================================================================================
-//=================================================================================================
-//=================================================================================================
-//=================================================================================================
-//=================================================================================================
-//=================================================================================================
+//==================================================================================================================================================================================================
+//==================================================================================================================================================================================================
+//==================================================================================================================================================================================================
+//==================================================================================================================================================================================================
+//==================================================================================================================================================================================================
+//==================================================================================================================================================================================================
+//==================================================================================================================================================================================================
+//==================================================================================================================================================================================================
+//==================================================================================================================================================================================================
 
 #ifndef MANUFACTURER_SPECIFIC_LAST_INDEX
 	#define MANUFACTURER_SPECIFIC_LAST_INDEX 0

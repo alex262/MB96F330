@@ -42,11 +42,11 @@ void	(*SERVICE_PAK_UART)(BYTE, BYTE*, WORD) = ServiceUart;
 WORD TIME_WAIT_SELECT_MASTER = 30/TIMER_RESOLUTION_MS;				// Время задержки перед выставлением статуса мастер
 WORD TIME_WAIT_SELECT_MASTER_IF_ERROR = 3000/TIMER_RESOLUTION_MS;	// Время задержки перед выставлением статуса мастер при наличии ощибок и отсутствия другого мастера на шине
 //==============================================================================
-TTar	TarrRAM[2*COUNT_DAC_CH];									// Тарировки ЦАПа и АЦП скопированные в RAM  
+TTar	TarRam[2*COUNT_DAC_CH];										// Тарировки ЦАПа и АЦП скопированные в RAM  
 TTar	TarrEEPROM[2*COUNT_DAC_CH];									// тарировки каналов в EEPROM
 //==============================================================================
 #define SETTING_0	0xF7	
-#define SETTING_1	0xFF	
+#define SETTING_1	0x0E	
 #define SETTING_7	0x57	// настройки цапа
 //==============================================================================
 TPAK_SPI_RM		pak_spi_rm;
@@ -262,18 +262,18 @@ int ConvertADCtoINT(WORD d)
 // Выбор SPI 
 void SelectMask_DAC(WORD Mask)
 {
-	if(Mask&0x0001) {CS11 = CS_ON; return;}
-	if(Mask&0x0002) {CS12 = CS_ON; return;}
-	if(Mask&0x0004) {CS13 = CS_ON; return;}
-	if(Mask&0x0008) {CS14 = CS_ON; return;}
-	if(Mask&0x0010) {CS15 = CS_ON; return;}
-	if(Mask&0x0020) {CS16 = CS_ON; return;}
-	if(Mask&0x0040) {CS21 = CS_ON; return;}
-	if(Mask&0x0080) {CS22 = CS_ON; return;}
-	if(Mask&0x0100) {CS23 = CS_ON; return;}
-	if(Mask&0x0200) {CS24 = CS_ON; return;}
-	if(Mask&0x0400) {CS25 = CS_ON; return;}
-	if(Mask&0x0800) {CS26 = CS_ON; return;}
+	if(Mask&0x0001) {CS11 = CS_ON; }
+	if(Mask&0x0002) {CS12 = CS_ON; }
+	if(Mask&0x0004) {CS13 = CS_ON; }
+	if(Mask&0x0008) {CS14 = CS_ON; }
+	if(Mask&0x0010) {CS15 = CS_ON; }
+	if(Mask&0x0020) {CS16 = CS_ON; }
+	if(Mask&0x0040) {CS21 = CS_ON; }
+	if(Mask&0x0080) {CS22 = CS_ON; }
+	if(Mask&0x0100) {CS23 = CS_ON; }
+	if(Mask&0x0200) {CS24 = CS_ON; }
+	if(Mask&0x0400) {CS25 = CS_ON; }
+	if(Mask&0x0800) {CS26 = CS_ON; }
 }
 
 void SelectAll_DAC(void)
@@ -336,7 +336,7 @@ void WriteNormalDataDac(BYTE ch, float data)
 
 	if(ch>(COUNT_DAC_CH-1)) return;
 
-	res=TarrRAM[ch].k*data+TarrRAM[ch].ofs;
+	res=TarRam[ch].k*data+TarRam[ch].ofs;
 
 	if(res>MAX_COD_DAC) res=(float)MAX_COD_DAC;
 	if(res<MIN_COD_DAC) res=(float)MIN_COD_DAC;
@@ -363,33 +363,33 @@ void DriverDAC11(void)
 			//========================================================
 			// Читаем тарировки из EEPROM в RAM
 			SetWorkChI2C(1);
-			HighDensSequentialRead(0, (BYTE *)(&TarrRAM),2*8*COUNT_DAC_CH);
+			HighDensSequentialRead(0, (BYTE *)(&TarRam),2*8*COUNT_DAC_CH);
 			st =0;
 			
 			for(i=0; i<2*COUNT_DAC_CH; i++)
 			{
-				if((check_NaN_Inf(TarrRAM[i].k)) == TRUE)
+				if((check_NaN_Inf(TarRam[i].k)) == TRUE)
 				{
-					TarrRAM[i].k = 1.0;
+					TarRam[i].k = 1.0;
 					st = 1;
 				}
-				if(check_NaN_Inf(TarrRAM[i].ofs) == TRUE)
+				if(check_NaN_Inf(TarRam[i].ofs) == TRUE)
 				{
-					TarrRAM[i].ofs = 0.0;
+					TarRam[i].ofs = 0.0;
 					st = 1;
 				}
-				TarrEEPROM[i].k		= TarrRAM[i].k;
-				TarrEEPROM[i].ofs	= TarrRAM[i].ofs;
+				TarrEEPROM[i].k		= TarRam[i].k;
+				TarrEEPROM[i].ofs	= TarRam[i].ofs;
 			}
 			
-			if(st == 1)	HighDensPageWrite(0, (BYTE*)(&TarrRAM), 2*8*COUNT_DAC_CH);
+			if(st == 1)	HighDensPageWrite(0, (BYTE*)(&TarRam), 2*8*COUNT_DAC_CH);
 			
 			//=============================================================
 			// если хотябы один цап имеет ед тарировки разрешаем коммм реле
 			Dac11.TarrStatus		=true;
 			for(i=0; i<COUNT_DAC_CH; i++)
 			{
-				if(TarrRAM[i].k == 1.0)
+				if(TarRam[i].k == 1.0)
 				{
 					Dac11.TarrStatus = false;
 					break;
@@ -441,15 +441,15 @@ void DriverDAC11(void)
 			st = 0;
 			for(i=0; i<2*COUNT_DAC_CH; i++)
 			{
-				if(TarrEEPROM[i].k	!= TarrRAM[i].k)
+				if(TarrEEPROM[i].k	!= TarRam[i].k)
 				{
 					st = 1;
-					TarrEEPROM[i].k	= TarrRAM[i].k;
+					TarrEEPROM[i].k	= TarRam[i].k;
 				}
-				if(TarrEEPROM[i].ofs	!= TarrRAM[i].ofs)
+				if(TarrEEPROM[i].ofs	!= TarRam[i].ofs)
 				{
 					st = 1;
-					TarrEEPROM[i].ofs = TarrRAM[i].ofs;
+					TarrEEPROM[i].ofs = TarRam[i].ofs;
 				}
 			}
 			if(st == 1)
@@ -507,7 +507,7 @@ void DriverDAC11(void)
 					
 				iData = wData&0xFFF;
 				
-				Dac11.fADC[i] = TarrRAM[COUNT_DAC_CH+i].k*(float)iData + TarrRAM[COUNT_DAC_CH+i].ofs;
+				Dac11.fADC[i] = TarRam[COUNT_DAC_CH+i].k*(float)iData + TarRam[COUNT_DAC_CH+i].ofs;
 				
 				if(digit(Dac11.OutDac[0], i) == 1) // если соответствующий выход скомутирован наружу
 				{
@@ -618,7 +618,7 @@ void DriverDAC11(void)
 	if(Dac11.SendPakTar == TRUE)
 	{
 		Dac11.SendPakTar = FALSE;
-		CreateAndSend_Pkt_UART0((U8 *)(&TarrRAM), COUNT_DAC_CH*4*2*2, 2, 2);
+		CreateAndSend_Pkt_UART0((U8 *)(&TarRam), COUNT_DAC_CH*4*2*2, 2, 2);
 	}
 	//----------------------------------------------------
 }
@@ -645,8 +645,8 @@ void ServiceUart(BYTE Id, BYTE* pData, WORD Len)
 		pTar = (TTar *)pData;
 		for(i=0; i<2*COUNT_DAC_CH; i++)
 		{
-			TarrRAM[i].k	= pTar[i].k;
-			TarrRAM[i].ofs	= pTar[i].ofs;
+			TarRam[i].k	= pTar[i].k;
+			TarRam[i].ofs	= pTar[i].ofs;
 		}
 		Dac11.WriteTar = 1;
 	}
@@ -697,26 +697,33 @@ void SelectMasterDAC(void)
 	Message	msg;
 	//WORD	wData;
 	//========================================================
+	// разрешена запись тарировок считаем что мы в стенде спб
+	if(Dac11.WriteTar == 1)
+	{
+		Dac11.Master[0] = 0xFFF;
+		return;
+	}
+	//========================================================
 	// если тарировки не прописаны разрешаем замыкание реле
-//	if(Dac11.TarrStatus == false)	
-//	{
-//		Dac11.Master[0] = 0xFFF;
-//		return;
-//	}
+	if(Dac11.TarrStatus == false)	
+	{
+		Dac11.Master[0] = 0xFFF;
+		return;
+	}
 	//========================================================
 	// Если нет связи с УСО выходим 
-//	if((getTimer(&program.TimerCan1)>=TIME_OUT_CAN)&&(getTimer(&program.TimerCan2)>=TIME_OUT_CAN))
-//	{
-//		Dac11.Master[0] = 0;
-//		return;
-//	}
+	if((getTimer(&program.TimerCan1)>=TIME_OUT_CAN)&&(getTimer(&program.TimerCan2)>=TIME_OUT_CAN))
+	{
+		Dac11.Master[0] = 0;
+		return;
+	}
 	//========================================================
 	// Если блок не проинициализирован УСО выходим 
-//	if(getState() != Operational)
-//	{
-//		Dac11.Master[0] = 0;
-//		return;
-//	}
+	if(getState() != Operational)
+	{
+		Dac11.Master[0] = 0;
+		return;
+	}
 	//========================================================
 	if(getTimer(&Dac11.TimerPingNeighbor) == 0) // пришло время выдать пинг соседям
 	{

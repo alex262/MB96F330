@@ -149,7 +149,7 @@ typedef struct
 	WORD	ErrorUP;			// ошибка по превышению значения 											//2
 	WORD	ErrorDOWN;			// ошибка по падению измеряемого тока 										//2
 	DWORD	ErrorDAC[3];		// неисправность выхода ЦАП(два бита на канал), в 0 индексе наши данные		//12
-	WORD	OutDac[3];			// используются первые 12 бит, 1 - выход цапа скомутированы					//6
+	WORD	OutDac[3];			// используются первые 12 бит, 1 - выход ЦАПа скомутированы					//6
 	BYTE	StNeigborData[3];	// true - наличие данных от соседей
 	//--------------------------------------------------------
 	WORD	NewOutDac;			// сюда приходят новые значения для управления реле
@@ -186,7 +186,7 @@ void InitDAC11();
 void ServiceUart(BYTE Id, BYTE* pData, WORD Len);
 
 extern CDAC11 Dac11;
-extern TTar TarRam[COUNT_DAC_CH];	// тарировки каналов в ОЗУ
+extern TTar TarRam[2*COUNT_DAC_CH];	// тарировки каналов в ОЗУ
 
 
 

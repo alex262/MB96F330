@@ -3,9 +3,10 @@
 -ra _INRAM01=0x001240/0x007FFF
 -ra _INRAM02=0x018000/0x018FEF
 -ro _INROM02=0xF80000/0xFFFFFF
--sc RAMCODE/Code/WORD=_INRAM01
+-sc RAMCODE/Code/WORD+RAMCODE2/Code/WORD=_INRAM01
 -sc CONST/Const/BYTE=0xFF8000
 -sc @RAMCODE/Const/BYTE=0xDF6000
+-sc @RAMCODE2/Const/BYTE=0xFA0000
 -check_rora
 -check_locate
 -rg 0
@@ -19,9 +20,8 @@
 -alin "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\LST"
 -alout "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\LST"
 -alsf "Flash.lst"
--alsf "mhx_reader.lst"
+-alsf "Main.lst"
 -alrf "Flash.lst"
--alrf "mhx_reader.lst"
 -Xals
 -Xalr
 -na
@@ -66,4 +66,5 @@
 "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\FSU29_30.obj"
 "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\NDD22.obj"
 "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\DAC11.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\Flash2.obj"
 

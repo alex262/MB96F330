@@ -17,7 +17,7 @@ $0
 $other
 -INF srcin  
 $time
-1396866994
+1409899487
 $end
 $1
 -g
@@ -31,10 +31,11 @@ $1
 -pl 60
 -pw 100
 -tab 8
+-lf
 -Xdof
 $other
 $time
-1396863955
+1410261556
 $end
 $2
 -g
@@ -42,9 +43,10 @@ $2
 -ra _INRAM01=0x001240/0x007FFF
 -ra _INRAM02=0x018000/0x018FEF
 -ro _INROM02=0xF80000/0xFFFFFF
--sc RAMCODE/Code/WORD=_INRAM01
+-sc RAMCODE/Code/WORD+RAMCODE2/Code/WORD=_INRAM01
 -sc CONST/Const/BYTE=0xFF8000
 -sc @RAMCODE/Const/BYTE=0xDF6000
+-sc @RAMCODE2/Const/BYTE=0xFA0000
 -check_rora
 -check_locate
 -rg 0
@@ -56,9 +58,8 @@ $2
 -pl 60
 -pw 132
 -alsf "Flash.lst"
--alsf "mhx_reader.lst"
+-alsf "Main.lst"
 -alrf "Flash.lst"
--alrf "mhx_reader.lst"
 -Xals
 -Xalr
 -na
@@ -67,7 +68,7 @@ $2
 $other
 -Xset_rora
 $time
-1390470672
+1410259627
 $end
 $3
 -dt s,d,r,a
@@ -77,7 +78,7 @@ $3
 -Xdof
 $other
 $time
-1390470672
+1410256349
 $end
 $4
 -S2

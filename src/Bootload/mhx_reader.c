@@ -29,13 +29,21 @@
 #pragma section FAR_INIT=INIT_MHX,	attr=DATA, locate=0x18F00
 #pragma section DATA=DATA_MHX, 		attr=DATA, locate=0x18F20
 #pragma section FAR_DATA=DATA_MHX, 	attr=DATA, locate=0x18F20
-
 //------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------
+const WORD VerBootloader = 0x0102; 
+//------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------
+
 const char ASCII_[] = "0123456789ABCDEF";
 const char START_BOOT[] = {'B','O','O','T','L','O','A','D','E','R'};
 //------------------------------------------------------------------------------------------------------------------
-static U16	ID_BOOT;	// ID для обмена с УСО
-static U8	CAN_BUS;	// номер CAN по которому идёт обмен
+static U16	ID_BOOT;		// ID для обмена с УСО
+static U8	CAN_BUS;		// номер CAN по которому идёт обмен
 static BYTE BufferCAN[50];	// буфер 
 //------------------------------------------------------------------------------------------------------------------
 #define SWAP_USHORT(x) ( ((x) >> 8) | ((x) << 8) )	// Swap 2 bytes of a word
@@ -277,7 +285,7 @@ int write_MHX_com(BYTE * pData)
 	return (1);
 }
 //------------------------------------------------------------------------------------------------------------------
-int checkResetVector( void )
+/*int checkResetVector( void )
 {
 	unsigned int data,dataB;
 	data = (unsigned int)RamRead(RESETVECT);
@@ -289,13 +297,13 @@ int checkResetVector( void )
 	if ((data == 0xFFFF) && (dataB == 0xFFFF)) return 1;
 	if ((data == 0x0000) && (dataB == 0x0000)) return 2;
 	return 0;
-}
+}*/
 //------------------------------------------------------------------------------------------------------------------
-void flashResetVector( void )
+/*void flashResetVector( void )
 {
 	write((__far unsigned int *)(RESETVECT)  ,BOOTLOADER_START & 0xFFFF);
 	write((__far unsigned int *)(RESETVECT+2),BOOTLOADER_START >> 16);
-}
+}*/
 //------------------------------------------------------------------------------------------------------------------
 #define COUNT_MEM_PART				2
 const static unsigned long ADDR_START_MEM[COUNT_MEM_PART]	= {0xDF0000,0xF80000};
@@ -308,6 +316,7 @@ const static unsigned long ADDR_END_MEM[COUNT_MEM_PART]	= {0xDF7FFF,0xFFFFFF};
 #define CMD_REBOOT					0x04
 #define CMD_READ					0x05
 #define CMD_WRITE					0x06
+#define CMD_GET_VER_BOOT			0x07
 
 #define STR_EXIT					"EXIT"
 #define STR_BOOTLOADER				"BOOTLOADER"
@@ -315,6 +324,7 @@ const static unsigned long ADDR_END_MEM[COUNT_MEM_PART]	= {0xDF7FFF,0xFFFFFF};
 #define STR_REBOOT					"REBOOT"
 #define STR_READ					"READ"
 #define STR_WRITE					"WRITE"
+#define STR_GET_VER_BOOT			"GETBOOTVER"
 
 static BOOL cmd = FALSE;
 
@@ -406,6 +416,8 @@ static void parse_cmd(void)
 		else if (!_strcmp(cmd_str, STR_REBOOT		)) cmd_type = CMD_REBOOT;
 		else if (!_strcmp(cmd_str, STR_READ			)) cmd_type = CMD_READ;
 		else if (!_strcmp(cmd_str, STR_WRITE		)) cmd_type = CMD_WRITE;
+		else if (!_strcmp(cmd_str, STR_GET_VER_BOOT	)) cmd_type = CMD_GET_VER_BOOT;
+
 
 		else
 		{
@@ -530,6 +542,12 @@ void ObrCmd(BYTE TypeInterf)
 			FMWC1 = 0xFF;       // enable sector for FLASH writing
 			FMWC5 = 0xFF;       // enable sector for FLASH writing 
 			/* =============================================================== */
+			break;
+		case CMD_GET_VER_BOOT:
+			/* =============================================================== */
+			/* Запрос версии BOOTLOADERa                                 +++++ */
+			/* =============================================================== */
+				SendCanBuf((U8 *)(&VerBootloader), 2);
 			break;
 		case CMD_ERASE:
 			//if(StBootloader == 1)
@@ -1336,7 +1354,6 @@ BYTE ServiceBootloadCan(BYTE bus_id, TMsgCan *m)
 	/* =============================================================== */
 	/*    НАСТРАИВАЕМ CAN ДЛЯ ПРОГРАММАТОРА                            */
 	/* =============================================================== */
-	//ID_BOOT	= getNodeId()|(((WORD)0xD)<<7);
 	ID_BOOT	= ADDR|(((WORD)0xD)<<7);
 	CAN_BUS = bus_id;
 	CAN_ConfigMsgBox_(bus_id);	// Конфигурим наш CAN на прием сообщений с нашим адресом .. младшие 5 бит адресс остальные нули

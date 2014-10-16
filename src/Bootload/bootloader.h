@@ -42,6 +42,7 @@ typedef struct
 }TMsgCan;
 
 unsigned char ServiceBootloadCan(unsigned char bus_id, TMsgCan *m);
+unsigned char ServiceBootloadUpd(unsigned char bus_id, TMsgCan *m);
 
 #define TYPE_UART				0  //обновляемся по uart
 #define TYPE_CAN				1  //обновляемся по can

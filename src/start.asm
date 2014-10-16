@@ -1272,6 +1272,10 @@ EBCS       .EQU      0x06F5
           .SECTION  RAMCODE,   CODE,  ALIGN=1
           .IMPORT _RAM_RAMCODE                  ; provided by linker
           .IMPORT _ROM_RAMCODE                  ; provided by linker
+          ;
+          .SECTION  RAMCODE2,   CODE,  ALIGN=1
+          .IMPORT _RAM_RAMCODE2                  ; provided by linker
+          .IMPORT _ROM_RAMCODE2                  ; provided by linker
 #endif
 
 
@@ -1310,6 +1314,9 @@ EBCS       .EQU      0x06F5
 #if COPY_RAMCODE == ON
    .DATA.L _ROM_RAMCODE, _RAM_RAMCODE
    .DATA.H SIZEOF RAMCODE
+   ;
+   .DATA.L _ROM_RAMCODE2, _RAM_RAMCODE2
+   .DATA.H SIZEOF RAMCODE2
 #endif
 
 ;====================================================================

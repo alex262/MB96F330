@@ -1,5 +1,5 @@
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:   1
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:   1
 - ASSEMBLE INFORMATION - ( STARTUP )
 
 |             Command line         :  C:\Softune\BIN\fasm907s.exe -f C:\Wor |
@@ -25,7 +25,7 @@ F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:   1
 |                                                                           |
 | NO NEST     SOURCE-FILE-NAME                     CREATE DATE/TIME         |
 | -- -------- ------------------------------------ ------------------------ |
-|  0          C:\Work\Project\Блоки Fujitsu MB96F3 2014-10-16 10:11:38      |
+|  0          C:\Work\Project\Блоки Fujitsu MB96F3 2014-10-16 15:20:28      |
 |             30\SourceBoot\Src\Start.asm                                   |
 | -- -------- ------------------------------------ ------------------------ |
 |                                                                           |
@@ -41,7 +41,7 @@ F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:   1
 |                                                                           |
 | NO NEST     OPTION-FILE-NAME                     CREATE DATE/TIME         |
 | -- -------- ------------------------------------ ------------------------ |
-|  0          C:\Work\Project\Блоки Fujitsu MB96F3 2014-10-16 13:58:54      |
+|  0          C:\Work\Project\Блоки Fujitsu MB96F3 2014-10-20 10:20:36      |
 |             30\SourceBoot\OPT\96338us.opa                                 |
 |             ------------------------------------                          |
 |             -g                                                            |
@@ -59,14 +59,14 @@ F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:   1
 |             -cpu MB96F338USA                                              |
 | -- -------- ------------------------------------ ------------------------ |
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:   2
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:   2
 - ASSEMBLE INFORMATION - ( STARTUP )
 
 |___________________________________________________________________________|
 
 
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:   3
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:   3
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -127,7 +127,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                            29      /* responsibility of the customer to obtain nece
                                                    ssary licenses to       */
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:   4
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:   4
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -187,7 +187,7 @@ MODULE NAME = STARTUP                      48                .PROGRAM  STARTUP
                                            64      ; 4.3   Function-Call Interface
                                            65      ; 4.4   Constant Data Handling
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:   5
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:   5
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -248,7 +248,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                           110      ; 6.15  Shut down library
                                           111      ; 6.16  Program end loop
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:   6
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:   6
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -308,7 +308,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                           155      Revision 1.54 3179 2009-07-03 08:53:18Z rlande
                                           156      - added: devices MB96378HxB, MB96379RxB, MB96388
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:   7
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:   7
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -369,7 +369,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                           197      Revision 1.43  2475 2009-01-16 15:31:58Z rlande
                                           198      - added: Clock setting CPU_24MHZ_CLKP2_24MHZ.
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:   8
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:   8
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -430,7 +430,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                           247      - clock settings corrected
                                           248      - Main/Satellite Flash term outdated, now: Flash
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:   9
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:   9
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -491,7 +491,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                           293      - Clock settings optimized for CPU_8MHZ_CLKP2_8M
                                                    HZ, CPU_12MHZ_CLKP2_12MHZ, CPU_16MHZ_CLKP2_16MHZ
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  10
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  10
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -552,7 +552,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                           331      - fix typo
                                           332
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  11
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  11
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -613,7 +613,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                           372      ;
                                           373      ; Configure this startup file in the "Settings"
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  12
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  12
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -673,7 +673,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                           416      #set      MB96338UxA   2
                                           417      #set      MB96336UxA   3
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  13
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  13
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -733,7 +733,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                           470      #set      MB96386RxA   5
                                           471      #set      MB96386YxA   6
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  14
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  14
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -793,7 +793,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                                    upied. If this is not
                                           510      ; acceptable, the above setting should be set to
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  15
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  15
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -853,7 +853,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                           544      ;   empty section CINIT in RAM. However, the cod
                                                    e, which copies from
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  16
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  16
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -913,7 +913,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                                     a reasonable size.
                                           578      ; - If STACK_RESERVE is ON, the sections USTACK
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  17
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  17
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -973,7 +973,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                           613
                                           614      #set      CLIBINIT       OFF    ; <<< select ext
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  18
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  18
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1033,7 +1033,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                           648      #set      CRYSTAL         FREQ_4MHZ  ; <<< selec
                                                    t external crystal frequency
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  19
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  19
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1093,7 +1093,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                           678      #set      WAIT_STATE_OPTIMIZATION  2
                                           679      #set      LOW_PLL_OPTIMIZATION     1
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  20
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  20
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1153,7 +1153,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                                    debugging may fail
                                           711      ; when the clock settings are altered during app
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  21
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  21
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1213,7 +1213,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                           749
                                           750
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  22
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  22
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1273,7 +1273,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                                      A15..A8 to be output.
                                           784      #set      ADDR_PINS_7_0      B'00000000     ; <<
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  23
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  23
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1333,7 +1333,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                           810      ;                       |||||||||||||+++-- Autom
                                                    atic wait cycles (0: 0, 1: 1, 2: 2, 3: 3, 4: 4,
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  24
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  24
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1393,7 +1393,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                           833      ;                       ++---------------- ignor
                                                    ed
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  25
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  25
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1453,7 +1453,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                                    led)
                                           857      ;                       |||+-------------- Chip
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  26
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  26
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1513,7 +1513,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                           881      ;===============================================
                                                    =====================
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  27
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  27
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1573,7 +1573,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                           914      ; All settings regarding Flash B are ignored on
                                                    devices that do not
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  28
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  28
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1633,7 +1633,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                           962      #set      DATAFLASH_A_UNLOCK_5       0x00
                                           963      #set      DATAFLASH_A_UNLOCK_6       0x00
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  29
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  29
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1693,7 +1693,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                                        ; <<< select individual sector to protect
                                           998      #set      PROTECT_SECTOR_SB1              OFF
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  30
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  30
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1753,7 +1753,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                                    TOR_TABLE, BOOT_VECTOR_FIXED),
                                          1029      ; appropriate code is generated. If it is disabl
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  31
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  31
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1813,7 +1813,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                          1061
                                          1062      ;===============================================
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  32
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  32
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1823,8 +1823,8 @@ SN LOC    OBJ                           LLINE      SOURCE
                                          1064      ;===============================================
                                                    =====================
                                          1065
-                                         1066      #set      COPY_RAMCODE      OFF     ; <<< enable
-                                                    RAMCODE section to
+                                         1066      #set      COPY_RAMCODE      ON     ; <<< enable
+                                                   RAMCODE section to
                                          1067                                          ; be copied
                                                    from ROM to RAM
                                          1068
@@ -1873,7 +1873,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                          1094      ;                                    |||||+-----
                                                    -- BdmAutoStart
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  33
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  33
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1933,7 +1933,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                          1133      ;===============================================
                                                    =====================
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  34
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  34
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1993,7 +1993,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                          1162   X  PIER01     .EQU      0x0445
                                          1163   X  PIER02     .EQU      0x0446
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  35
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  35
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2053,7 +2053,7 @@ BO DF0030 FFFFFFFF                       1200                .DATA.L 0xFFFFFFFF
                                                    CATE=H'DF0030
                                          1207   X            .SKIP   4
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  36
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  36
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2113,7 +2113,7 @@ DA 000000 -----------<DATA2>-----------  1243                .SECTION  DATA2,   
 DI 000000 ----------<DIRDATA>----------  1244                .SECTION  DIRDATA,   DIR,    ALIGN=2
                                                    ; zero clear direct
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  37
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  37
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2164,22 +2164,22 @@ CO 000000 ----------<CONST2>-----------  1265                .SECTION  CONST2,  
                                                    =====================
                                          1270
                                          1271      #if COPY_RAMCODE == ON
-                                         1272   X            .SECTION  RAMCODE,   CODE,  ALIGN=1
-                                         1273   X            .IMPORT _RAM_RAMCODE
+RA 000000 ----------<RAMCODE>----------  1272                .SECTION  RAMCODE,   CODE,  ALIGN=1
+                                         1273                .IMPORT _RAM_RAMCODE
                                                    ; provided by linker
-                                         1274   X            .IMPORT _ROM_RAMCODE
+                                         1274                .IMPORT _ROM_RAMCODE
                                                    ; provided by linker
-                                         1275   X            ;
-                                         1276   X            .SECTION  RAMCODE2,   CODE,  ALIGN=1
-                                         1277   X            .IMPORT _RAM_RAMCODE2
+                                         1275                ;
+RA 000000 ---------<RAMCODE2>----------  1276                .SECTION  RAMCODE2,   CODE,  ALIGN=1
+                                         1277                .IMPORT _RAM_RAMCODE2
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  38
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  38
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
 
                                                     ; provided by linker
-                                         1278   X            .IMPORT _ROM_RAMCODE2
+                                         1278                .IMPORT _ROM_RAMCODE2
                                                     ; provided by linker
                                          1279      #endif
                                          1280
@@ -2233,7 +2233,7 @@ DT 000014 0000S 0000S 0000S 0000S 0000S  1307         .DATA.H LIBDCONST,BNKSEC L
                                          1308
                                          1309      #if CONSTDATA == RAMCONST
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  39
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  39
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2245,11 +2245,11 @@ DT 000028 0000S 0000S 0000S 0000S 0000S  1311         .DATA.H CONST2,   BNKSEC C
                                          1312      #endif
                                          1313
                                          1314      #if COPY_RAMCODE == ON
-                                         1315   X     .DATA.L _ROM_RAMCODE, _RAM_RAMCODE
-                                         1316   X     .DATA.H SIZEOF RAMCODE
-                                         1317   X     ;
-                                         1318   X     .DATA.L _ROM_RAMCODE2, _RAM_RAMCODE2
-                                         1319   X     .DATA.H SIZEOF RAMCODE2
+DT 000032 00000000I 00000000I            1315         .DATA.L _ROM_RAMCODE, _RAM_RAMCODE
+DT 00003A 0000S                          1316         .DATA.H SIZEOF RAMCODE
+                                         1317         ;
+DT 00003C 00000000I 00000000I            1318         .DATA.L _ROM_RAMCODE2, _RAM_RAMCODE2
+DT 000044 0000S                          1319         .DATA.H SIZEOF RAMCODE2
                                          1320      #endif
                                          1321
                                          1322      ;===============================================
@@ -2293,7 +2293,7 @@ US 000002                                1340      USTACK_TOP:
 DI 000000 ----------<DIRDATA>----------  1351                .SECTION  DIRDATA  ; zero clear direct
 DI 000000                                1352      DIRDATA_S:
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  40
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  40
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2353,7 +2353,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                          1381          )
                                                                  \
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  41
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  41
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2413,7 +2413,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                          1409        )
                                          1410
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  42
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  42
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2473,7 +2473,7 @@ FL DF001C - DF0016   [6]                 1427                    .SKIP   6
                                                    | FLASH_B_UNLOCK_14)
                                          1444   X  #  endif
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  43
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  43
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2533,7 +2533,7 @@ FL DF001C ------<FLASH_A_PROTECT>------  1474                .SECTION FLASH_A_PR
                                          1480   X            .DATA.B ~((PROTECT_SECTOR_S39 << 7) |
                                                    (PROTECT_SECTOR_S38 << 6) | (PROTECT_SECTOR_S37
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  44
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  44
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2593,7 +2593,7 @@ BD DF0040 --------<BDM_CONFIG>---------  1511                .SECTION BDM_CONFIG
                                          1516   X
                                          1517   X            .ORG    H'DF0044
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  45
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  45
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2653,7 +2653,7 @@ BD DF0080                                1557                .ORG    0xDF0080
                                          1563      ;===============================================
                                                    =====================
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  46
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  46
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2713,7 +2713,7 @@ CO 000001 00                             1596                NOP  ; read hint be
                                          1601      ; address can also be used.
                                          1602      ; This mechanism is using the .END instruction a
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  47
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  47
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2773,7 +2773,7 @@ CO 00000B 71DF0204FC                     1622                MOV  CKSSR, #(0xF8 
                                          1635      ;                                  ||+-----    C
                                                    LKB divider (CPU clock)
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  48
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  48
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2833,7 +2833,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                          1662   X  #  set   CLK_PARAMS_8MHZ_PLL_LOW 0x012222E   ; C
                                                    LKS1=CLKS2= 8MHZ, CLK_VCO=112MHZ
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  49
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  49
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2893,7 +2893,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                          1691   X  #  set   CLK_PARAMS_8MHZ_CLKB2   0x0622424   ; C
                                                    LKS1=CLKS2=48MHZ, CLK_VCO=192MHZ
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  50
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  50
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2953,7 +2953,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                                    LKS1=CLKS2=64MHZ, CLK_VCO=128MHZ
                                          1720   X  #  set  CLK_PARAMS_16MHZ_PLL_LOW 0x0212216   ; C
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  51
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  51
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -3013,7 +3013,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                                    LKS1=CLKS2=96MHZ, CLK_VCO=192MHZ
                                          1748   X  #  set  CLK_PARAMS_16MHZ_PLL_LOW 0x0312314   ; C
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  52
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  52
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -3073,7 +3073,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                                    B2
                                          1780      #elif CRYSTAL == FREQ_8MHZ
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  53
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  53
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -3133,7 +3133,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                          1824      #define CLKS1_CLKS2(params) \
                                          1825        (CRYSTAL * PLL_MULTIPLIER(params))
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  54
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  54
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -3193,7 +3193,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                                    ") is not allowed for the selected device.
                                          1872      #endif
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  55
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  55
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -3253,7 +3253,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                          1910   X  #    if (CLKS1_CLKS2(CLK_PARAMS) > (56 * FREQ_1M
                                                    HZ))
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  56
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  56
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -3314,7 +3314,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                          1939   X  #    if (CLKP2(CLK_PARAMS) > (28 * FREQ_1MHZ))
                                          1940   X  #      error The current clock setting ("CLOCK_S
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  57
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  57
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -3374,7 +3374,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                                                                   \
                                          1974   X          (DEVICE == MB96386YxA) ||
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  58
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  58
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -3434,7 +3434,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                                     || ((CLKP1(CLK_PARAMS) > (40 * FREQ_1MHZ)))
                                          2006   X  #      error The current clock setting ("CLOCK_S
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  59
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  59
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -3494,7 +3494,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                          2039          ((CLKP1_DIVIDER(params) - 1) <<  8)
                                                                                   \
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  60
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  60
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -3554,7 +3554,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                                    REQ_1MHZ)) )\
                                          2074           &&  ((( 10 * FREQ_1MHZ) <= CLKB(CLK_PARAMS)
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  61
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  61
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -3614,7 +3614,7 @@ CO 00002C 71DF0104FA                     2108                MOV  CKSR,  # CKSR_
                                          2110      ;===============================================
                                                    =====================
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  62
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  62
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -3674,7 +3674,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                                    G & 0x0080) == 0 || (CS2_CONFIG & 0x0080) == 0 |
                                                    | (CS3_CONFIG & 0x0080) == 0 || (CS4_CONFIG & 0x
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  63
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  63
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -3734,7 +3734,7 @@ CO 000031 71DFAE03F7                     2181                 MOV  ROMM, #ROMM_C
                                          2187      ;
                                          2188      ; Note:
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  64
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  64
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -3794,7 +3794,7 @@ CO 000056 47                             2220                MOVW SP,A          
                                          2222      ; When monitor debugger that uses BootROM suppor
                                                    t (e.g. EUROScope,
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  65
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  65
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -3854,7 +3854,7 @@ CO 000066 6EE3                           2238                FILSWI    SPB      
                                          2258                MOVW SP,A
                                          2259      #  endm
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  66
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  66
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -3914,7 +3914,7 @@ CO 00007B 6F4C08                         2293                MOVW A, @RL2+8     
                                                    ytes to copy -> A
 CO 00007E 98                             2294                MOVW RW0, A              ; number of b
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  67
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  67
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -3974,7 +3974,7 @@ CO 000097 6010                           2327                BRA  LABEL4        
                                                    oop condition
 CO 000099                                2328      LABEL3:
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  68
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  68
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -4034,7 +4034,7 @@ CO 0000B8 6F14                           2352                MOV  DPR,A
                                          2361   X            MOVN A, #0
                                          2362   X            MOV  TCCSL2, A
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  69
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  69
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -4094,7 +4094,7 @@ CO 0000BF 73DFF203096B                   2394                MOVW MTCRA, # MTCR_
                                          2404      ;===============================================
                                                    =====================
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  70
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  70
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -4154,7 +4154,7 @@ CO 0000C5 65000000                  I    2428                CALLP _main        
                                          2439   X            CALLP _exit              ; ignore rema
                                                    ining word on stack,
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  71
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  71
 STARTUP FILE FOR MEMORY INITIALISATION
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -4176,7 +4176,7 @@ CO 0000C9 60FE                           2449      end:      BRA  end           
           =>  00000001              R    2451                .END notresetyet         ; define debu
                                                    gger start address
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  72
+F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-20 15:06:14   Page:  72
 - SECTION LISTING - ( STARTUP )
 
    NO SECTION-NAME                       SIZE  ATTRIBUTES
@@ -4200,11 +4200,13 @@ F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:53   Page:  72
    16 LIBDCONST  . . . . . . . . . . .  000000 CONST   REL ALIGN=2
    17 CONST  . . . . . . . . . . . . .  000000 CONST   REL ALIGN=2
    18 CONST2 . . . . . . . . . . . . .  000000 CONST   REL ALIGN=2
-   19 DCLEAR . . . . . . . . . . . . .  000012 CONST   REL ALIGN=2
-   20 DTRANS . . . . . . . . . . . . .  000032 CONST   REL ALIGN=2
-   21 SSTACK . . . . . . . . . . . . .  000300 STACK   REL ALIGN=2
-   22 USTACK . . . . . . . . . . . . .  000002 STACK   REL ALIGN=2
-   23 FLASH_A_SECURITY . . . . . . . .  00001C CONST   ABS LOCATE=DF0000
-   24 FLASH_A_PROTECT  . . . . . . . .  000014 CONST   ABS LOCATE=DF001C
-   25 BDM_CONFIG . . . . . . . . . . .  000040 CONST   ABS LOCATE=DF0040
-   26 CODE_START . . . . . . . . . . .  0000CB CODE    REL ALIGN=1
+   19 RAMCODE  . . . . . . . . . . . .  000000 CODE    REL ALIGN=1
+   20 RAMCODE2 . . . . . . . . . . . .  000000 CODE    REL ALIGN=1
+   21 DCLEAR . . . . . . . . . . . . .  000012 CONST   REL ALIGN=2
+   22 DTRANS . . . . . . . . . . . . .  000046 CONST   REL ALIGN=2
+   23 SSTACK . . . . . . . . . . . . .  000300 STACK   REL ALIGN=2
+   24 USTACK . . . . . . . . . . . . .  000002 STACK   REL ALIGN=2
+   25 FLASH_A_SECURITY . . . . . . . .  00001C CONST   ABS LOCATE=DF0000
+   26 FLASH_A_PROTECT  . . . . . . . .  000014 CONST   ABS LOCATE=DF001C
+   27 BDM_CONFIG . . . . . . . . . . .  000040 CONST   ABS LOCATE=DF0040
+   28 CODE_START . . . . . . . . . . .  0000CB CODE    REL ALIGN=1

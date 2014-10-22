@@ -1,5 +1,5 @@
 -g
--w 3
+-w 4
 -I "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\src\CanOpenMain"
 -I "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\SRC"
 -I "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\SRC\SRC_modul"

@@ -15,9 +15,10 @@ Exec=0
 AutoLoad=1
 
 [DirInfo]
-WSP=C:\softune\96330_template_96338us-v13\
+WSP=C:\Lyapin\src\
 
 [EditState]
-STATE-1=Src\Main.c:13
-Count=1
+STATE-1=src\SRC_Modul\DAC11.h:154
+STATE-2=src\SRC_Modul\DAC11.c:1046
+Count=2
 

@@ -1,5 +1,5 @@
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:   1
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:   1
 - ASSEMBLE INFORMATION - ( MB96338US )
 
 |             Command line         :  C:\Softune\BIN\fasm907s.exe -f C:\Wor |
@@ -42,7 +42,7 @@ F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:   1
 |                                                                           |
 | NO NEST     OPTION-FILE-NAME                     CREATE DATE/TIME         |
 | -- -------- ------------------------------------ ------------------------ |
-|  0          C:\Work\Project\Блоки Fujitsu MB96F3 2014-10-16 13:58:56      |
+|  0          C:\Work\Project\Блоки Fujitsu MB96F3 2015-01-22 10:24:18      |
 |             30\SourceBoot\OPT\96338us.opa                                 |
 |             ------------------------------------                          |
 |             -g                                                            |
@@ -59,7 +59,7 @@ F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:   1
 |             -cwno                                                         |
 |             -cpu MB96F338USA                                              |
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:   2
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:   2
 - ASSEMBLE INFORMATION - ( MB96338US )
 
 | -- -------- ------------------------------------ ------------------------ |
@@ -67,7 +67,7 @@ F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:   2
 
 
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:   3
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:   3
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -128,7 +128,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                                     law FME disclaims all  */
                                            27      /* warranties, whether express or implied, in pa
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:   4
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:   4
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -189,7 +189,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                                    tag.                         */
                                            55      /* - removed: Bit definitions from ADSR.
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:   5
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:   5
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -249,7 +249,7 @@ MODULE NAME = MB96338US                    78       .PROGRAM MB96338US
                                            85   X          .REG_PASS
                                            86      #endif
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:   6
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:   6
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -309,7 +309,7 @@ IO 000000 ----------<IOBASE>-----------    94       .section IOBASE, IO, locate=
                                           117       .GLOBAL __pcnl1,    __pcnh1,    __ptmr2,    __p
                                                    csr2,    __pdut2,    __pcn2
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:   7
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:   7
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -369,7 +369,7 @@ IO 000009 [1]B                            153      __pdr09   .res.b 1           
           = 00000009                      154      PDR09    .equ 0x0009
 IO 00000A [1]B                            155      __pdr10   .res.b 1             ;00000A
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:   8
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:   8
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -429,7 +429,7 @@ IO 000029 [1]B                            206      __ocs1   .res.b 1            
 IO 00002A [2]B                            208      __occp0   .res.b 2             ;00002A
           = 0000002A                      209      OCCP0    .equ 0x002A
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:   9
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:   9
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -489,7 +489,7 @@ IO 000049 [1]B                            260      __ipcph2   .res.b 1          
 IO 00004A                                 262      __ipcp3  ; overlay symbol      ;00004A
           = 0000004A                      263      IPCP3    .equ 0x004A
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  10
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  10
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -549,7 +549,7 @@ IO 00005E                                 314      __elvr1  ; overlay symbol    
 IO 00005E [1]B                            316      __elvrl1   .res.b 1             ;00005E
           = 0000005E                      317      ELVRL1    .equ 0x005E
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  11
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  11
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -609,7 +609,7 @@ IO 000072 [2]B                            368      __tmr6   .res.b 2            
 IO 000074                                 370      __gcn10  ; overlay symbol      ;000074
           = 00000074                      371      GCN10    .equ 0x0074
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  12
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  12
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -669,7 +669,7 @@ IO 000094 [2]B                            422      __pdut3   .res.b 2           
 IO 000096                                 424      __pcn3  ; overlay symbol      ;000096
           = 00000096                      425      PCN3    .equ 0x0096
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  13
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  13
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -729,7 +729,7 @@ IO 0000B0                                 476      __itmk0  ; overlay symbol    
 IO 0000B0 [1]B                            478      __itmkl0   .res.b 1             ;0000B0
           = 000000B0                      479      ITMKL0    .equ 0x00B0
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  14
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  14
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -789,7 +789,7 @@ IO 0000C6 [1]B                            530      __bgrl0   .res.b 1           
 IO 0000C7 [1]B                            532      __bgrh0   .res.b 1             ;0000C7
           = 000000C7                      533      BGRH0    .equ 0x00C7
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  15
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  15
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -849,7 +849,7 @@ IO 0000DF [1]B                            585      __scr3   .res.b 1            
           = 000000DF                      586      SCR3    .equ 0x00DF
 IO 0000E0                                 587      __tdr3  ; overlay symbol      ;0000E0
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  16
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  16
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -909,7 +909,7 @@ DM 000100 -------<DMADESCRIPTOR>-------   606       .section DMADESCRIPTOR, DATA
                                           623       .GLOBAL __ioah9,    __dct9,     __dctl9,    __d
                                                    cth9
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  17
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  17
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -969,7 +969,7 @@ DM 000114 [1]B                            675      __ioal2   .res.b 1           
           = 00000114                      676      IOAL2    .equ 0x0114
 DM 000115 [1]B                            677      __ioah2   .res.b 1             ;000115
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  18
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  18
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1029,7 +1029,7 @@ DM 00012A [1]B                            729      __baph5   .res.b 1           
           = 0000012A                      730      BAPH5    .equ 0x012A
 DM 00012B [1]B                            731      __dmacs5   .res.b 1             ;00012B
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  19
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  19
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1089,7 +1089,7 @@ DM 00013F [1]B                            783      __dcth7   .res.b 1           
           = 0000013F                      784      DCTH7    .equ 0x013F
 DM 000140 [1]B                            785      __bapl8   .res.b 1             ;000140
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  20
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  20
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1149,7 +1149,7 @@ IO 000380 ----------<IOXTND>-----------   826       .section IOXTND, DATA, locat
                                                    fcs1,    __pfcs2,    __pfcs3
                                           833       .GLOBAL __pfal0,    __pfam0,    __pfah0,    __p
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  21
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  21
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1209,7 +1209,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                                    odr11,   __podr12,   __podr13
                                           860       .GLOBAL __podr14,   __podr15,   __podr17,   __p
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  22
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  22
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1269,7 +1269,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                                    dut7,    __pcn7,     __pcnl7
                                           887       .GLOBAL __pcnh7,    __gcn12,    __gcn1l2,   __g
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  23
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  23
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1329,7 +1329,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                                    p0dtl0,  __ep0dth0,  __ep1dt0
                                           914       .GLOBAL __ep1dtl0,  __ep1dth0,  __ep2dt0,   __e
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  24
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  24
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1389,7 +1389,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                                    _msgval10, __msgval1l0, __msgval1h0
                                           941       .GLOBAL __msgval20, __msgval2l0, __msgval2h0, _
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  25
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  25
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1449,7 +1449,7 @@ SN LOC    OBJ                           LLINE      SOURCE
                                                    _if1msk22, __if1msk2l2, __if1msk2h2
                                           968       .GLOBAL __if1arb2,  __if1arb12, __if1arb1l2, __
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  26
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  26
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1509,7 +1509,7 @@ IO 000390                                1005      __dsr  ; overlay symbol      
           = 00000390                     1006      DSR    .equ 0x0390
 IO 000390 [1]B                           1007      __dsrl   .res.b 1             ;000390
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  27
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  27
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1569,7 +1569,7 @@ IO 0003B8 [1]B                           1059      __pfal0   .res.b 1           
           = 000003B8                     1060      PFAL0    .equ 0x03B8
 IO 0003B9 [1]B                           1061      __pfam0   .res.b 1             ;0003B9
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  28
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  28
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1629,7 +1629,7 @@ IO 0003D2                                1113      __pfd1  ; overlay symbol     
           = 000003D2                     1114      PFD1    .equ 0x03D2
 IO 0003D2 [1]B                           1115      __pfdl1   .res.b 1             ;0003D2
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  29
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  29
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1689,7 +1689,7 @@ IO 0003FD                                1167       .org 0x0003fd
 IO 0003FD [1]B                           1168      __fmwc5   .res.b 1             ;0003FD
           = 000003FD                     1169      FMWC5    .equ 0x03FD
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  30
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  30
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1749,7 +1749,7 @@ IO 00041B [1]B                           1220      __cmprh   .res.b 1           
 IO 00042C                                1222       .org 0x00042c
 IO 00042C [1]B                           1223      __vrcr   .res.b 1             ;00042C
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  31
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  31
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1809,7 +1809,7 @@ IO 000449 [1]B                           1274      __pier05   .res.b 1          
 IO 00044A [1]B                           1276      __pier06   .res.b 1             ;00044A
           = 0000044A                     1277      PIER06    .equ 0x044A
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  32
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  32
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1869,7 +1869,7 @@ IO 000466 [1]B                           1328      __pilr14   .res.b 1          
 IO 000467 [1]B                           1330      __pilr15   .res.b 1             ;000467
           = 00000467                     1331      PILR15    .equ 0x0467
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  33
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  33
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1929,7 +1929,7 @@ IO 000485 [1]B                           1382      __podr05   .res.b 1          
 IO 000486 [1]B                           1384      __podr06   .res.b 1             ;000486
           = 00000486                     1385      PODR06    .equ 0x0486
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  34
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  34
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -1989,7 +1989,7 @@ IO 0004B3 [1]B                           1437      __pucr11   .res.b 1          
           = 000004B3                     1438      PUCR11    .equ 0x04B3
 IO 0004B4 [1]B                           1439      __pucr12   .res.b 1             ;0004B4
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  35
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  35
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2049,7 +2049,7 @@ IO 0004D2 [1]B                           1491      __ader2   .res.b 1           
           = 000004D2                     1492      ADER2    .equ 0x04D2
 IO 0004D3 [1]B                           1493      __ader3   .res.b 1             ;0004D3
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  36
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  36
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2109,7 +2109,7 @@ IO 0004EC                                1545      __cutd  ; overlay symbol     
           = 000004EC                     1546      CUTD    .equ 0x04EC
 IO 0004EC [1]B                           1547      __cutdl   .res.b 1             ;0004EC
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  37
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  37
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2169,7 +2169,7 @@ IO 000512 [2]B                           1599      __occp11   .res.b 2          
           = 00000512                     1600      OCCP11    .equ 0x0512
 IO 000514 [1]B                           1601      __ics89   .res.b 1             ;000514
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  38
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  38
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2229,7 +2229,7 @@ IO 000543 [1]B                           1653      __escr7   .res.b 1           
           = 00000543                     1654      ESCR7    .equ 0x0543
 IO 000544                                1655      __bgr7  ; overlay symbol      ;000544
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  39
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  39
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2289,7 +2289,7 @@ IO 00055A [1]B                           1707      __esir9   .res.b 1           
           = 0000055A                     1708      ESIR9    .equ 0x055A
 IO 000560                                1709       .org 0x000560
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  40
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  40
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2349,7 +2349,7 @@ IO 00057E                                1760      __pcn8  ; overlay symbol     
 IO 00057E [1]B                           1762      __pcnl8   .res.b 1             ;00057E
           = 0000057E                     1763      PCNL8    .equ 0x057E
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  41
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  41
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2409,7 +2409,7 @@ IO 00059C [2]B                           1814      __ptmr12   .res.b 2          
 IO 00059E [2]B                           1816      __pcsr12   .res.b 2             ;00059E
           = 0000059E                     1817      PCSR12    .equ 0x059E
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  42
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  42
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2469,7 +2469,7 @@ IO 0005BE                                1868      __gcn24  ; overlay symbol    
 IO 0005BE [1]B                           1870      __gcn2l4   .res.b 1             ;0005BE
           = 000005BE                     1871      GCN2L4    .equ 0x05BE
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  43
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  43
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2529,7 +2529,7 @@ IO 000660 [1]B                           1923      __prrr10   .res.b 1          
           = 00000660                     1924      PRRR10    .equ 0x0660
 IO 000661 [1]B                           1925      __prrr11   .res.b 1             ;000661
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  44
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  44
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2589,7 +2589,7 @@ IO 0006B3 [1]B                           1976      __ep0ch0   .res.b 1          
 IO 0006B4                                1978      __ep1c0  ; overlay symbol      ;0006B4
           = 000006B4                     1979      EP1C0    .equ 0x06B4
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  45
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  45
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2649,7 +2649,7 @@ IO 0006C6                                2030      __ep1s0  ; overlay symbol    
 IO 0006C6 [1]B                           2032      __ep1sl0   .res.b 1             ;0006C6
           = 000006C6                     2033      EP1SL0    .equ 0x06C6
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  46
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  46
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2709,7 +2709,7 @@ IO 0006D8                                2084      __ep4dt0  ; overlay symbol   
 IO 0006D8 [1]B                           2086      __ep4dtl0   .res.b 1             ;0006D8
           = 000006D8                     2087      EP4DTL0    .equ 0x06D8
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  47
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  47
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2769,7 +2769,7 @@ IO 0006EF [1]B                           2139      __eas5   .res.b 1            
           = 000006EF                     2140      EAS5    .equ 0x06EF
 IO 0006F0 [1]B                           2141      __ebm   .res.b 1             ;0006F0
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  48
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  48
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2829,7 +2829,7 @@ IO 00070C [1]B                           2192      __brperl0   .res.b 1         
 IO 00070D [1]B                           2194      __brperh0   .res.b 1             ;00070D
           = 0000070D                     2195      BRPERH0    .equ 0x070D
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  49
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  49
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2889,7 +2889,7 @@ IO 00071E [1]B                           2247      __if1dta1l0   .res.b 1       
           = 0000071E                     2248      IF1DTA1L0    .equ 0x071E
 IO 00071F [1]B                           2249      __if1dta1h0   .res.b 1             ;00071F
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  50
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  50
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -2949,7 +2949,7 @@ IO 000748                                2300      __if2arb10  ; overlay symbol 
 IO 000748 [1]B                           2302      __if2arb1l0   .res.b 1             ;000748
           = 00000748                     2303      IF2ARB1L0    .equ 0x0748
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  51
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  51
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -3009,7 +3009,7 @@ IO 000782                                2355      __treqr20  ; overlay symbol  
           = 00000782                     2356      TREQR20    .equ 0x0782
 IO 000782 [1]B                           2357      __treqr2l0   .res.b 1             ;000782
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  52
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  52
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -3069,7 +3069,7 @@ IO 000800                                2409       .org 0x000800
 IO 000800                                2410      __ctrlr1  ; overlay symbol      ;000800
           = 00000800                     2411      CTRLR1    .equ 0x0800
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  53
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  53
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -3129,7 +3129,7 @@ IO 000813 [1]B                           2463      __if1cmskh1   .res.b 1       
           = 00000813                     2464      IF1CMSKH1    .equ 0x0813
 IO 000814                                2465      __if1msk1  ; overlay symbol      ;000814
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  54
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  54
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -3189,7 +3189,7 @@ IO 000822 [1]B                           2517      __if1dtb1l1   .res.b 1       
           = 00000822                     2518      IF1DTB1L1    .equ 0x0822
 IO 000823 [1]B                           2519      __if1dtb1h1   .res.b 1             ;000823
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  55
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  55
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -3249,7 +3249,7 @@ IO 00084C [1]B                           2570      __if2mctrl1   .res.b 1       
 IO 00084D [1]B                           2572      __if2mctrh1   .res.b 1             ;00084D
           = 0000084D                     2573      IF2MCTRH1    .equ 0x084D
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  56
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  56
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -3309,7 +3309,7 @@ IO 000891 [1]B                           2624      __newdt1h1   .res.b 1        
 IO 000892                                2626      __newdt21  ; overlay symbol      ;000892
           = 00000892                     2627      NEWDT21    .equ 0x0892
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  57
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  57
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -3369,7 +3369,7 @@ IO 000904                                2678      __errcnt2  ; overlay symbol  
 IO 000904 [1]B                           2680      __errcntl2   .res.b 1             ;000904
           = 00000904                     2681      ERRCNTL2    .equ 0x0904
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  58
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  58
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -3429,7 +3429,7 @@ IO 000917 [1]B                           2733      __if1msk2h2   .res.b 1       
           = 00000917                     2734      IF1MSK2H2    .equ 0x0917
 IO 000918                                2735      __if1arb2  ; overlay symbol      ;000918
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  59
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  59
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -3489,7 +3489,7 @@ IO 000940 [1]B                           2786      __if2creql2   .res.b 1       
 IO 000941 [1]B                           2788      __if2creqh2   .res.b 1             ;000941
           = 00000941                     2789      IF2CREQH2    .equ 0x0941
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  60
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  60
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -3549,7 +3549,7 @@ IO 000950 [1]B                           2840      __if2dta2l2   .res.b 1       
 IO 000951 [1]B                           2842      __if2dta2h2   .res.b 1             ;000951
           = 00000951                     2843      IF2DTA2H2    .equ 0x0951
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  61
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  61
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -3609,7 +3609,7 @@ IO 0009A1 [1]B                           2895      __intpnd1h2   .res.b 1       
           = 000009A1                     2896      INTPND1H2    .equ 0x09A1
 IO 0009A2                                2897      __intpnd22  ; overlay symbol      ;0009A2
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  62
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  62
 MB96338US
 
 SN LOC    OBJ                           LLINE      SOURCE
@@ -3641,7 +3641,7 @@ IO 0009CE [1]B                           2919      __coer2   .res.b 1           
                                          2922
           ==                             2923       .end
 _____________________________________________________________________________
-F2MC-16 Family SOFTUNE Assembler V30L13       2014-10-16 13:58:54   Page:  63
+F2MC-16 Family SOFTUNE Assembler V30L13       2015-01-22 10:24:16   Page:  63
 - SECTION LISTING - ( MB96338US )
 
    NO SECTION-NAME                       SIZE  ATTRIBUTES

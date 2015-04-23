@@ -108,7 +108,8 @@ void InitFSU();
 void ServiceUart(BYTE Id, BYTE* pData, WORD Len);
 //====================================================================
 BYTE ServiceMaster(BYTE bus_id, Message *m);
-BYTE ServiceObmenData(BYTE bus_id, Message *m);
+BYTE ServiceObmenData1(BYTE bus_id, Message *m);
+BYTE ServiceObmenData2(BYTE bus_id, Message *m);
 
 extern CFSU Fsu;
 

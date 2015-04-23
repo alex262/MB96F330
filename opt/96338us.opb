@@ -28,8 +28,6 @@
 -a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\sdo.obj"
 -a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\sync.obj"
 -a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\KCU4.obj"
--a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\Flash.obj"
--a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\mhx_reader.obj"
 -a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\i2c_Func.obj"
 -a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\D1Ware.obj"
 -a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\ADC8.obj"
@@ -38,5 +36,5 @@
 -a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\FSU29_30.obj"
 -a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\NDD22.obj"
 -a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\DAC11.obj"
--a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\Flash2.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\bootloader.obj"
 

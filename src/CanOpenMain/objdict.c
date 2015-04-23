@@ -119,8 +119,8 @@ const proceed_info proceed_infos[] =
 	{0x3A,	/*	"Unknown",*/		0},							//58
 	{0x3B,	/*	"Unknown",*/		0},							//59
 	{0x3C,	/*	"Unknown",*/		0},							//60
-	{0x3D,	/*	"Unknown",*/		0},							//61
-	{0x3E,	/*	"Unknown",*/		ServiceObmenData},			//62
+	{0x3D,	/*	"Unknown",*/		ServiceObmenData1},			//61
+	{0x3E,	/*	"Unknown",*/		ServiceObmenData2},			//62
 	{0x3F,	/*	"Unknown",*/		ServiceMaster}				//63
 };
 const UNS8 Num_Proc_Max=sizeof(proceed_infos)/sizeof(proceed_info)-1;
@@ -1559,7 +1559,7 @@ subindex Index2000[] =
 	{ RO, uint32, sizeof(UNS32), 	(void*)&Dac11.ErrorDAC[0]},		//7
 	{ RO, uint16, sizeof(UNS16), 	(void*)&Dac11.Master[0]},		//8
 	{ RW, uint16, sizeof (UNS16), 	(void*)&Dac11.NewOutDac},		//9
-	{ RO, uint16, sizeof (UNS16), 	(void*)&Dac11.EnOutDac},		//10
+	{ RO, uint16, sizeof (UNS16), 	(void*)&Dac11.EnOutDac[0]},		//10
 	{ RO, uint16, sizeof (UNS16), 	(void*)&Dac11.DiagRele}			//11
 };
 /********* Index 2001 *********/

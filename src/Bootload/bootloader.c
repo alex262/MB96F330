@@ -1,50 +1,57 @@
-/************************************************************************/
-/*               (C) Fujitsu Semiconductor Europe GmbH                  */
-/*                                                                      */
-/* (V1.4)                                                               */
-/************************************************************************/
-/*----------------------------------------------------------------------*/
-/* Note:                                                                */
-/*                                                                      */
-/* -------------------------------------------------------------------- */
-/* History:                                                             */
-/* Date         Version  Author  Description                            */
-/*----------------------------------------------------------------------*/
-
-#include "bootloader.h"
+//bootloader.c
 #include "mb96338us.h"
-#include "flash.h"
+#include "bootloader.h"
 #include "global.h"
-//------------------------------------------------------------------------------------------------------------------
-#pragma section CODE=BOOTLOADER,		attr=CODE,	locate=0xDF1000
-#pragma section FAR_CODE=BOOTLOADER,	attr=CODE,	locate=0xDF1000
 
-#pragma section CONST=CONST_BOOT,		attr=CONST,	locate=0xDF7000
-#pragma section FAR_CONST=CONST_BOOT,	attr=CONST,	locate=0xDF7000
+#define BOOTLOADER_CODE_ADDR		0xDF5800	//адрес должен совпадать с адресом секции CODE_BOOTLOADER
+#define BOOTLOADER_CODE_SIZE		0x2400	
 
-#pragma section DCONST=DCONST_BOOT,		attr=CONST,	locate=0xDF7900
-#pragma section FAR_DCONST=DCONST_BOOT,	attr=CONST,	locate=0xDF7900
+//фиксированное расположение кода для последующего копирования в RAM 
+// младшая часть адреса (16 бит) соответствует области памяти RAM куда будет скопирован код
+#pragma section CODE=CODE_BOOTLOADER,		attr=CODE,	locate=0xDF5800
+#pragma section FAR_CODE=CODE_BOOTLOADER,	attr=CODE,	locate=0xDF5800
 
-#pragma section INIT=INIT_MHX, 		attr=DATA, locate=0x18F00
-#pragma section FAR_INIT=INIT_MHX,	attr=DATA, locate=0x18F00
-#pragma section DATA=DATA_MHX, 		attr=DATA, locate=0x18F20
-#pragma section FAR_DATA=DATA_MHX, 	attr=DATA, locate=0x18F20
-//------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------
-const WORD VerBootloader = 0x0102; 
-//------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------
+//расположение стека на время загрузки программы - гарантия что не затрем стек при копировании кода в RAM
+#pragma asm
+	.SECTION  STACK_BOOTLOADER, STACK, LOCATE=07E00H
+	.ALIGN 2
+	.RES.B 0A0H
+#pragma endasm
 
-const char ASCII_[] = "0123456789ABCDEF";
+//переопределение стеков
+#pragma inline set_stack
+void set_stack(void)
+{
+	__asm("	MOVL A, #07EA0H");	//верхушка стека LOCATE + size
+    __asm("	MOVW SP,A");
+    __asm("	MOV  A, #0");
+    __asm("	MOV  USB, A");
+    __asm("	MOV  SSB, A");
+}
+
+//фиксированное расположение переменных и инициализационых данных - гарантия что они не
+// окажутся в области куда будет скопирован код
+#pragma section INIT=INIT_BOOTLOADER, 		attr=DATA, locate=0x7EA0
+#pragma section FAR_INIT=INIT_BOOTLOADER,	attr=DATA, locate=0x7EA0
+#pragma section DATA=DATA_BOOTLOADER, 		attr=DATA, locate=0x7F40
+#pragma section FAR_DATA=DATA_BOOTLOADER, 	attr=DATA, locate=0x7F40
+
+//------------------------------------------------------------------------------------------------------------------
+#define TYPE_UART				0  //обновляемся по uart
+#define TYPE_CAN				1  //обновляемся по can
+
+WORD VerBootloader = 0x0103; 
 const char START_BOOT[] = {'B','O','O','T','L','O','A','D','E','R'};
+
 //------------------------------------------------------------------------------------------------------------------
-static U16	ID_BOOT;		// ID для обмена с УСО
-static U8	CAN_BUS;		// номер CAN по которому идёт обмен
-static BYTE BufferCAN[50];	// буфер 
+
+char ASCII_[] = "0123456789ABCDEF";
+char SPACES[]="       0";
+
+//------------------------------------------------------------------------------------------------------------------
+static U16	ID_BOOT;			// ID для обмена с УСО
+static U8	CAN_BUS;			// номер CAN по которому идёт обмен
+static char_t BufferCAN[50];	// буфер 
 //------------------------------------------------------------------------------------------------------------------
 #define SWAP_USHORT(x) ( ((x) >> 8) | ((x) << 8) )	// Swap 2 bytes of a word
 //------------------------------------------------------------------------------------------------------------------
@@ -52,10 +59,15 @@ static BYTE	WATCH_DOG_CODE_ = 0x55;
 
 #define clrwdt_ 			WDTCP = WATCH_DOG_CODE_; WATCH_DOG_CODE_ = ~WATCH_DOG_CODE_; // очистка WatchDog
 //------------------------------------------------------------------------------------------------------------------
-void SendCanBuf(U8 *buf, U8 len);
-U8 CanReciveMsg(TMsgCan *msg);
+__near unsigned char erase(__far unsigned int *sector_adr);
+__near unsigned char write(__far unsigned int *adr, unsigned int wdata);
+#define read_byte(adr) (*(__far unsigned char *)(adr))
+
+__near void SendCanBuf(char_t *buf, U8 len);
+__near U8 CanReciveMsg(TMsgCan *msg);
 //------------------------------------------------------------------------------------------------------------------
-int get_ch_ (char * ch)
+
+__near int get_ch_ (char * ch)
 {
 	char c;
 	if(SSR0_RDRF)
@@ -73,23 +85,23 @@ int get_ch_ (char * ch)
 	return (-1);					/* return char */
 }
 //------------------------------------------------------------------------------------------------------------------
-void putch_ (char_t ch)				/* sends a char_t */
+__near void putch_ (char_t ch)				/* sends a char_t */
 {
 	while (SSR0_TDRE == 0);			// wait for transmit buffer empty
 	TDR0 = ch;						// put ch into buffer
 }
 //------------------------------------------------------------------------------------------------------------------
-void puts_count(const char_t *buf, U8 count)
+__near void puts_count(const char_t *buf, U8 count)
 {
 	while ((count--) > 0) putch_(*buf++);
 }
 //------------------------------------------------------------------------------------------------------------------
-void puts_(const char_t *buf)
+__near void puts_(const char_t *buf)
 {
 	while (*buf != '\0')putch_(*buf++);
 }
 //------------------------------------------------------------------------------------------------------------------
-void puthex_(unsigned long n, char digits)
+__near void puthex_(unsigned long n, char digits)
 {
 	char i,ch,div=0;
 
@@ -103,7 +115,7 @@ void puthex_(unsigned long n, char digits)
 	}
 }
 //------------------------------------------------------------------------------------------------------------------
-void conv_hex(unsigned long n, char digits)
+__near void conv_hex(unsigned long n, char digits)
 {
 	char i,ch,div=0;
 
@@ -117,19 +129,19 @@ void conv_hex(unsigned long n, char digits)
 	}
 }
 //------------------------------------------------------------------------------------------------------------------
-void buf_8bit_hex_(U8 num, U8 n)
+__near void buf_8bit_hex_(U8 num, U8 n)
 {
 	BufferCAN[num]		= ASCII_[(n>>4)&0xF];
 	BufferCAN[num+1]	= ASCII_[n&0xF];
 }
 //------------------------------------------------------------------------------------------------------------------
-void put_8bit_hex_(unsigned char n)
+__near void put_8bit_hex_(unsigned char n)
 {
 	putch_(ASCII_[(n>>4)&0xF]);
 	putch_(ASCII_[n&0xF]);
 }
 //------------------------------------------------------------------------------------------------------------------
-BYTE OstatokDiv10(uint32_t x)
+__near BYTE OstatokDiv10(uint32_t x)
 {
 	while(x >= 10)
 	{
@@ -137,7 +149,7 @@ BYTE OstatokDiv10(uint32_t x)
 	}
 	return x;
 }
-uint32_t  Div10(uint32_t x)
+__near uint32_t  Div10(uint32_t x)
 {
 	uint32_t ret=0;
 	
@@ -148,13 +160,13 @@ uint32_t  Div10(uint32_t x)
 	}
 	return ret;
 }
-void putdec_(uint32_t x)
+__near void putdec_(uint32_t x)
 {
 	int16_t i;
 	char_t buf[9];
 	if (x == 0) 
 	{
-		puts_("       0");
+		puts_(SPACES);
 		return;
 	}
 	buf[8]='\0';				/* end sign of string */
@@ -174,7 +186,7 @@ void putdec_(uint32_t x)
 	puts_(buf);					/* send string */
 }
 //------------------------------------------------------------------------------------------------------------------
-void conv_dec(uint32_t x)
+__near void conv_dec(uint32_t x)
 {
 	int16_t i;
 	char_t buf[9];
@@ -197,7 +209,7 @@ void conv_dec(uint32_t x)
 }
 //------------------------------------------------------------------------------------------------------------------
 /*convert string hex value to long*/
-DWORD StrHexToLong(BYTE *inputStr, BYTE lenStr)
+__near DWORD StrHexToLong(BYTE *inputStr, BYTE lenStr)
 /* 
 const char *inputStr: input string
 unsigned char lenStr: length of hey value
@@ -226,7 +238,7 @@ unsigned char lenStr: length of hey value
 	return sum;
 }
 //------------------------------------------------------------------------------------------------------------------
-int write_MHX_com(BYTE * pData)
+__near int write_MHX_com(BYTE * pData)
 {
 	__far unsigned int *adr;
 	DWORD data,crc;
@@ -246,8 +258,7 @@ int write_MHX_com(BYTE * pData)
 		// storing addresslength and converting it into a even word address 
 		adr = (__far unsigned int *)((unsigned long)StrHexToLong(&pData[4],6));
 		
-		if((DWORD)adr >= 0xF80000)
-		{
+//		if((DWORD)adr >= 0xF80000)	{
 			// building crc 
 			crc +=(DWORD)((((DWORD)adr & 0xFF0000) >> 16) + (((DWORD)adr & 0x00FF00) >> 8) + ((DWORD)adr & 0x0000FF));
 			//crc +=pData[4]+pData[5]+pData[6]+pData[7]+pData[8]+pData[9];
@@ -280,34 +291,14 @@ int write_MHX_com(BYTE * pData)
 				//write((__far unsigned int *)(RESETVECT+2),0x0000); // deleting everything in the resetvector
 				return (-4);
 			}
-		}else return 0;
+//		}else return 0;
 	}else return (-2);
 	return (1);
 }
 //------------------------------------------------------------------------------------------------------------------
-/*int checkResetVector( void )
-{
-	unsigned int data,dataB;
-	data = (unsigned int)RamRead(RESETVECT);
-	dataB = (unsigned int)RamRead(RESETVECT + 2);
-	puts_("RESET VECT : ");
-	puthex_((unsigned long)(data),4);
-	puthex_((unsigned long)(dataB),4);
-	puts_("\n");
-	if ((data == 0xFFFF) && (dataB == 0xFFFF)) return 1;
-	if ((data == 0x0000) && (dataB == 0x0000)) return 2;
-	return 0;
-}*/
-//------------------------------------------------------------------------------------------------------------------
-/*void flashResetVector( void )
-{
-	write((__far unsigned int *)(RESETVECT)  ,BOOTLOADER_START & 0xFFFF);
-	write((__far unsigned int *)(RESETVECT+2),BOOTLOADER_START >> 16);
-}*/
-//------------------------------------------------------------------------------------------------------------------
 #define COUNT_MEM_PART				2
-const static unsigned long ADDR_START_MEM[COUNT_MEM_PART]	= {0xDF0000,0xF80000};
-const static unsigned long ADDR_END_MEM[COUNT_MEM_PART]	= {0xDF7FFF,0xFFFFFF};
+static unsigned long ADDR_START_MEM[COUNT_MEM_PART]	= {0xDF0000,0xF80000};
+static unsigned long ADDR_END_MEM[COUNT_MEM_PART]	= {0xDF7FFF,0xFFFFFF};
 
 #define CMD_NONE					0x00
 #define CMD_EXIT					0x01
@@ -318,26 +309,19 @@ const static unsigned long ADDR_END_MEM[COUNT_MEM_PART]	= {0xDF7FFF,0xFFFFFF};
 #define CMD_WRITE					0x06
 #define CMD_GET_VER_BOOT			0x07
 
-#define STR_EXIT					"EXIT"
-#define STR_BOOTLOADER				"BOOTLOADER"
-#define STR_ERASE					"ERASE"
-#define STR_REBOOT					"REBOOT"
-#define STR_READ					"READ"
-#define STR_WRITE					"WRITE"
-#define STR_GET_VER_BOOT			"GETBOOTVER"
+char STR_EXIT[]="EXIT";
+char STR_BOOTLOADER[]="BOOTLOADER";
+char STR_ERASE[]="ERASE";
+char STR_REBOOT[]="REBOOT";
+char STR_READ[]="READ";
+char STR_WRITE[]="WRITE";
+char STR_GET_VER_BOOT[]="GETBOOTVER";
 
 static BOOL cmd = FALSE;
-
-//static BYTE count_ch_bt=0;
-//static int StBootloader = 0; 
-
 #define END_LINE	'\0'
 
 //! command number
 static BYTE   cmd_type = CMD_NONE;
-//! flag for first ls : mount if set
-//static bool first_ls = true ;
-//! string length
 static BYTE   i_str = 0;
 
 //! string for command
@@ -349,15 +333,11 @@ static char par_str1[20];
 //! string for second arg
 static char par_str2[20];
 
-static void parse_cmd(void);
+__near static void parse_cmd(void);
 
 //------------------------------------------------------------------------------------------------------------------
-void build_cmd_b(int c)
+__near void build_cmd_b(int c)
 {
-//	if((StBootloader == 0)&&(i_str == 0))// загрузчик не активирован
-//	{
-//		if(c != 'B') return;
-//	}
 	if(c == END_LINE)
 	{
 		// Add NUL char.
@@ -374,7 +354,7 @@ void build_cmd_b(int c)
 	}
 }
 //------------------------------------------------------------------------------------------------------------------
-BYTE _strlen(const char *rhs)
+__near BYTE _strlen(const char *rhs)
 {
 	BYTE res = 0;
 	while(*(rhs++)) ++res;
@@ -382,7 +362,7 @@ BYTE _strlen(const char *rhs)
 	return res;
 }
 //------------------------------------------------------------------------------------------------------------------
-int _strcmp(const char *first, const char *last)
+__near int _strcmp(const char *first, const char *last)
 {
 	while ((*first && *last)&&(*first == *last))
 	{
@@ -392,13 +372,11 @@ int _strcmp(const char *first, const char *last)
 	return (*first - *last);
 }
 //------------------------------------------------------------------------------------------------------------------
-static void parse_cmd(void)
+__near static void parse_cmd(void)
 {
 	BYTE i, j;
-
 	// Get command type.
 	for (i = 0; cmd_str[i] != ' ' && i < i_str; i++);
-
 	if (i)
 	{
 		cmd = TRUE;
@@ -417,8 +395,6 @@ static void parse_cmd(void)
 		else if (!_strcmp(cmd_str, STR_READ			)) cmd_type = CMD_READ;
 		else if (!_strcmp(cmd_str, STR_WRITE		)) cmd_type = CMD_WRITE;
 		else if (!_strcmp(cmd_str, STR_GET_VER_BOOT	)) cmd_type = CMD_GET_VER_BOOT;
-
-
 		else
 		{
 			cmd = FALSE;
@@ -431,7 +407,6 @@ static void parse_cmd(void)
 	{
 		return;
 	}
-
 	// Get first arg (if any).
 	if (++i < i_str)
 	{
@@ -488,11 +463,11 @@ static void parse_cmd(void)
 static BYTE BufferReadCom[44];
 static BYTE CountReadComm=0;
 
-static const char_t STR_OK[10] = {'O','K',0,0,0,0,0,0,0,0};
-static const char_t STR_OK_A[5] = {'O','K',' ','A',0};
-static const char_t STR_OK_B[5] = {'O','K',' ','B',0};
+static char_t STR_OK[10] = {'O','K',0,0,0,0,0,0,0,0};
+static char_t STR_OK_A[5] = {'O','K',' ','A',0};
+static char_t STR_OK_B[5] = {'O','K',' ','B',0};
 
-void wait1mks()
+__near void wait1mks()
 {
 	__wait_nop();
 	__wait_nop();
@@ -507,23 +482,25 @@ void wait1mks()
 	__wait_nop();
 }
 
-void wait_mks(WORD n)
+__near void wait_mks(WORD n)
 {
 	WORD i;
-	for(i=0; i<n; i++) wait1mks;
+	for(i=0; i<n; i++) wait1mks();
 }
 
+char STR_ERROR[]="ERORR ";
+char STR_READY[]="READY";
+char STR_END_READ[]="END READ";
+char STR_S214[]="S214";
+
 // par1 - номер CAN U16 - ID CAN сообщения 
-void ObrCmd(BYTE TypeInterf)
+__near void ObrCmd(BYTE TypeInterf)
 {
 	TMsgCan msg;
 	char ch;
 	BYTE i, j, Data[0x10], st_send, crc;
 	DWORD adr, adr_s;
 	int ret;
-	
-	
-	
 	switch (cmd_type)
 	{
 		case CMD_BOOTLOADER:
@@ -547,18 +524,28 @@ void ObrCmd(BYTE TypeInterf)
 			/* =============================================================== */
 			/* Запрос версии BOOTLOADERa                                 +++++ */
 			/* =============================================================== */
-				SendCanBuf((U8 *)(&VerBootloader), 2);
+				SendCanBuf((char_t*)(&VerBootloader), 2);
 			break;
 		case CMD_ERASE:
 			//if(StBootloader == 1)
 			/* =============================================================== */
 			/* Erasing flash sectors                                     +++++ */
 			/* =============================================================== */
-			__DI();				// disables interrupts - needed for erasing flash
+/*
 			nerase(0xDF0000);	// NOT erases SA0
 			nerase(0xDF2000);	// NOT erases SA1
 			nerase(0xDF4000);	// NOT erases SA2
 			nerase(0xDF6000);	// NOT erases SA3
+*/
+			erase((__far unsigned int *)0xDF0000);	// NOT erases SA0
+			clrwdt_;
+			erase((__far unsigned int *)0xDF2000);	// NOT erases SA1
+			clrwdt_;
+			erase((__far unsigned int *)0xDF4000);	// NOT erases SA2
+			clrwdt_;
+			erase((__far unsigned int *)0xDF6000);	// NOT erases SA3
+			clrwdt_;
+
 			erase((__far unsigned int *)0xF80000);	// erases SA32
 			clrwdt_;
 			erase((__far unsigned int *)0xF90000);	// erases SA33
@@ -623,12 +610,12 @@ void ObrCmd(BYTE TypeInterf)
 						crc = 0;
 						if(TypeInterf == TYPE_UART)
 						{
-							puts_("S214");
+							puts_(STR_S214);
 							puthex_(adr_s,6);
 						}
 						if(TypeInterf == TYPE_CAN)
 						{
-							SendCanBuf("S214", 4);
+							SendCanBuf(STR_S214, 4);
 							conv_hex(adr_s,6);
 							SendCanBuf(BufferCAN, 6);
 						}
@@ -672,7 +659,7 @@ void ObrCmd(BYTE TypeInterf)
 			}
 			if(TypeInterf == TYPE_UART)
 			{
-				puts_("END READ");putch_(0);
+				puts_(STR_END_READ);putch_(0);
 			}
 			if(TypeInterf == TYPE_CAN)
 			{
@@ -697,7 +684,7 @@ void ObrCmd(BYTE TypeInterf)
 			CountReadComm=0;
 			if(TypeInterf == TYPE_UART)
 			{
-				puts_("READY");putch_(0);
+				puts_(STR_READY);putch_(0);
 			}
 			if(TypeInterf == TYPE_CAN)
 			{
@@ -735,11 +722,11 @@ void ObrCmd(BYTE TypeInterf)
 					{
 						if(TypeInterf == TYPE_UART)
 						{
-							puts_("ERORR ");putdec_(ret*(-1));putch_(0);
+							puts_(STR_ERROR);putdec_(ret*(-1));putch_(0);
 						}
 						if(TypeInterf == TYPE_CAN)
 						{
-							SendCanBuf("ERORR ", 6);
+							SendCanBuf(STR_ERROR, 6);
 							conv_dec(ret*(-1));
 							SendCanBuf(BufferCAN, 9);
 						}
@@ -748,8 +735,8 @@ void ObrCmd(BYTE TypeInterf)
 					CountReadComm = 0;
 					if(TypeInterf == TYPE_UART)
 					{
-						if(ret == 0){	puts_("OK B");putch_(0);putch_(0);putch_(0);}
-						if(ret == 1){	puts_("OK A");putch_(0);putch_(0);putch_(0);}
+						if(ret == 0){	puts_(STR_OK_B);putch_(0);putch_(0);putch_(0);}
+						if(ret == 1){	puts_(STR_OK_A);putch_(0);putch_(0);putch_(0);}
 					}
 					if(TypeInterf == TYPE_CAN)
 					{
@@ -782,13 +769,12 @@ void ObrCmd(BYTE TypeInterf)
 			break;
 	}
 }
+
+
 //------------------------------------------------------------------------------------------------------------------
-void ServiceBootloadUart (void)
+__far void ServiceBootloadUartStart (void)
 {
 	char ch;
-
-	__DI();
-	
 	/* =============================================================== */
 	/* Enable Sectors for FLASH writing and erasing                    */
 	/* =============================================================== */
@@ -797,13 +783,14 @@ void ServiceBootloadUart (void)
 	/* =============================================================== */
 	
 	puts_count(STR_OK, 3);
-
+	clrwdt_;
 	while(1)
 	{
 		clrwdt_;					// обнуление WatchDog таймера 
 		
 		if(get_ch_(&ch)>=0) 
 		{
+				
 			// While a usable user command on RS232 isn't received, build it
 			if (!cmd)
 			{
@@ -822,14 +809,10 @@ void ServiceBootloadUart (void)
 	}
 }
 //------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------
 #define MSG2STD_(msg) ((msg & 0x000007FFL) << 18)
 #define STD2MSG_(reg) (((reg & 0x1FFFFFFFL) >> 18) & 0x000007FFL)
 
-void CAN0_buffer_(U8 Num, U8 Dir, U16 setID, U32 mask)
+__near void CAN0_buffer_(U8 Num, U8 Dir, U16 setID, U32 mask)
 {
 	if((Num==0)||(Num>32)) return;
 	
@@ -867,7 +850,7 @@ void CAN0_buffer_(U8 Num, U8 Dir, U16 setID, U32 mask)
 	IF1CREQ0 = Num;		// Transfer the Interface Register Content to the Message Buffer
 }
 //------------------------------------------------------------------------------------------------------------------
-void CAN1_buffer_(U8 Num, U8 Dir, U16 setID, U32 mask)
+__near void CAN1_buffer_(U8 Num, U8 Dir, U16 setID, U32 mask)
 {
 	if((Num==0)||(Num>32)) return;
 	
@@ -905,21 +888,17 @@ void CAN1_buffer_(U8 Num, U8 Dir, U16 setID, U32 mask)
 	IF1CREQ1 = Num;		// Transfer the Interface Register Content to the Message Buffer
 }
 //------------------------------------------------------------------------------------------------------------------
-void CAN2_buffer_(U8 Num, U8 Dir, U16 setID, U32 mask)
+__near void CAN2_buffer_(U8 Num, U8 Dir, U16 setID, U32 mask)
 {
-
 	if((Num==0)||(Num>32)) return;
-	
 	// Prepare Arbitration Interface Register
 	IF1ARB2 = MSG2STD_(setID);	// <<< Define message id: Use MSG2STD() for 11bit IDs / Use MSG2EXT() for 29bit IDs
 	IF1ARB2_XTD		= 0;		// <<< 0: 11bit ID / 1: 29bit ID 
 	IF1ARB2_DIR		= Dir&1;	// <<< 0: RX Buffer / 1: TX Buffer 
 	IF1ARB2_MSGVAL	= 1;		// <<< 0: Buffer invalid / 1: Buffer valid 
-
 	// Prepare Mask Interface Register 
 	IF1MSK2			= MSG2STD_(mask);		// <<< Setup Mask corresponding to your application 
 	IF1MSK22_MXTD	= 1;		// <<< 0: ID type is not used for filtering / 1: ... is used for filtering 
-
 	// Prepare Message Control Interface Register 
 	IF1MCTR2_NEWDAT	= 0;		// Clear NEWDAT Flag 
 	IF1MCTR2_MSGLST	= 0;		// Clear MSGLST Flag 
@@ -944,7 +923,7 @@ void CAN2_buffer_(U8 Num, U8 Dir, U16 setID, U32 mask)
 	IF1CREQ2 = Num;		// Transfer the Interface Register Content to the Message Buffer
 }
 //------------------------------------------------------------------------------------------------------------------
-void CAN_buffer_(U8 NumCan, U8 Num, U8 Dir, U16 setID, U32 mask)
+__near void CAN_buffer_(U8 NumCan, U8 Num, U8 Dir, U16 setID, U32 mask)
 {
 	if(NumCan == 0)
 		CAN0_buffer_(Num, Dir, setID, mask);
@@ -954,7 +933,7 @@ void CAN_buffer_(U8 NumCan, U8 Num, U8 Dir, U16 setID, U32 mask)
 		CAN2_buffer_(Num, Dir, setID, mask);
 }
 //------------------------------------------------------------------------------------------------------------------
-void CAN0_buffer_off(U8 Num)
+__near void CAN0_buffer_off(U8 Num)
 {
 	if((Num==0)||(Num>32)) return;
 	
@@ -970,7 +949,7 @@ void CAN0_buffer_off(U8 Num)
 
 	IF1CREQ0 = Num;		// Transfer the Interface Register Content to the Message Buffer
 }
-void CAN1_buffer_off(U8 Num)
+__near void CAN1_buffer_off(U8 Num)
 {
 	if((Num==0)||(Num>32)) return;
 	
@@ -986,7 +965,7 @@ void CAN1_buffer_off(U8 Num)
 
 	IF1CREQ1 = Num;		// Transfer the Interface Register Content to the Message Buffer
 }
-void CAN2_buffer_off(U8 Num)
+__near void CAN2_buffer_off(U8 Num)
 {
 	if((Num==0)||(Num>32)) return;
 	
@@ -1003,7 +982,7 @@ void CAN2_buffer_off(U8 Num)
 	IF1CREQ2 = Num;		// Transfer the Interface Register Content to the Message Buffer
 }
 //------------------------------------------------------------------------------------------------------------------
-void CAN_buffer_off(U8 NumCan, U8 Num)
+__near void CAN_buffer_off(U8 NumCan, U8 Num)
 {
 	if(NumCan == 0)
 		CAN0_buffer_off(Num);
@@ -1013,7 +992,7 @@ void CAN_buffer_off(U8 NumCan, U8 Num)
 		CAN0_buffer_off(Num);
 }
 //------------------------------------------------------------------------------------------------------------------
-void CAN_ConfigMsgBox_(U8 NumCan)
+__near void CAN_ConfigMsgBox_(U8 NumCan)
 {
 	U8 i;
 	
@@ -1026,7 +1005,7 @@ void CAN_ConfigMsgBox_(U8 NumCan)
 	}
 }
 //------------------------------------------------------------------------------------------------------------------
-void ResetCan_(U8 nCan)
+__near void ResetCan_(U8 nCan)
 {
 	if(nCan == 0)
 	{
@@ -1048,7 +1027,7 @@ void ResetCan_(U8 nCan)
 	}
 }
 //------------------------------------------------------------------------------------------------------------------
-U8 CanReciveMsg0(TMsgCan *msg)
+__near U8 CanReciveMsg0(TMsgCan *msg)
 {
 	if(INTR0 == 0x8000)		/* status int */
 	{
@@ -1090,7 +1069,7 @@ U8 CanReciveMsg0(TMsgCan *msg)
 	return FALSE;
 }
 //------------------------------------------------------------------------------------------------------------------
-U8 CanReciveMsg1(TMsgCan *msg)
+__near U8 CanReciveMsg1(TMsgCan *msg)
 {
 	if(INTR1 == 0x8000)		/* status int */
 	{
@@ -1132,7 +1111,7 @@ U8 CanReciveMsg1(TMsgCan *msg)
 	return FALSE;
 }
 //------------------------------------------------------------------------------------------------------------------
-U8 CanReciveMsg2(TMsgCan *msg)
+__near U8 CanReciveMsg2(TMsgCan *msg)
 {
 	if(INTR2 == 0x8000)		/* status int */
 	{
@@ -1174,7 +1153,7 @@ U8 CanReciveMsg2(TMsgCan *msg)
 	return FALSE;
 }
 //------------------------------------------------------------------------------------------------------------------
-U8 CanReciveMsg(TMsgCan *msg)
+__near U8 CanReciveMsg(TMsgCan *msg)
 {
 	if(CAN_BUS == 0) return CanReciveMsg0(msg);
 	if(CAN_BUS == 1) return CanReciveMsg1(msg);
@@ -1182,7 +1161,7 @@ U8 CanReciveMsg(TMsgCan *msg)
 	return FALSE;
 }
 //------------------------------------------------------------------------------------------------------------------
-U8 CAN0_SendMessage_(TMsgCan *msg)
+__near U8 CAN0_SendMessage_(TMsgCan *msg)
 {
 	U32 timeout=0;
 	
@@ -1220,7 +1199,7 @@ U8 CAN0_SendMessage_(TMsgCan *msg)
 	return TRUE;
 }
 //------------------------------------------------------------------------------------------------------------------
-U8 CAN1_SendMessage_(TMsgCan *msg)
+__near U8 CAN1_SendMessage_(TMsgCan *msg)
 {
 	U32 timeout=0;
 	// Prepare Arbitration Interface Register 
@@ -1257,7 +1236,7 @@ U8 CAN1_SendMessage_(TMsgCan *msg)
 	return TRUE;
 }
 //------------------------------------------------------------------------------------------------------------------
-U8 CAN2_SendMessage_(TMsgCan *msg)
+__near U8 CAN2_SendMessage_(TMsgCan *msg)
 {
 	U32 timeout=0;
 	// Prepare Arbitration Interface Register 
@@ -1294,7 +1273,7 @@ U8 CAN2_SendMessage_(TMsgCan *msg)
 	return TRUE;
 }
 //------------------------------------------------------------------------------------------------------------------
-U8 CanSendMsg(TMsgCan *msg)
+__near U8 CanSendMsg(TMsgCan *msg)
 {
 	if(CAN_BUS == 0) return CAN0_SendMessage_(msg);
 	if(CAN_BUS == 1) return CAN1_SendMessage_(msg);
@@ -1302,7 +1281,7 @@ U8 CanSendMsg(TMsgCan *msg)
 	return FALSE;
 }
 //------------------------------------------------------------------------------------------------------------------
-void SendCanBuf(U8 *buf, U8 len)
+__near void SendCanBuf(char_t *buf, U8 len)
 {
 	TMsgCan msg;
 	U8 i;
@@ -1329,28 +1308,11 @@ void SendCanBuf(U8 *buf, U8 len)
 	}
 }
 //------------------------------------------------------------------------------------------------------------------
-// код функции 0xD
-
-BYTE ServiceBootloadCan(BYTE bus_id, TMsgCan *m)
+__far void ServiceBootloadCanStart(BYTE bus_id)
 {
 	
 	TMsgCan msg;
 	U8 i;
-	
-	/* =============================================================== */
-	// проверяем сообщение 
-	/* =============================================================== */
-	if(m->len != 8) return 0;
-	if(m->data[0] != 'B') return 0;
-	if(m->data[1] != 'O') return 0;
-	if(m->data[2] != 'O') return 0;
-	if(m->data[3] != 'T') return 0;
-	if(m->data[4] != 'L') return 0;
-	if(m->data[5] != 'O') return 0;
-	if(m->data[6] != 'A') return 0;
-	if(m->data[7] != 'D') return 0;
-	/* =============================================================== */
-	__DI();	//запрещяем все прерывания
 	/* =============================================================== */
 	/*    НАСТРАИВАЕМ CAN ДЛЯ ПРОГРАММАТОРА                            */
 	/* =============================================================== */
@@ -1358,8 +1320,6 @@ BYTE ServiceBootloadCan(BYTE bus_id, TMsgCan *m)
 	CAN_BUS = bus_id;
 	CAN_ConfigMsgBox_(bus_id);	// Конфигурим наш CAN на прием сообщений с нашим адресом .. младшие 5 бит адресс остальные нули
 	/* =============================================================== */
-	LEDR_ON;
-	LEDG_OFF;
 	/* =============================================================== */
 	/* Enable Sectors for FLASH writing and erasing                    */
 	/* =============================================================== */
@@ -1400,4 +1360,197 @@ BYTE ServiceBootloadCan(BYTE bus_id, TMsgCan *m)
 	}
 	//return 0;
 }
+
 //------------------------------------------------------------------------------------------------------------------
+
+//копирование всего кода bootloader.c в RAM
+void CopyLoaderToRam(void)
+{
+int i;
+__far unsigned int *src=(__far unsigned int *)BOOTLOADER_CODE_ADDR; 
+__far volatile unsigned int *dst=(__far unsigned int *)((unsigned long)(BOOTLOADER_CODE_ADDR & 0xFFFF));
+	__DI();	//запрещяем все прерывания
+	LEDR_ON;
+	LEDG_ON;
+	clrwdt_;	
+	for (i=0;i<(BOOTLOADER_CODE_SIZE >> 1);i++)
+		*(dst++)=*(src++);
+	clrwdt_;	
+	LEDR_ON;
+	LEDG_OFF;
+}
+
+
+typedef __far void can_start(BYTE bus_id);
+
+// CAN Open код функции 0xD
+unsigned char ServiceBootloadUpd(BYTE bus_id,TMsgCan *m)
+{
+static BYTE bus_id_saved=0;
+can_start *f;
+	// проверяем сообщение здесь, m может быть затерто при копировании кода в RAM 
+	if(m->len != 8) return 0;
+	if(m->data[0] != 'B') return 0;
+	if(m->data[1] != 'O') return 0;
+	if(m->data[2] != 'O') return 0;
+	if(m->data[3] != 'T') return 0;
+	if(m->data[4] != 'L') return 0;
+	if(m->data[5] != 'O') return 0;
+	if(m->data[6] != 'A') return 0;
+	if(m->data[7] != 'D') return 0;
+	bus_id_saved=bus_id;
+	set_stack();	//брoсаем старый стек и переходим на новый
+	CopyLoaderToRam();
+	f=(can_start*)((unsigned long)ServiceBootloadCanStart & 0xFFFF);	//обрезали верхнюю часть адреса 
+	f(bus_id_saved);
+	return 1;
+}
+
+typedef __far void uart_start(void);
+
+void ServiceBootloadUart(void)
+{
+uart_start *f;
+	set_stack();	//брoсаем старый стек и переходим на новый
+	CopyLoaderToRam();
+	f=(uart_start*)((unsigned long)ServiceBootloadUartStart & 0xFFFF);	//обрезали верхнюю часть адреса 
+	f();	//вызов ServiceBootloadUartStart из RAM
+}
+
+/**************** FLASH ROUTINES *****************/
+
+#define DQ7 0x0080	// data polling flag
+#define DQ5 0x0020	// time limit exceeding flag
+#define DQ3 0x0008	//sector erase timer flag
+
+#define far_vuint	__far volatile unsigned int
+#define far_uint	__far unsigned int
+//------------------------------------------------------------------------------------------------------------------
+__near void fwait(unsigned long a)
+{
+	unsigned long i;
+	
+	for (i = 0; i < a; i++)
+	{
+		__wait_nop();
+	}
+}
+
+// Erases Flash sector
+__near unsigned char erase(__far unsigned int *sector_adr)
+{
+	unsigned char flag = 0;
+	unsigned char MCSRA_save;
+	unsigned int  MTCRA_save;
+	__far volatile unsigned int *seq_AAAA;
+	__far volatile unsigned int *seq_5554;
+	seq_AAAA = (far_uint*)(((unsigned long)sector_adr & 0x0FFF000) + 0x0AAA);
+	seq_5554 = (far_uint*)(((unsigned long)sector_adr & 0x0FFF000) + 0x0554);
+	MCSRA_save = MCSRA;		// save Flash settings
+	MTCRA_save = MTCRA;
+		
+	MCSRA_CRBE = 0;			// disable Code Read Buffer
+	MCSRA_DRBE = 0;			// disable Data Read Buffer
+
+	MTCRA = 0x4B3D;			//was 0x4B3D    // slow down Flash access to 4 wait states
+
+	MCSRA_WE = 1;			// set write enable flag
+	
+	*seq_AAAA = 0x00AA;		// sends the command to the pointed address
+	*seq_5554 = 0x0055;
+	*seq_AAAA = 0x0080;
+	*seq_AAAA = 0x00AA;
+	*seq_5554 = 0x0055;
+	*sector_adr = 0x0030;	// erase sector at the pointed address
+	
+	while ((*sector_adr & DQ3) != DQ3);  // sector erase timer ready?
+	while(flag == 0)
+	{
+		if((*sector_adr & DQ7) == DQ7)	// Toggle bit
+		{
+			flag = 1;					// successful erased
+		}
+		
+		if((*sector_adr & DQ5) == DQ5)	// time out
+		{
+			if((*sector_adr & DQ7) == DQ7)
+			{
+				flag = 1;				// successful erased
+			}
+			else
+			{
+				flag = 2;				// timeout error
+			}
+		}
+	}
+	MCSRA_WE = 0;          // reset write enable flag
+
+	MTCRA = MTCRA_save;    // restore Flash settings
+	MCSRA = MCSRA_save;
+	LEDG=~LEDG;	
+	return(flag);
+}
+
+__near unsigned int RamRead(unsigned long adr)
+{
+	unsigned int y;	
+	y = (*(unsigned int*) adr);
+	return y;
+}
+
+
+// Write word data to flash
+__near unsigned char write(__far unsigned int *adr, unsigned int wdata)
+{
+	unsigned char flag = 0;
+	unsigned char MCSRA_save;
+	unsigned int  MTCRA_save;
+	__far volatile unsigned int *seq_AAAA;
+	__far volatile unsigned int *seq_5554;
+	
+	seq_AAAA = (far_uint*)(((unsigned long)adr & 0x0FFF000) + 0x0AAA);
+	seq_5554 = (far_uint*)(((unsigned long)adr & 0x0FFF000) + 0x0554);
+	
+	// preparations
+	MCSRA_save = MCSRA;	// save Flash settings
+	MTCRA_save = MTCRA;
+	
+	MCSRA_CRBE = 0;		// disable Code Read Buffer
+	MCSRA_DRBE = 0;		// disable Data Read Buffer
+	
+	MTCRA = 0x4B3D;		//was 0x4B3D     // slow down Flash access to 4 wait states
+
+	MCSRA_WE = 1;		// set write enable flag
+	fwait(100);
+	*seq_AAAA = 0x00AA;	// sends the command to the pointed address
+	*seq_5554 = 0x0055;
+	*seq_AAAA = 0x00A0;
+	*adr = wdata;		// send data to the pointed address
+	while(flag == 0)
+	{
+		if((*adr & DQ7) == (wdata & DQ7))	// Toggle bit
+		{
+			flag = 1;						// successful written
+		}
+		
+		if((*adr & DQ5) == DQ5)				// time out
+		{
+			if((*adr & DQ7) == (wdata & DQ7))
+			{
+				flag = 1;					// successful written
+			}
+			else
+			{
+				flag = 2;					// timeout error
+			}
+		}
+	}
+	MTCRA = MTCRA_save;  // restore Flash settings
+	MCSRA = MCSRA_save;
+	fwait(100);	
+	MCSRA_WE = 0;        // reset write enable flag
+	fwait(100);
+	LEDG=~LEDG;
+	return(flag);
+}
+

@@ -19,9 +19,7 @@
 -pw 132
 -alin "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\LST"
 -alout "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\LST"
--alsf "Flash.lst"
 -alsf "Main.lst"
--alrf "Flash.lst"
 -Xals
 -Xalr
 -na
@@ -56,8 +54,6 @@
 "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\sdo.obj"
 "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\sync.obj"
 "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\KCU4.obj"
-"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\Flash.obj"
-"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\mhx_reader.obj"
 "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\i2c_Func.obj"
 "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\D1Ware.obj"
 "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\ADC8.obj"
@@ -66,5 +62,5 @@
 "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\FSU29_30.obj"
 "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\NDD22.obj"
 "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\DAC11.obj"
-"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\Flash2.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\bootloader.obj"
 

@@ -57,9 +57,7 @@ $2
 -mlf
 -pl 60
 -pw 132
--alsf "Flash.lst"
 -alsf "Main.lst"
--alrf "Flash.lst"
 -Xals
 -Xalr
 -na
@@ -68,7 +66,7 @@ $2
 $other
 -Xset_rora
 $time
-1410259627
+1421824532
 $end
 $3
 -dt s,d,r,a
@@ -78,7 +76,7 @@ $3
 -Xdof
 $other
 $time
-1410256349
+1421824532
 $end
 $4
 -S2

@@ -119,6 +119,9 @@ typedef struct
 void DriverADC8();
 void InitADC8();
 void ServiceUart(BYTE Id, BYTE* pData, WORD Len);
+BYTE ServiceObmenData1(BYTE bus_id, Message *m);
+BYTE ServiceObmenData2(BYTE bus_id, Message *m);
+
 
 extern CADC8 Adc8;
 extern TTar TarRam[ADC_CH];	// тарировки каналов в ОЗУ

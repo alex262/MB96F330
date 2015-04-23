@@ -5,8 +5,8 @@
 
 #include "can.h"
 
-//#define PLATA_NDD22_ 
-#define PLATA_NDD23_ 
+#define PLATA_NDD22_ 
+//#define PLATA_NDD23_ 
 
 #define DEVICE_TYPE 1
 
@@ -96,7 +96,8 @@ void DriverNDD();
 void InitNDD();
 void ServiceUart(BYTE Id, BYTE* pData, WORD Len);
 BYTE ServiceMaster(BYTE bus_id, Message *m);
-BYTE ServiceObmenData(BYTE bus_id, Message *m);
+BYTE ServiceObmenData1(BYTE bus_id, Message *m);
+BYTE ServiceObmenData2(BYTE bus_id, Message *m);
 
 
 extern CNDD Ndd;

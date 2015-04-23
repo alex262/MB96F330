@@ -58,7 +58,11 @@ BYTE ServiceMaster(BYTE bus_id, Message *m)
 {
 	return 0;
 }
-BYTE ServiceObmenData(BYTE bus_id, Message *m)
+BYTE ServiceObmenData1(BYTE bus_id, Message *m)
+{
+	return 0;
+}
+BYTE ServiceObmenData2(BYTE bus_id, Message *m)
 {
 	return 0;
 }

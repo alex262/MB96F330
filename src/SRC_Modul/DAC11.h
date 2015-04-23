@@ -16,7 +16,8 @@ extern void (*DRIVER_BLOK)(void);	//Указатель на функции драйвера блока
 extern void	(*SERVICE_PAK_UART)(BYTE, BYTE*, WORD);// Указатель на функции обработки входящих пакетов по UART
 
 BYTE ServiceMaster(BYTE bus_id, Message *m);
-BYTE ServiceObmenData(BYTE bus_id, Message *m);
+BYTE ServiceObmenData1(BYTE bus_id, Message *m);
+BYTE ServiceObmenData2(BYTE bus_id, Message *m);
 
 extern WORD (*STATE_BLOCK);			//Уазатель на поле Info блока
 //=============================================================
@@ -136,7 +137,7 @@ typedef struct
 	float	fDAC_Set[COUNT_DAC_CH];																			//48
 	float	fADC[COUNT_DAC_CH];																				//48	
 	WORD	DiagRele;			// диагностика состояния реле	читаем через дискретные входы				//2
-	WORD	EnOutDac;			// используются первые 12 бит, 1 - выход цапа необходимо коммутировать		//2
+	WORD	EnOutDac[3];		// используются первые 12 бит, 1 - выход цапа необходимо коммутировать		//2
 	WORD	DiagMAX;			// диагностика наличия микросхем MAX										//2
 	WORD	Master[3];			// побитно указывается какими мы каналами управляем какими нет				//2
 	BYTE	TarrStatus;			// Оттарирован блок или нет, если не оттарирован то можно выставить мастера	//1
@@ -176,8 +177,10 @@ typedef struct
 	TYPE_DATA_TIMER	TimerDin;
 	TYPE_DATA_TIMER	TimerAin;
 	TYPE_DATA_TIMER	TimerTemp;
+	//TYPE_DATA_TIMER	TimerZachvat[2];
 	//--------------------------------------------------------
 	BYTE	WriteTar;		// 1 - при изменении тарировки прописываются в EEPROM
+	BYTE	ZachvatCh[3];	// в случае если нам пришла команда на выдачу управления а соседу нет забираем управление
 
 }CDAC11;
 

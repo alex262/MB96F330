@@ -130,12 +130,12 @@ BYTE ServiceMaster(BYTE bus_id, Message *m)
 			}	
 		}
 	}
-	bus_id;
+//	bus_id;
 	return 0;
 }
-BYTE ServiceObmenData(BYTE bus_id, Message *m)
+BYTE ServiceObmenData1(BYTE bus_id, Message *m)
 {
-	DWORD dwData;
+	//DWORD dwData;
 	BYTE n, addr;
 	
 	if(m->len != 8) return 0;
@@ -160,23 +160,61 @@ BYTE ServiceObmenData(BYTE bus_id, Message *m)
 	{
 		return 0;
 	}
+	if(m->data[1] == 0)
+	{
+		Dac11.OutDac[n] = m->data[2];
+		Dac11.OutDac[n] |=((WORD)(m->data[3]))<<8;
+					
+		Dac11.Master[n] = m->data[4];
+		Dac11.Master[n] |=((WORD)(m->data[5]))<<8;
 	
-	dwData = m->data[1];
-	dwData |= ((DWORD)(m->data[2]))<<8;
-	dwData |= ((DWORD)(m->data[3]))<<16;
+		Dac11.EnOutDac[n] = m->data[6];
+		Dac11.EnOutDac[n] |=((WORD)(m->data[7]))<<8;
 	
-	Dac11.ErrorDAC[n]		= dwData;
-	Dac11.StNeigborData[n]	= TRUE;
-	Dac11.PingDataBlock[n]	= 0;
-			
-	Dac11.OutDac[n] = m->data[4];
-	Dac11.OutDac[n] |=((WORD)(m->data[5]))<<8;
-			
-	Dac11.Master[n] = m->data[6];
-	Dac11.Master[n] |=((WORD)(m->data[7]))<<8;
+		Dac11.StNeigborData[n]	= TRUE;
+		Dac11.PingDataBlock[n]	= 0;
+	}
+	return 0;
+}
+BYTE ServiceObmenData2(BYTE bus_id, Message *m)
+{
+	DWORD dwData;
+	BYTE n, addr;
 	
-	bus_id;
+	if(m->len != 5) return 0;
 	
+	addr = m->data[0];
+	
+	if(addr == Dac11.AddrBl[0]) // если произошол сбой в формировании адреса(кто-то неверно назначил адрес) 
+	{
+		return 0;	
+	}
+	
+	if(addr > 2) // некорректный адрес
+	{
+		return 0;	
+	}
+	// ищем индекс в нашей базе с таким адресом
+	if((Dac11.AddrBl[1] == addr)||(Dac11.AddrBl[2] == addr))
+	{
+		if(Dac11.AddrBl[1] == addr) n = 1;
+		if(Dac11.AddrBl[2] == addr) n = 2;
+	}else
+	{
+		return 0;
+	}
+
+	if(m->data[1] == 1)
+	{
+
+		dwData = m->data[2];
+		dwData |= ((DWORD)(m->data[3]))<<8;
+		dwData |= ((DWORD)(m->data[4]))<<16;
+		Dac11.ErrorDAC[n]		= dwData;
+
+		Dac11.StNeigborData[n]	= TRUE;
+		Dac11.PingDataBlock[n]	= 0;
+	}
 	return 0;
 }
 //------------------------------------------------------------------------------
@@ -204,13 +242,13 @@ void InitDAC11(void)
 		Dac11.StNeigbor[i]			= FALSE;
 		Dac11.StNeigborData[i]		= FALSE;
 		Dac11.AddrBl[i]				= 0;
-		Dac11.StNeigborData[i]		= FALSE;
 		Dac11.ErrorDAC[i]			= 0;
 		Dac11.Master[i]				= 0;
 		Dac11.OutDac[i]				= 0;
+		Dac11.ZachvatCh[i]			= 0;
+		Dac11.EnOutDac[i]			= 0;
 	}
 	//==========================================
-	Dac11.EnOutDac		= 0;
 	Dac11.Info.word		= 0;
 	Dac11.WriteTar		= 0;
 	Dac11.StatusMaster	= 0;
@@ -471,13 +509,13 @@ void DriverDAC11(void)
 			Dac11.HiLo = ~Dac11.HiLo;
 		}
 		
-		if(Dac11.EnOutDac != Dac11.NewOutDac)
+		if(Dac11.EnOutDac[0] != Dac11.NewOutDac)
 		{
-			Dac11.EnOutDac = Dac11.NewOutDac;
+			Dac11.EnOutDac[0] = Dac11.NewOutDac;
 			setTimer(&Dac11.TimerAin, PeriodTimeoutADC);// задержка измерения АЦП после выдачи нового значения в ЦАП или Коммутация канала
 		}
 	
-		Dac11.OutDac[0] = Dac11.Master[0]&Dac11.EnOutDac;
+		Dac11.OutDac[0] = Dac11.Master[0]&Dac11.EnOutDac[0];
 		if(Dac11.OutDac[0] != 0)
 		{
 			if(Dac11.HiLoDec == true)
@@ -630,7 +668,7 @@ void ServiceUart(BYTE Id, BYTE* pData, WORD Len)
 	BYTE i;
 	WORD *pW;
 
-	Len;
+//	Len;
 	
 	if(Id == 0x01)
 	{	
@@ -694,6 +732,8 @@ static BYTE	StartFindMaster = 0;
 void SelectMasterDAC(void)
 {
 	BYTE	i, addr, n, err, err1, err2;
+	BYTE	out, out1, out2;
+	BYTE	adr, adr1, adr2;
 	Message	msg;
 	//WORD	wData;
 	//========================================================
@@ -752,6 +792,8 @@ void SelectMasterDAC(void)
 				Dac11.PingDataBlock[i] = MAX_COUNT_PING_LOST;
 				Dac11.StNeigborData[i] = FALSE;
 				Dac11.Master[i] = 0;
+				Dac11.OutDac[i] = 0;
+				Dac11.EnOutDac[i] = 0;
 			}
 		}
 		
@@ -896,21 +938,33 @@ void SelectMasterDAC(void)
 			// отправляем данные о своем состоянии (реле, ошибки)
 			if((Dac11.AddrBl[0]+Dac11.AddrBl[1]+Dac11.AddrBl[2])>0)	// если расставелны адреса блокам
 			{
-				msg.cob_id	= KF_TO_COB_ID(((WORD)0x3E))|ADDR_NODE;
+				msg.cob_id	= KF_TO_COB_ID(((WORD)0x3D))|ADDR_NODE;
 				msg.rtr 	= 0;
 				msg.len 	= 8;
 				
 				msg.data[0] = Dac11.AddrBl[0];
 				
-				msg.data[1] = Dac11.ErrorDAC[0];
-				msg.data[2] = Dac11.ErrorDAC[0]>>8;
-				msg.data[3] = Dac11.ErrorDAC[0]>>16;
+				msg.data[1] = 0;
 				
-				msg.data[4] = Dac11.OutDac[0];
-				msg.data[5] = Dac11.OutDac[0]>>8;		
+				msg.data[2] = Dac11.OutDac[0];
+				msg.data[3] = Dac11.OutDac[0]>>8;		
 				
-				msg.data[6] = Dac11.Master[0];
-				msg.data[7] = Dac11.Master[0]>>8;		
+				msg.data[4] = Dac11.Master[0];
+				msg.data[5] = Dac11.Master[0]>>8;		
+				
+				msg.data[6] = Dac11.EnOutDac[0];
+				msg.data[7] = Dac11.EnOutDac[0]>>8;		
+				
+				CAN_SendMessage(NUM_CAN_FOR_SELECT_MASTER, &msg);
+				
+				msg.cob_id	= KF_TO_COB_ID(((WORD)0x3E))|ADDR_NODE;
+				msg.len 	= 5;
+				msg.data[1] = 1;
+				
+				msg.data[2] = Dac11.ErrorDAC[0];
+				msg.data[3] = Dac11.ErrorDAC[0]>>8;
+				msg.data[4] = Dac11.ErrorDAC[0]>>16;
+				
 				CAN_SendMessage(NUM_CAN_FOR_SELECT_MASTER, &msg);
 			}
 			//==============================================================
@@ -922,7 +976,90 @@ void SelectMasterDAC(void)
 				
 				for(i=0; i<COUNT_DAC_CH; i++)
 				{
-					if(digit(Dac11.Master[0], i) == 0) // если мы не управляем данным каналом, проверим можноли захватить уравление
+					err  = GetErrorDAC(0,i);	// Запрос ошибки выхода
+					err1 = GetErrorDAC(1,i);	// Запрос ошибки выхода
+					err2 = GetErrorDAC(2,i);	// Запрос ошибки выхода
+					out  = digit(Dac11.EnOutDac[0],i);
+					out1 = digit(Dac11.EnOutDac[1],i);
+					out2 = digit(Dac11.EnOutDac[2],i);
+					adr  = Dac11.AddrBl[0];
+					adr1 = Dac11.AddrBl[1];
+					adr2 = Dac11.AddrBl[2];
+					
+					CLEARBIT(Dac11.Master[0], i);
+					if(err<ERROR_KZ) // если только несущественные ошибки смотрим можно ли забрать канал
+					{
+						if(out == 1) // у нас есть комада на выдачю сигнала
+						{
+							if((out1 == 0)&&(out2 == 0))	SETBIT(Dac11.Master[0], i); //у соседей нет команды на выдачю сигнала
+							else
+							{
+								if((out1 == 1)&&(out2 == 1)) // у всех трех блоков есть команда на выдачю сигнала
+								{
+									err  = (~err)&1;
+									err1 = (~err1)&1;
+									err2 = (~err2)&1;
+								
+									out  = out&err;
+									out1 = out1&err1;
+									out2 = out2&err2;
+								
+									if((out == 1)&&(out1 == 0)&&(out2 == 0))SETBIT(Dac11.Master[0], i); // только у нас есть команда и нет ошибок
+									else
+									{
+										if((out == 0)&&((out1 == 1)||(out2 == 1)))CLEARBIT(Dac11.Master[0], i); // у кого-то из соседей есть команда и нет ишибки
+										else
+										{
+											if((out == 0)&&(out1 == 0)&&(out2 == 0))// у всех трех есть ошибки
+											{
+												if((adr<adr1)&&(adr<adr2))	SETBIT(Dac11.Master[0], i); // управление берет тот у кого меньше адрес
+											}
+											else
+											{
+												if(out1 == 1)
+												{
+													if(out2 == 1)	
+													{
+														if((adr<adr1)&&(adr<adr2))	SETBIT(Dac11.Master[0], i); // ни у  кого нет ошибок забирает блок с младшим адресом
+													}
+													else if(adr<adr1)	SETBIT(Dac11.Master[0], i);	// у второго блока ест ошибка
+												}else
+												{
+													if(out2 == 1)	// у первого блока ошибка
+														if(adr<adr2)	SETBIT(Dac11.Master[0], i);	
+												}
+											}
+										}
+									}
+								}
+								else
+								{
+									if(out1 == 1) //команда есть у нас и у первого блока
+									{
+										if(err < err1 ) SETBIT(Dac11.Master[0], i);
+										else
+											if(adr<adr1)	SETBIT(Dac11.Master[0], i);	
+									}
+									else
+									{
+										if(out2 == 1)	//команда есть у нас и у второго блока
+										{
+											if(err < err2 ) SETBIT(Dac11.Master[0], i);
+											else
+												if(adr<adr2) SETBIT(Dac11.Master[0], i);	
+										}
+									}
+								}
+							}
+						}else
+						{
+							if((out1 == 0)&&(out2 == 0)) // ни у кого нет команду на выдачю сигнала
+							{
+								if((adr<adr1)&&(adr<adr2))	SETBIT(Dac11.Master[0], i);
+							}
+						}
+					}
+					/*if(digit(Dac11.Master[0], i) == 0) // если мы не управляем данным каналом, проверим можноли захватить уравление
 					{
 						//Если ни один из каналов который на связи не захватил управление данным каналом
 						if(digit(Dac11.Master[1], i) == 0)
@@ -934,7 +1071,8 @@ void SelectMasterDAC(void)
 								{
 									if(Dac11.AddrBl[0] == 0) // если мы мастер забираем канал без вопросов
 									{
-										SETBIT(Dac11.Master[0], i);
+										if((digit(Dac11.EnOutDac[1],i) == 0)&&(digit(Dac11.EnOutDac[2],i) == 0))
+											SETBIT(Dac11.Master[0], i);
 									}else
 									{ // если мы не мастер забираем только по приоритету, если у высоко приоритетного ошибка
 										err1 = GetErrorDAC(1,i); // Запрос ошибки выхода
@@ -945,7 +1083,7 @@ void SelectMasterDAC(void)
 											
 										}else 
 										{
-											if((Dac11.StNeigborData[2] == TRUE)&&(err1 == ERROR_OK)&&(Dac11.AddrBl[2]<Dac11.AddrBl[0]))
+											if((Dac11.StNeigborData[2] == TRUE)&&(err2 == ERROR_OK)&&(Dac11.AddrBl[2]<Dac11.AddrBl[0]))
 											{// блок 2 имеет больше преимуществ на захват канала
 											
 											}else 
@@ -964,10 +1102,21 @@ void SelectMasterDAC(void)
 										err2 = GetErrorDAC(2,i); // Запрос ошибки выхода
 										
 										// если есть блок с более высоким приоритетом который который на связи с такой же ошибкой забирает он
+										
+										if(Dac11.StNeigborData[1] == false) err1 = 10;
+										if(Dac11.StNeigborData[2] == false) err2 = 10;
+										
 										if((err1 >= ERROR_ZERO)&&(err2 >= ERROR_ZERO))
 										{
 											if((Dac11.AddrBl[0]<Dac11.AddrBl[1])&&(Dac11.AddrBl[0]<Dac11.AddrBl[2]))
-												SETBIT(Dac11.Master[0], i);
+											{
+												if(digit(Dac11.EnOutDac[0], i) == 1)
+													SETBIT(Dac11.Master[0], i);
+											}
+										}
+										if((digit(Dac11.EnOutDac[0], i) == 1)&&(digit(Dac11.EnOutDac[1], i) == 0)&&(digit(Dac11.EnOutDac[2], i)== 0))
+										{
+											SETBIT(Dac11.Master[0], i);
 										}
 									}
 									if(err == ERROR_KZ) // превышение тока критичная ошибка канал не забираем
@@ -981,9 +1130,19 @@ void SelectMasterDAC(void)
 								}
 							}else 
 							{	// канал захвачен блоком 2 
+								// проверяем есть ли команда на коммутацию у блока 2  и у нас
+								if((digit(Dac11.EnOutDac[0], i) == 1)&&(digit(Dac11.EnOutDac[2], i) == 0))
+								{
+									SETBIT(Dac11.Master[0], i);
+								}
 							}
 						}else
 						{	// канал захвачен блоком 1
+							// проверяем есть ли команда на коммутацию у блока 1  и у нас
+							if((digit(Dac11.EnOutDac[0], i) == 1)&&(digit(Dac11.EnOutDac[1], i) == 0)) 
+							{
+								SETBIT(Dac11.Master[0], i);
+							}
 						}
 					}else // мы управляем данным каналом
 					{
@@ -992,8 +1151,12 @@ void SelectMasterDAC(void)
 						{						// проверяем если у других блоков данный канал работает отдаем управление	
 							err1 = GetErrorDAC(1,i); // Запрос ошибки выхода
 							err2 = GetErrorDAC(2,i); // Запрос ошибки выхода
-							if(((Dac11.StNeigborData[1] == TRUE)&&(err1 == 0))||(((Dac11.StNeigborData[2] == TRUE)&&(err2 == 0))))
-							{// если хотябы один блок на связи и исправен то управление отдаем
+							if((Dac11.StNeigborData[1] == TRUE)&&(err1 == 0)&&(digit(Dac11.EnOutDac[1], i) == 1))
+							{// если хотябы один блок на связи и исправен то управление отдаем, и у данного канала есть команда на коммутацию
+								CLEARBIT(Dac11.Master[0], i);
+							}
+							if((Dac11.StNeigborData[2] == TRUE)&&(err2 == 0)&&(digit(Dac11.EnOutDac[2], i) == 1))
+							{// если хотябы один блок на связи и исправен то управление отдаем, и у данного канала есть команда на коммутацию
 								CLEARBIT(Dac11.Master[0], i);
 							}	
 						}	
@@ -1005,18 +1168,17 @@ void SelectMasterDAC(void)
 						{
 							CLEARBIT(Dac11.Master[0], i);
 						}
-						
 						// если есть блок с более высоким приоритетом который скомутировал реле отключаем свое
-						if(digit(Dac11.Master[2], i) == 1)
+						if((digit(Dac11.Master[2], i) == 1)&&(digit(Dac11.OutDac[2], i) == 1) )
 						{
-							if(Dac11.AddrBl[2] < Dac11.AddrBl[0]) CLEARBIT(Dac11.Master[0], i);
+							 CLEARBIT(Dac11.Master[0], i);
 						}
 						// если есть блок с более высоким приоритетом который скомутировал реле отключаем свое
-						if(digit(Dac11.Master[1], i) == 1)
+						if((digit(Dac11.Master[1], i) == 1)&&(digit(Dac11.OutDac[1], i) == 1) )
 						{
-							if(Dac11.AddrBl[1] < Dac11.AddrBl[0]) CLEARBIT(Dac11.Master[0], i);
+							CLEARBIT(Dac11.Master[0], i);
 						}
-					}
+					}*/
 				}
 			}
 		}	

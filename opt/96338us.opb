@@ -37,4 +37,9 @@
 -a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\NDD22.obj"
 -a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\DAC11.obj"
 -a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\bootloader.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\OK6.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\OC9.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\RAV7.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\crc32.obj"
+-a "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\dma.obj"
 

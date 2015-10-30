@@ -13,6 +13,8 @@
 
 #include "fifo.h"
 
+// size должно быть кратно 128
+
 void fifo_init(fifo_desc_t *fifo_desc, void *buffer, WORD size)
 {
 	// Check the size parameter. It must be a 2-power.

@@ -2,7 +2,7 @@ $CPUSERIES-907
 $Prj-Debug
 $0
 -g
--w 4
+-w 2
 -I "%(PRJPATH)\src\CanOpenMain"
 -I "%(PRJPATH)\SRC"
 -I "%(PRJPATH)\SRC\SRC_modul"
@@ -17,7 +17,7 @@ $0
 $other
 -INF srcin  
 $time
-1413889570
+1432726923
 $end
 $1
 -g
@@ -31,11 +31,10 @@ $1
 -pl 60
 -pw 100
 -tab 8
--lf
 -Xdof
 $other
 $time
-1410261556
+1432728681
 $end
 $2
 -g
@@ -61,12 +60,12 @@ $2
 -Xals
 -Xalr
 -na
--w 2
+-w 1
 -Xdof
 $other
 -Xset_rora
 $time
-1421824532
+1445501107
 $end
 $3
 -dt s,d,r,a
@@ -76,7 +75,7 @@ $3
 -Xdof
 $other
 $time
-1421824532
+1444994199
 $end
 $4
 -S2

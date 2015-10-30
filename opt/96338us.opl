@@ -23,7 +23,7 @@
 -Xals
 -Xalr
 -na
--w 2
+-w 1
 -Xset_rora
 -cwno
 -a
@@ -63,4 +63,9 @@
 "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\NDD22.obj"
 "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\DAC11.obj"
 "C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\bootloader.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\OK6.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\OC9.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\RAV7.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\crc32.obj"
+"C:\Work\Project\Блоки Fujitsu MB96F330\SourceBoot\OBJ\dma.obj"
 

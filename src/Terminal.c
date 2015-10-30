@@ -16,6 +16,7 @@
 #include "uart.h"
 #include "fifo.h"
 #include "pakuart.h"
+#include "dma.h"
 
 
 //_____ M A C R O S ________________________________________________________
@@ -43,7 +44,10 @@
 #define CMD_ADDR					2
 #define CMD_CYKLE					3
 #define CMD_TIMERS					4
-
+#define CMD_CAN0					5
+#define CMD_CAN1					6
+#define CMD_CAN2					7
+#define CMD_DMA						8
 //! @}
 /*! \name String Values for Commands
  */
@@ -52,6 +56,10 @@
 #define STR_ADDR              		"addr"
 #define STR_CYKLE              		"cycle"
 #define STR_TIMERS					"timers"
+#define STR_CAN0					"can0"
+#define STR_CAN1					"can1"
+#define STR_CAN2					"can2"
+#define STR_DMA					"dma"
 //! @}
 /*! \name String Messages
  */
@@ -66,7 +74,9 @@
 #define MSG_HELP             "Поддерживаемые команды \r\n" \
                               " cycle - среднее время цикла, мкс \r\n" \
                               " addr  - вывод адреса блока \r\n" \
-                              " timers- таймеры системы \r\n"
+                              " timers- таймеры системы \r\n"\
+                              " canx  - отображение регистров can (x-номер 0,1,2) \r\n"\
+                              " dma   - отображение регистров DMA \r\n"
 
 //! @}
 
@@ -112,6 +122,10 @@ static void parse_cmd_t(void)
 	if  	(!strcmp(cmd_str, STR_HELP    				)) cmd_type = CMD_HELP;
 	else if (!strcmp(cmd_str, STR_ADDR    				)) cmd_type = CMD_ADDR;
 	else if (!strcmp(cmd_str, STR_TIMERS    			)) cmd_type = CMD_TIMERS;
+	else if (!strcmp(cmd_str, STR_CAN0    			    )) cmd_type = CMD_CAN0;
+	else if (!strcmp(cmd_str, STR_CAN1    			    )) cmd_type = CMD_CAN1;
+	else if (!strcmp(cmd_str, STR_CAN2    			    )) cmd_type = CMD_CAN2;
+	else if (!strcmp(cmd_str, STR_DMA    			    )) cmd_type = CMD_DMA;
 #ifdef EN_SR_ZN_CYKL
 	else if (!strcmp(cmd_str, STR_CYKLE    				)) cmd_type = CMD_CYKLE;
 #endif
@@ -119,7 +133,7 @@ static void parse_cmd_t(void)
 		else
 		{
 			// error : command not found
-			puts( MSG_ER_CMD_NOT_FOUND);
+			puts((BYTE *)MSG_ER_CMD_NOT_FOUND);
 			cmd = false;
 		}
 		// restore last byte
@@ -128,7 +142,7 @@ static void parse_cmd_t(void)
 	// if command isn't found, display prompt
 	if (!cmd)
 	{
-		puts(MSG_PROMPT);
+		puts((BYTE *)MSG_PROMPT);
 	return;
 	}
 
@@ -193,7 +207,7 @@ void build_cmd(int c)
 		// Add CRLF.
 		//case CR:
 		case LF:
-			puts(CRLF);
+			puts((BYTE *)CRLF);
 			// Add NUL char.
 			i_str--;
 			cmd_str[i_str] = '\0';
@@ -206,14 +220,14 @@ void build_cmd(int c)
 			// Reset command length.
 			i_str = 0;
 			// Display prompt.
-			puts("\r\n" MSG_PROMPT);
+			puts((BYTE *)"\r\n" MSG_PROMPT);
 			break;
 		// Backspace.
 		case BKSPACE_CHAR:
 			if (i_str > 0)
 			{
 				// Replace last char.
-				puts("\b \b");
+				puts((BYTE *)"\b \b");
 				// Decraese command length.
 				i_str--;
 			}
@@ -245,19 +259,32 @@ void Terminal (void)
 	{
 		switch (cmd_type)
 		{
+			case CMD_DMA:
+				DrawDMAStatus();
+				break;
+			case CMD_CAN0:
+				DrawCanStatus(0);
+				break;
+			case CMD_CAN1:
+				DrawCanStatus(1);
+				break;
+			case CMD_CAN2:
+				DrawCanStatus(2);
+				break;
+	
 			
 			#ifdef EN_SR_ZN_CYKL
 				case CMD_CYKLE:
-					puts(" Среднее время цикла - ");
+					puts((BYTE *)" Среднее время цикла - ");
 					putdec(program.SrCikl_mks);
-					puts(" мкс \n\r");
+					puts((BYTE *)" мкс \n\r");
 					break;
 			#endif
 		
 			case CMD_ADDR:
-				puts(" Адрес блока - ");
+				puts((BYTE *)" Адрес блока - ");
 				putdec(ADDR,3);
-				puts("\n\r");
+				puts((BYTE *)"\n\r");
 				
 				break;
 			case CMD_TIMERS:
@@ -266,18 +293,18 @@ void Terminal (void)
 			//=============================================
 			case CMD_HELP:
 				// Display help on USART
-				puts(MSG_HELP);
+				puts((BYTE *)MSG_HELP);
 				break;
 			// Unknown command.
 			default:
 				// Display error message.
-				puts(MSG_ER_CMD_NOT_FOUND);
+				puts((BYTE *)MSG_ER_CMD_NOT_FOUND);
 				break;
 		}
 		// Reset vars.
 		cmd_type = CMD_NONE;
 		cmd = false;
 		// Display prompt.
-		puts(MSG_PROMPT);
+		puts((BYTE *)MSG_PROMPT);
 	}
 }

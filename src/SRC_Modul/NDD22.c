@@ -187,36 +187,40 @@ void DriverNDD()
 		if(getTimer(&TimerStartBlock) == 0)
 		{
 			setTimer(&TimerStartBlock,20);
-			//--------------------------------------
+			//************************************************************************
+			//************************************************************************
 			// определяем необходимио ли перезапустить блок питания
-			if((Ndd.Init[0] == TRUE)&&(Ndd.Init[1] == TRUE)) // пропадало питание по 27В нужно перезапустить соответствующий блок питания
-			{
+			if((Ndd.Init[0] == TRUE)&&(Ndd.Init[1] == TRUE)&&((Ndd.Link[0] == TRUE)||(Ndd.Link[1] == TRUE))) // пропадало питание по 27В нужно перезапустить соответствующий блок питания
+			{// есть необходимость перезапуска первой пары и есть связь хотябы с одной
 				Ndd.Reboot[0]	= TRUE;
 				Ndd.Init[0]		= FALSE;
 				Ndd.Init[1]		= FALSE;
 				StatusReboot1 = 0;
 			}
-			if((Ndd.Init[2] == TRUE)&&(Ndd.Init[3] == TRUE)) // пропадало питание по 27В нужно перезапустить соответствующий блок питания
-			{
+			if((Ndd.Init[2] == TRUE)&&(Ndd.Init[3] == TRUE)&&((Ndd.Link[2] == TRUE)||(Ndd.Link[3] == TRUE))) // пропадало питание по 27В нужно перезапустить соответствующий блок питания
+			{// есть необходимость перезапуска второй пары и есть связь хотябы с одной
 				Ndd.Reboot[1]	= TRUE;
 				Ndd.Init[2]		= FALSE;
 				Ndd.Init[3]		= FALSE;
 				StatusReboot2 = 0;
 			}
-			
-			if((Ndd.Reboot[0] == TRUE)&&((Ndd.Link[0] == TRUE)||(Ndd.Link[1] == TRUE))) // есть необходимость перезапуска первой пары и есть связь хотябы с одной
+			//************************************************************************
+			//************************************************************************
+			if(Ndd.Reboot[0] == TRUE) // можно проводить переинициализацию так как связь с микросхемой есть
 			{
 				if(StatusReboot1 == 0)
 				{
 					TimerReboot1 = 1000;
 					add_timer(&TimerReboot1);
 					ON1_PWR_OFF;
+					program.setON1 = 0;
 					StatusReboot1 = 1;
 				}
 				if(StatusReboot1 == 1)
 				{
 					if(getTimer(&TimerReboot1) == 0)
 					{
+						program.setON1 = 1;
 						ON1_PWR_ON;
 						msDelay(5);
 						InitDinReg(0);
@@ -233,17 +237,20 @@ void DriverNDD()
 						del_timer(&TimerReboot1);
 						Ndd.valid[0]= VALID_DIN;
 						Ndd.valid[1]= VALID_DIN;
-						Ndd.Reboot[0] == FALSE;
+						Ndd.Reboot[0] = FALSE;
 					}
 				}	
 			}
-			if((Ndd.Reboot[1] == TRUE)&&((Ndd.Link[2] == TRUE)||(Ndd.Link[3] == TRUE))) // есть необходимость перезапуска второй пары и есть связь хотябы с одной
+			//************************************************************************
+			//************************************************************************
+			if(Ndd.Reboot[1] == TRUE)
 			{
 				if(StatusReboot2 == 0)
 				{
 					TimerReboot2 = 1000;
 					add_timer(&TimerReboot2);
 					ON2_PWR_OFF;
+					program.setON2 = 0;
 					StatusReboot2 = 1;
 				}
 				if(StatusReboot2 == 1)
@@ -251,6 +258,7 @@ void DriverNDD()
 					if(getTimer(&TimerReboot2) == 0)
 					{
 						ON2_PWR_ON;
+						program.setON2 = 1;
 						msDelay(5);
 						InitDinReg(2);
 						InitDinReg(3);
@@ -266,11 +274,12 @@ void DriverNDD()
 						del_timer(&TimerReboot2);
 						Ndd.valid[2]= VALID_DIN;
 						Ndd.valid[3]= VALID_DIN;
-						Ndd.Reboot[1] == FALSE;
+						Ndd.Reboot[1] = FALSE;
 					}
 				}	
 			}
-			//----------------------------------------		
+			//************************************************************************
+			//************************************************************************
 			if(Ndd.stWrReg	== TRUE)
 			{
 				Ndd.stWrReg = FALSE;
@@ -285,57 +294,60 @@ void DriverNDD()
 					msDelay(1);
 				}
 			}
-			//-------------------------------------------
+			//************************************************************************
+			//************************************************************************
 			if(stStartValid == FALSE)
 			{
 				stStartValid = TRUE;
 				for(i=0; i<4; i++)
 					Ndd.valid[i]= VALID_DIN;
 			}
-			
+			//************************************************************************
+			//************************************************************************
 			for(i=0; i<4; i++)
 			{
-				ChipSelektDIN(i, CS_ON);
-				if(write_spi_reg(i, 0, 0, RET_DATA_SPI, TRUE) == FALSE)	// нет связи
+				if(((i<2)&&(StatusReboot1==0))||((i>1)&&(StatusReboot2==0)))
 				{
-					Ndd.valid[i]= NOT_VALID_DIN;
-					Ndd.Link[i] = FALSE;
-					Ndd.Init[i] = TRUE;
-				}
-				else
-				{
-					Ndd.Link[i] = TRUE;
-				}
-				
-				ChipSelektDIN(i, CS_OFF);
-				
-				Ndd.State[i][0] = RET_DATA_SPI[0];
-				Ndd.State[i][1] = RET_DATA_SPI[1];
-				Ndd.State[i][2] = RET_DATA_SPI[2];
-			}
-			for(i=0; i<4; i++)
-			{
-				tmp[0]= 0;
-				tmp[1]= 0;
-				
-				Ndd.Term[i] = digit(Ndd.State[i][0],7);
-				if(Ndd.Term[i] != 0) Ndd.valid[i]= NOT_VALID_DIN;
+					ChipSelektDIN(i, CS_ON);
+					if(write_spi_reg(i, 0, 0, RET_DATA_SPI, TRUE) == FALSE)	// нет связи
+					{
+						Ndd.valid[i]= NOT_VALID_DIN;
+						Ndd.Link[i] = FALSE;
+						Ndd.Init[i] = TRUE;
+					}
+					else
+					{
+						Ndd.Link[i] = TRUE;
+					}
 					
+					ChipSelektDIN(i, CS_OFF);
+					
+					Ndd.State[i][0] = RET_DATA_SPI[0];
+					Ndd.State[i][1] = RET_DATA_SPI[1];
+					Ndd.State[i][2] = RET_DATA_SPI[2];
 				
-				#ifdef PLATA_NDD22_
-					tmp[0]= digit(Ndd.State[i][0],2) | (digit(Ndd.State[i][0],3)<<1)|(digit(Ndd.State[i][0],4)<<2)|(digit(Ndd.State[i][0],5)<<3)
-							 |(digit(Ndd.State[i][1],6)<<4)|(digit(Ndd.State[i][1],7)<<5)|(digit(Ndd.State[i][0],0)<<6)|(digit(Ndd.State[i][0],1)<<7);
-	
-					tmp[1]= digit(Ndd.State[i][2],7) | (digit(Ndd.State[i][1],0)<<1)|(digit(Ndd.State[i][1],1)<<2)|(digit(Ndd.State[i][1],2)<<3)
-							 |(digit(Ndd.State[i][2],0)<<4)|(digit(Ndd.State[i][2],1)<<5)|(digit(Ndd.State[i][2],2)<<6)|(digit(Ndd.State[i][2],3)<<7);
-	
-					Ndd.Din[i] = tmp[0]&tmp[1];
-				#endif
-				#ifdef PLATA_NDD23_
-					tmp[1]= digit(Ndd.State[i][2],7) | (digit(Ndd.State[i][1],0)<<1)|(digit(Ndd.State[i][1],1)<<2)|(digit(Ndd.State[i][1],2)<<3)
-							 |(digit(Ndd.State[i][2],0)<<4)|(digit(Ndd.State[i][2],1)<<5)|(digit(Ndd.State[i][2],2)<<6)|(digit(Ndd.State[i][2],3)<<7);
-					Ndd.Din[i] = ~tmp[1];
-				#endif
+					tmp[0]= 0;
+					tmp[1]= 0;
+					
+					Ndd.Term[i] = digit(Ndd.State[i][0],7);
+					if(Ndd.Term[i] != 0) Ndd.valid[i]= NOT_VALID_DIN;
+						
+					
+					#ifdef PLATA_NDD22_
+						tmp[0]= digit(Ndd.State[i][0],2) | (digit(Ndd.State[i][0],3)<<1)|(digit(Ndd.State[i][0],4)<<2)|(digit(Ndd.State[i][0],5)<<3)
+								 |(digit(Ndd.State[i][1],6)<<4)|(digit(Ndd.State[i][1],7)<<5)|(digit(Ndd.State[i][0],0)<<6)|(digit(Ndd.State[i][0],1)<<7);
+		
+						tmp[1]= digit(Ndd.State[i][2],7) | (digit(Ndd.State[i][1],0)<<1)|(digit(Ndd.State[i][1],1)<<2)|(digit(Ndd.State[i][1],2)<<3)
+								 |(digit(Ndd.State[i][2],0)<<4)|(digit(Ndd.State[i][2],1)<<5)|(digit(Ndd.State[i][2],2)<<6)|(digit(Ndd.State[i][2],3)<<7);
+		
+						Ndd.Din[i] = tmp[0]&tmp[1];
+					#endif
+					#ifdef PLATA_NDD23_
+						tmp[1]= digit(Ndd.State[i][2],7) | (digit(Ndd.State[i][1],0)<<1)|(digit(Ndd.State[i][1],1)<<2)|(digit(Ndd.State[i][1],2)<<3)
+								 |(digit(Ndd.State[i][2],0)<<4)|(digit(Ndd.State[i][2],1)<<5)|(digit(Ndd.State[i][2],2)<<6)|(digit(Ndd.State[i][2],3)<<7);
+						Ndd.Din[i] = ~tmp[1];
+					#endif
+				}
 			}
 				
 		/*		GoWorkAdc(0, TRUE);
@@ -444,12 +456,12 @@ void DriverNDD()
 	Ndd.Info.bits.Flt2 = program.stFLT2;
 	//========================================================
 	// обмен данными по COM
-	if (GetRxByte(&i) == FIFO_OK)
-	{
-		BuffUart[CountDataUart] = i;
-		if(CountDataUart < BUFFER_LEN_UART-1)	
-			CountDataUart++;
-	}
+//	if (GetRxByte(&i) == FIFO_OK)
+//	{
+//		BuffUart[CountDataUart] = i;
+//		if(CountDataUart < BUFFER_LEN_UART-1)	
+//			CountDataUart++;
+//	}
 	
 	GetPak_Uart(&CountDataUart, BuffUart);
 	

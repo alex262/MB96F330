@@ -49,25 +49,36 @@
 void InitUART(BYTE ch);
 void UART_RX_IntSet(BYTE ch, BYTE st);
 void UART_TX_IntSet(BYTE ch, BYTE st);
+void SetUartTRD_Reg(BYTE ch, BYTE data);
+void SetUartESIR_Reg(BYTE ch, BYTE data);
+WORD GetUartRDR_addr(BYTE ch);
+void ClearErrorUart(BYTE ch);
+void UartESIR_RDRF_Clear(BYTE ch);
+WORD GetUartTDR_addr(BYTE ch);
+
 
 void receive_line(void);
 int16_t receive_line_echo(uint16_t *cnt);
-int16_t  scan_line(char_t *str); 
+int16_t  scan_line(BYTE *str); 
 uint32_t Inputhex(uint8_t digits);
 uint32_t ASCIItobin(uint8_t k);
 void puthex(uint32_t n, uint8_t digits);
 void putbytehex(uint8_t n);
 //void putdec(uint32_t x);
 void putdec(uint32_t x, uint8_t len);
-char_t getch(void);
-void putch(char_t ch);
-void puts(char_t *buf);
-char_t getkey(char_t LKey, char_t HKey);
-char_t upcase(char_t k);
+BYTE getch(void);
+void putch(BYTE ch);
+void puts(BYTE *buf);
+BYTE getkey(BYTE LKey, BYTE HKey);
+BYTE upcase(BYTE k);
+void puts_bin_byte(uint8_t data);
+void puts_bin_word(uint16_t data);
+BYTE GetNumRxIRQUart(BYTE ch);
+BYTE GetNumTxIRQUart(BYTE ch);
+void UartESIR_TDRE_Clear(BYTE ch);
+
 
 __interrupt void irq_uart0_rx(void);
-__interrupt void irq_uart0_tx(void);
-
 __interrupt void irq_uart1_rx(void);
 __interrupt void irq_uart2_rx(void);
 __interrupt void irq_uart3_rx(void);
@@ -75,5 +86,14 @@ __interrupt void irq_uart5_rx(void);
 __interrupt void irq_uart7_rx(void);
 __interrupt void irq_uart8_rx(void);
 __interrupt void irq_uart9_rx(void);
+
+__interrupt void irq_uart0_tx(void);
+__interrupt void irq_uart1_tx(void);
+__interrupt void irq_uart2_tx(void);
+__interrupt void irq_uart3_tx(void);
+__interrupt void irq_uart5_tx(void);
+__interrupt void irq_uart7_tx(void);
+__interrupt void irq_uart8_tx(void);
+__interrupt void irq_uart9_tx(void);
 
 #endif /* UART_H */

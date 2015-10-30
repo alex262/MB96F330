@@ -52,12 +52,12 @@
 /* declarations */
 
 /* global variables */
-//char_t line_buffer[255];
-char_t line_buffer[50];
-char_t *line_buffer_ptr;
+//BYTE line_buffer[255];
+BYTE line_buffer[50];
+BYTE *line_buffer_ptr;
 uint8_t use_uart = 0;
 /* constants */
-const char_t ASCII[] = "0123456789ABCDEF";
+const BYTE ASCII[] = "0123456789ABCDEF";
 
 /* prototypes */
 
@@ -77,15 +77,15 @@ const char_t ASCII[] = "0123456789ABCDEF";
  *****************************************************************************/
 void InitUART(BYTE ch)
 {
-	if(ch>7) return;
-	
 	switch(ch)
 	{
 		case 0:
 		{	
 			PIER08_IE2	= 1;	// enable SIN0
+			DDR08_D2	= 0;	
 			DDR08_D3	= 1;	// SOT0 = output
-			BGR0		= 417;	// 115200 Baud @ 48 MHz
+			//BGR0		= 417;	// 115200 Baud @ 48 MHz
+			BGR0		= 104;	// 460800 Baud @ 48 MHz
 			SCR0		= 0x17;	// 8N1
 			SMR0		= 0x0d;	// enable SOT0, Reset, normal mode
 			SSR0		= 0x00;	// LSB first
@@ -94,6 +94,7 @@ void InitUART(BYTE ch)
 		case 1:
 		{	
 			PIER08_IE5	= 1; 	// enable SIN1
+			DDR08_D5	= 0;	
 			DDR08_D6	= 1;	// SOT1 = output
 			BGR1		= 417;	// 115200 Baud @ 48 MHz
 			SCR1		= 0x17;	// 8N1
@@ -104,8 +105,15 @@ void InitUART(BYTE ch)
 		case 2:
 		{	
 			PIER05_IE0	= 1;	// enable SIN2
+			DDR05_D0	= 0;	
 			DDR05_D1	= 1;	// SOT2 = output
-			BGR2		= 417;	// 115200 Baud @ 48 MHz
+			//BGR2		= 417;	// 115200 Baud @ 48 MHz
+			//BGR2		= 52;	// 921600 Baud @ 48 MHz
+			//BGR2		= 96;	// 500000 Baud @ 48 MHz
+			BGR2		= 104;	// 460800 Baud @ 48 MHz
+			//BGR2		= 208;	// 230400 Baud @ 48 MHz
+			//BGR2		= 5000;	// 9600 Baud @ 48 MHz
+			
 			SCR2		= 0x17;	// 8N1
 			SMR2		= 0x0d;	// enable SOT2, Reset, normal mode
 			SSR2		= 0x00;	// LSB first
@@ -114,6 +122,7 @@ void InitUART(BYTE ch)
 		case 3:
 		{	
 			PIER01_IE2	= 1;	// enable SIN3
+			DDR01_D2	= 0;	
 			DDR01_D3	= 1;	// SOT3 = output
 			BGR3		= 417;	// 115200 Baud @ 48 MHz
 			SCR3		= 0x17;	// 8N1
@@ -121,9 +130,10 @@ void InitUART(BYTE ch)
 			SSR3		= 0x00;	// LSB first
 			break;
 		}
-		case 4:
+		case 5:
 		{	
 			PIER10_IE4	= 1;	// enable SIN5
+			DDR10_D4	= 0;	
 			DDR10_D3	= 1;	// SOT5 = output
 			BGR5		= 417;	// 115200 Baud @ 48 MHz
 			SCR5		= 0x17;	// 8N1
@@ -131,9 +141,10 @@ void InitUART(BYTE ch)
 			SSR5		= 0x00;	// LSB first
 			break;
 		}
-		case 5:
+		case 7:
 		{	
 			PIER00_IE2	= 1;	// enable SIN7
+			DDR00_D2	= 0;	
 			DDR00_D1	= 1;	// SOT7 = output
 			BGR7		= 417;	// 115200 Baud @ 48 MHz
 			SCR7		= 0x17;	// 8N1
@@ -141,9 +152,10 @@ void InitUART(BYTE ch)
 			SSR7		= 0x00;	// LSB first
 			break;
 		}
-		case 6:
+		case 8:
 		{	
 			PIER00_IE5	= 1;	// enable SIN8
+			DDR00_D5	= 0;	
 			DDR00_D4	= 1;	// SOT8 = output
 			BGR8		= 417;	// 115200 Baud @ 48 MHz
 			SCR8		= 0x17;	// 8N1
@@ -151,9 +163,10 @@ void InitUART(BYTE ch)
 			SSR8		= 0x00;	// LSB first
 			break;
 		}
-		case 7:
+		case 9:
 		{	
 			PIER17_IE3	= 1;	// enable SIN9
+			DDR17_D4	= 0;	
 			DDR17_D4	= 1;	// SOT9 = output
 			BGR9		= 417;	// 115200 Baud @ 48 MHz
 			SCR9		= 0x17;	// 8N1
@@ -162,107 +175,132 @@ void InitUART(BYTE ch)
 			break;
 		}
 	}
-						
+}
+//====================================================================
+BYTE GetNumRxIRQUart(BYTE ch)
+{
+	if(ch == 0){return 94;}
+	if(ch == 1){return 96;}
+	if(ch == 2){return 98;}
+	if(ch == 3){return 100;}
+	if(ch == 5){return 102;}
+	if(ch == 7){return 104;}
+	if(ch == 8){return 106;}
+	if(ch == 9){return 108;}
+}
+BYTE GetNumTxIRQUart(BYTE ch)
+{
+	if(ch == 0){return 94;}
+	if(ch == 1){return 97;}
+	if(ch == 2){return 99;}
+	if(ch == 3){return 101;}
+	if(ch == 5){return 103;}
+	if(ch == 7){return 105;}
+	if(ch == 8){return 107;}
+	if(ch == 9){return 109;}
+}
+
+void ClearErrorUart(BYTE ch)
+{
+	if(ch == 0){SCR0_CRE = 1;	return;}
+	if(ch == 1){SCR1_CRE = 1;	return;}
+	if(ch == 2){SCR2_CRE = 1;	return;}
+	if(ch == 3){SCR3_CRE = 1;	return;}
+	if(ch == 5){SCR5_CRE = 1;	return;}
+	if(ch == 7){SCR7_CRE = 1;	return;}
+	if(ch == 8){SCR8_CRE = 1;	return;}
+	if(ch == 9){SCR9_CRE = 1;	return;}
+}
+WORD GetUartRDR_addr(BYTE ch)
+{
+	if(ch == 0){return (WORD)(&RDR0);}
+	if(ch == 1){return (WORD)(&RDR1);}
+	if(ch == 2){return (WORD)(&RDR2);}
+	if(ch == 3){return (WORD)(&RDR3);}
+	if(ch == 5){return (WORD)(&RDR5);}
+	if(ch == 7){return (WORD)(&RDR7);}
+	if(ch == 8){return (WORD)(&RDR8);}
+	if(ch == 9){return (WORD)(&RDR9);}
+}
+WORD GetUartTDR_addr(BYTE ch)
+{
+	if(ch == 0){return (WORD)(&TDR0);}
+	if(ch == 1){return (WORD)(&TDR1);}
+	if(ch == 2){return (WORD)(&TDR2);}
+	if(ch == 3){return (WORD)(&TDR3);}
+	if(ch == 5){return (WORD)(&TDR5);}
+	if(ch == 7){return (WORD)(&TDR7);}
+	if(ch == 8){return (WORD)(&TDR8);}
+	if(ch == 9){return (WORD)(&TDR9);}
+}
+
+void UartESIR_RDRF_Clear(BYTE ch)
+{
+	if(ch == 0){ESIR0_RDRF = 0;	return;}
+	if(ch == 1){ESIR1_RDRF = 0;	return;}
+	if(ch == 2){ESIR2_RDRF = 0;	return;}
+	if(ch == 3){ESIR3_RDRF = 0;	return;}
+	if(ch == 5){ESIR5_RDRF = 0;	return;}
+	if(ch == 7){ESIR7_RDRF = 0;	return;}
+	if(ch == 8){ESIR8_RDRF = 0;	return;}
+	if(ch == 9){ESIR9_RDRF = 0;	return;}
+}
+void UartESIR_TDRE_Clear(BYTE ch)
+{
+	if(ch == 0){ESIR0_TDRE = 0;	return;}
+	if(ch == 1){ESIR1_TDRE = 0;	return;}
+	if(ch == 2){ESIR2_TDRE = 0;	return;}
+	if(ch == 3){ESIR3_TDRE = 0;	return;}
+	if(ch == 5){ESIR5_TDRE = 0;	return;}
+	if(ch == 7){ESIR7_TDRE = 0;	return;}
+	if(ch == 8){ESIR8_TDRE = 0;	return;}
+	if(ch == 9){ESIR9_TDRE = 0;	return;}
+}
+void SetUartESIR_Reg(BYTE ch, BYTE data)
+{
+	if(ch == 0){ESIR0 = data;	return;}
+	if(ch == 1){ESIR1 = data;	return;}
+	if(ch == 2){ESIR2 = data;	return;}
+	if(ch == 3){ESIR3 = data;	return;}
+	if(ch == 5){ESIR5 = data;	return;}
+	if(ch == 7){ESIR7 = data;	return;}
+	if(ch == 8){ESIR8 = data;	return;}
+	if(ch == 9){ESIR9 = data;	return;}
+}
+void SetUartTRD_Reg(BYTE ch, BYTE data)
+{
+	if(ch == 0){TDR0 = data;	return;}
+	if(ch == 1){TDR1 = data;	return;}
+	if(ch == 2){TDR2 = data;	return;}
+	if(ch == 3){TDR3 = data;	return;}
+	if(ch == 5){TDR5 = data;	return;}
+	if(ch == 7){TDR7 = data;	return;}
+	if(ch == 8){TDR8 = data;	return;}
+	if(ch == 9){TDR9 = data;	return;}
 }
 void UART_RX_IntSet(BYTE ch, BYTE st)
 {
-	if(ch>7) return;
-	
-	switch(ch)
-	{
-		case 0:
-		{	
-			SSR0_RIE	= st&1;	
-			break;
-		}
-		case 1:
-		{	
-			SSR1_RIE	= st&1;	
-			break;
-		}
-		case 2:
-		{	
-			SSR2_RIE	= st&1;	
-			break;
-		}
-		case 3:
-		{	
-			SSR3_RIE	= st&1;	
-			break;
-		}
-		case 4:
-		{	
-			SSR5_RIE	= st&1;	
-			break;
-		}
-		case 5:
-		{	
-			SSR7_RIE	= st&1;	
-			break;
-		}
-		case 6:
-		{	
-			SSR8_RIE	= st&1;	
-			break;
-		}
-		case 7:
-		{	
-			SSR9_RIE	= st&1;	
-			break;
-		}
-	}
-						
+	if(ch == 0){SSR0_RIE	= st&1;	return;}
+	if(ch == 1){SSR1_RIE	= st&1;	return;}
+	if(ch == 2){SSR2_RIE	= st&1;	return;}
+	if(ch == 3){SSR3_RIE	= st&1;	return;}
+	if(ch == 5){SSR5_RIE	= st&1;	return;}
+	if(ch == 7){SSR7_RIE	= st&1;	return;}
+	if(ch == 8){SSR8_RIE	= st&1;	return;}
+	if(ch == 9){SSR9_RIE	= st&1;	return;}
 }
 void UART_TX_IntSet(BYTE ch, BYTE st)
 {
-	if(ch>7) return;
-	
-	switch(ch)
-	{
-		case 0:
-		{	
-			SSR0_TIE	= st&1;	
-			break;
-		}
-		case 1:
-		{	
-			SSR1_TIE	= st&1;	
-			break;
-		}
-		case 2:
-		{	
-			SSR2_TIE	= st&1;	
-			break;
-		}
-		case 3:
-		{	
-			SSR3_TIE	= st&1;	
-			break;
-		}
-		case 4:
-		{	
-			SSR5_TIE	= st&1;	
-			break;
-		}
-		case 5:
-		{	
-			SSR7_TIE	= st&1;	
-			break;
-		}
-		case 6:
-		{	
-			SSR8_TIE	= st&1;	
-			break;
-		}
-		case 7:
-		{	
-			SSR9_TIE	= st&1;	
-			break;
-		}
-	}
-						
+	if(ch == 0){SSR0_TIE	= st&1;	return;}
+	if(ch == 1){SSR1_TIE	= st&1;	return;}
+	if(ch == 2){SSR2_TIE	= st&1;	return;}
+	if(ch == 3){SSR3_TIE	= st&1;	return;}
+	if(ch == 5){SSR5_TIE	= st&1;	return;}
+	if(ch == 7){SSR7_TIE	= st&1;	return;}
+	if(ch == 8){SSR8_TIE	= st&1;	return;}
+	if(ch == 9){SSR9_TIE	= st&1;	return;}
 }
-
+/*
 void InitUART0( void )
 {
 	PIER08 |= 0x04; // enable SIN0
@@ -307,7 +345,7 @@ void InitUART1( void )
     SSR1 = 0x00; 	// LSB first
     use_uart = 1;
 }
-
+*/
 /*****************************************************************************/
 /*                                                                           */
 /*                 UART Reception Interrupt Service Routine                  */
@@ -350,36 +388,59 @@ __interrupt void irq_uart0_tx(void)
 {
 	IRQ_TX0();
 }
-
+//***********************************************************
+//***********************************************************
+//***********************************************************
 __interrupt void irq_uart1_rx(void)
 {
-	char ch;
-
+//	char ch;
 	if (SSR1_ORE | SSR1_FRE)
 	{
 		SCR1_TXE = 0;
 		SCR1_CRE = 1;    // clear reception errors
 		SCR1_TXE = 1;
 	}
-	ch = RDR1;
-	//ESIR1 = 0x01;
+	ESIR1_RDRF = 0;
+	#ifdef	PLATA_OC9
+		IRQ_RX_OC9(1, RDR1);
+	#endif
 }
+__interrupt void irq_uart1_tx(void)
+{
+	ESIR1_TDRE = 0;
+	#ifdef	PLATA_OC9
+		IRQ_TX_OC9(1);
+	#endif
+}
+//***********************************************************
 __interrupt void irq_uart2_rx(void)
 {
-	char ch;
-
+//	char ch;
+//	if (SSR2_ORE)putch('O');
+//	if (SSR2_FRE)putch('F');
 	if (SSR2_ORE | SSR2_FRE)
 	{
 		SCR2_TXE = 0;
 		SCR2_CRE = 1;    // clear reception errors
 		SCR2_TXE = 1;
 	}
-	ch = RDR2;
-	//ESIR2 = 0x01;
+	ESIR2_RDRF = 0;
+	#ifdef	PLATA_OC9
+		IRQ_RX_OC9(2, RDR2);
+	#endif
 }
+__interrupt void irq_uart2_tx(void)
+{
+	ESIR2_TDRE = 0;
+	#ifdef	PLATA_OC9
+		IRQ_TX_OC9(2);
+	#endif
+	
+}
+//***********************************************************
 __interrupt void irq_uart3_rx(void)
 {
-	char ch;
+	//char ch;
 
 	if (SSR3_ORE | SSR3_FRE)
 	{
@@ -387,12 +448,23 @@ __interrupt void irq_uart3_rx(void)
 		SCR3_CRE = 1;    // clear reception errors
 		SCR3_TXE = 1;
 	}
-	ch = RDR3;
+	ESIR3_RDRF = 0;
 	//ESIR3 = 0x01;
+	#ifdef	PLATA_OC9
+		IRQ_RX_OC9(3, RDR3);
+	#endif
 }
+__interrupt void irq_uart3_tx(void)
+{
+	ESIR3_TDRE = 0;
+	#ifdef	PLATA_OC9
+		IRQ_TX_OC9(3);
+	#endif
+}
+//***********************************************************
 __interrupt void irq_uart5_rx(void)
 {
-	char ch;
+	//char ch;
 
 	if (SSR5_ORE | SSR5_FRE)
 	{
@@ -400,12 +472,24 @@ __interrupt void irq_uart5_rx(void)
 		SCR5_CRE = 1;    // clear reception errors
 		SCR5_TXE = 1;
 	}
-	ch = RDR5;
+	ESIR5_RDRF = 0;
 	//ESIR5 = 0x01;
+	#ifdef	PLATA_OC9
+		IRQ_RX_OC9(5, RDR5);
+	#endif
 }
+__interrupt void irq_uart5_tx(void)
+{
+	ESIR5_TDRE = 0;
+	#ifdef	PLATA_OC9
+		IRQ_TX_OC9(5);
+	#endif
+	
+}
+//***********************************************************
 __interrupt void irq_uart7_rx(void)
 {
-	char ch;
+	//char ch;
 
 	if (SSR7_ORE | SSR7_FRE)
 	{
@@ -413,12 +497,22 @@ __interrupt void irq_uart7_rx(void)
 		SCR7_CRE = 1;    // clear reception errors
 		SCR7_TXE = 1;
 	}
-	ch = RDR7;
-	//ESIR7 = 0x01;
+	ESIR7_RDRF = 0;
+	#ifdef	PLATA_OC9
+		IRQ_RX_OC9(7, RDR7);
+	#endif
 }
+__interrupt void irq_uart7_tx(void)
+{
+	ESIR7_TDRE = 0;
+	#ifdef	PLATA_OC9
+		IRQ_TX_OC9(7);
+	#endif
+}
+//***********************************************************
 __interrupt void irq_uart8_rx(void)
 {
-	char ch;
+	//char ch;
 
 	if (SSR8_ORE | SSR8_FRE)
 	{
@@ -426,23 +520,42 @@ __interrupt void irq_uart8_rx(void)
 		SCR8_CRE = 1;    // clear reception errors
 		SCR8_TXE = 1;
 	}
-	ch = RDR8;
+	ESIR8_RDRF = 0;
 	//ESIR8 = 0x01;
+	#ifdef	PLATA_OC9
+		IRQ_RX_OC9(8, RDR8);
+	#endif
 }
+__interrupt void irq_uart8_tx(void)
+{
+	ESIR8_TDRE = 0;
+	#ifdef	PLATA_OC9
+		IRQ_TX_OC9(8);
+	#endif
+}
+//***********************************************************
 __interrupt void irq_uart9_rx(void)
 {
-	char ch;
-
 	if (SSR9_ORE | SSR9_FRE)
 	{
 		SCR9_TXE = 0;
 		SCR9_CRE = 1;    // clear reception errors
 		SCR9_TXE = 1;
 	}
-	ch = RDR9;
-//	ESIR9 = 0x01;
+	
+	ESIR9_RDRF = 0;
+	//ESIR9 = 0x01;
+	#ifdef	PLATA_OC9
+		IRQ_RX_OC9(9, RDR9);
+	#endif
 }
-
+__interrupt void irq_uart9_tx(void)
+{
+	ESIR9_TDRE = 0;
+	#ifdef	PLATA_OC9
+		IRQ_TX_OC9(9);
+	#endif
+}
 /*****************************************************************************
  *  DESCRIPTION:    sends a single character  (no timeout !)
  *
@@ -450,7 +563,7 @@ __interrupt void irq_uart9_rx(void)
  *
  *  RETURNS:        None
  *****************************************************************************/
-void putch (char_t ch)        /* sends a char_t */
+void putch (BYTE ch)        /* sends a BYTE */
 {
   switch (use_uart) {
     case 0:
@@ -471,15 +584,34 @@ void putch (char_t ch)        /* sends a char_t */
  *
  *  RETURNS:        None
  *****************************************************************************/
-void puts(char_t *buf)              
+void puts(BYTE *buf)              
 {
 	while (*buf != '\0')
 	{ 
 		if(*buf == '\n') putch('\r');
-		putch(*buf++);        /* send every char_t of string */
+		putch(*buf++);        /* send every BYTE of string */
 	}
 }
-
+//****************************************************************************
+//****************************************************************************
+//****************************************************************************
+void puts_bin_byte(uint8_t data)
+{
+	BYTE i;
+	
+	for(i=0; i<8; i++)
+	{
+		if(data&(1<<(7-i))) putch(0x31);
+		else putch(0x30);
+		if(i == 3) putch(0x20);
+	}
+}
+void puts_bin_word(uint16_t data)
+{
+	puts_bin_byte(data>>8);
+	putch(0x20);putch(0x20);
+	puts_bin_byte(data);
+}
 /*****************************************************************************
  *  DESCRIPTION:    sends a x-digit Hex-number (as ASCII charcaters)
  *                  to terminal via ext. UART
@@ -492,7 +624,7 @@ void puthex(uint32_t n, uint8_t digits)
 {
     uint8_t i,ch,div=0;
 
-    puts("0x");                /* hex string */
+    puts((BYTE *)"0x");                /* hex string */
     div=(digits-1) << 2;    /* init shift divisor */
 
     for (i=0; i<digits; i++) 
@@ -508,7 +640,7 @@ void putbytehex(BYTE n)
     uint8_t digits = 2;
     uint8_t i,ch,div=0;
 
-    puts("0x");                /* hex string */
+    //puts((BYTE *)"0x");                /* hex string */
     div=(digits-1) << 2;    /* init shift divisor */
 
     for (i=0; i<digits; i++) 
@@ -529,12 +661,12 @@ void putbytehex(BYTE n)
 void putdec(uint32_t x, uint8_t len)
 {
 	int16_t i;
-	char_t buf[9];
+	BYTE buf[9];
 	
 	if(len>8) len = 8;
 	if (x == 0) 
 	{
-		puts("       0");
+		puts((BYTE *)" 0");
 		return;
 	}
 	buf[len]='\0';                /* end sign of string */
@@ -561,9 +693,9 @@ void putdec(uint32_t x, uint8_t len)
  *  RETURNS:        Character or "-1" (Error)
  *****************************************************************************/
 
-char_t getch (void)   
+BYTE getch (void)   
 {
-    char_t data;
+    BYTE data;
     while((!SSR0_RDRF) && (!SSR1_RDRF));
     if (SSR0_RDRF) use_uart = 0;
     if (SSR1_RDRF) use_uart = 1;
@@ -576,7 +708,7 @@ char_t getch (void)
          SCR0_CRE = 1;                         // reset FRE, ORE, PE error flags
          return (-1);
        } else
-         return (RDR0);                /* return char_t */
+         return (RDR0);                /* return BYTE */
        break;
        
       case 1:
@@ -587,7 +719,7 @@ char_t getch (void)
          SCR1_CRE = 1;                         // reset FRE, ORE, PE error flags
          return (-1);
        } else
-         return (RDR1);                /* return char_t */
+         return (RDR1);                /* return BYTE */
        break;
     }
     return (-1);
@@ -602,7 +734,7 @@ char_t getch (void)
  *****************************************************************************/
 uint32_t ASCIItobin(uint8_t k)
 {
-  char_t d=(char_t) -1;
+  BYTE d=(BYTE) -1;
   if ((k > 47) & (k < 58)) d = k - 48;  /* 0..9 */
   if ((k > 64) & (k < 71)) d = k - 55;  /* A..F */
   if ((k > 96) & (k < 103)) d = k - 87; /* a..f */
@@ -665,7 +797,7 @@ int16_t receive_line_echo(uint16_t *cnt)
    line_buffer[i++]='\0';
    line_buffer_ptr = line_buffer + i;
    if (cnt) *cnt = i;
-   //BufferPtr = (char_t)  &line_buffer;
+   //BufferPtr = (BYTE)  &line_buffer;
    return (int16_t)(&line_buffer);
 }
 
@@ -679,7 +811,7 @@ int16_t receive_line_echo(uint16_t *cnt)
  *               2, if string 'string' was not found in string 'line_buffer'.
  *               0, if strings are identical to the final null character.
  ************************************************************************/
-int16_t scan_line(char_t *str) 
+int16_t scan_line(BYTE *str) 
 {
     line_buffer_ptr = line_buffer;
 
@@ -727,32 +859,32 @@ uint32_t Inputhex(uint8_t digits)
       return number;             /* return input value */
    else
    {
-      puts("\n\n input cancled \n");
+      puts((BYTE *)"\n\n input cancled \n");
       return -1;                /* return abort indicator */
    }
 }
 
-char_t getkey(char_t LKey, char_t HKey)
+BYTE getkey(BYTE LKey, BYTE HKey)
 {
-   char_t key;
+   BYTE key;
 
    do                           /* input next valid digit */
    {
      key = upcase(getch());     /* wait for next key input (0-9,A-Z,a-z) */
      if (key == 27)
      {
-       puts("\r>>> cancel input \n");
+       puts((BYTE *)"\r>>> cancel input \n");
        return -1;            /* return with ESC aborts */
      }
 
      if ( (key < LKey) || (key > HKey) )
      {
        /* undefinded key pressed */
-       puts("\r>>> key not defined \r");
+       puts((BYTE *)"\r>>> key not defined \r");
      }
      else
      {
-       puts("\r>                   \r");
+       puts((BYTE *)"\r>                   \r");
        putch(key);
        return key;              /* return input value */
      }
@@ -760,9 +892,9 @@ char_t getkey(char_t LKey, char_t HKey)
    } while(1);
 }
 
-char_t upcase(char_t k)
+BYTE upcase(BYTE k)
 {
-  char_t d=(char_t) -1;
+  BYTE d=(BYTE) -1;
   if ((k > 47) & (k < 58))  d = k;      /* 0..9 */
   if ((k > 64) & (k < 71))  d = k;      /* A..F */
   if ((k > 96) & (k < 123)) d = k - 32; /* a..f */

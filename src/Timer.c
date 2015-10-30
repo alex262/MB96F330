@@ -60,9 +60,9 @@ void PrintTimerService(void)
 {
 	BYTE cnt, i;
 
-	puts("Timers ");
+	puts((BYTE *)"Timers ");
 	putdec(SystemTimers.count,2);
-	puts(" \n\r");
+	puts((BYTE *)" \n\r");
 	
 	cnt = COUNT_USER_TIMERS;
 	
@@ -71,12 +71,12 @@ void PrintTimerService(void)
 	{				
 		i++;
 		putdec((DWORD)cnt, 2);
-		puts("-");
+		puts((BYTE *)"-");
 		puthex((U32)SystemTimers.timers[cnt], 6);
-		if(i>3) {i = 0; puts(" \n\r");}
-		else puts(" | ");
+		if(i>3) {i = 0; puts((BYTE *)" \n\r");}
+		else puts((BYTE *)" | ");
 	}
-	puts(" \n\r");
+	puts((BYTE *)" \n\r");
 }
 
 //регистрация пользовательского таймера в системе

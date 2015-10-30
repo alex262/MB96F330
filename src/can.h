@@ -72,6 +72,7 @@ U8 CAN_SendMessage(U8 NumCan, Message *msg);
 #define f_can_send CAN_SendMessage
 
 U8 CAN_ReceiveMessage(U8 nCAN, Message *m);
+void DrawCanStatus(BYTE i);
 
 void __interrupt CAN_0_IRQ(void);
 void __interrupt CAN_1_IRQ(void);

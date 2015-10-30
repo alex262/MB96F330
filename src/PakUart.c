@@ -131,7 +131,7 @@ WORD CRC( BYTE *sBuf, WORD nLen )
 }
 #pragma inline CRC
 //=======================================================================
-BYTE tx_pak_uart[6];
+static BYTE tx_pak_uart[6];
 void CreateAndSend_Pkt_UART0(U8 *sDataBuf, U16 nLen, U8 nReceiver, U8 nCodOp)
 {
 	U16 nCRC;

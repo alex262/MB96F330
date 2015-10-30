@@ -46,6 +46,7 @@
 /* ------------------------------------------------------------------------- */
 
 #include "mb96338us.h"
+#include "global.h"
 #include "rlt.h"
 #include "uart.h"
 #include "can.h"
@@ -76,9 +77,29 @@ void InitIrqLevels(void)
 	// enable the timer interrupt
 	ICR = (56 << 8) | 2;	// RLT0
 	//----------------------------------
+#ifdef PLATA_OC9
+	// EXT INT
+	ICR = (18 << 8) | 3;	// EXT UART RX TX
+	ICR = (19 << 8) | 3;	// EXT UART RX TX
+	ICR = (20 << 8) | 3;	// EXT UART RX TX
+	ICR = (21 << 8) | 3;	// EXT UART RX TX
+#endif
+	//----------------------------------
 	// UART
 	ICR = (94 << 8) | 3;	// UART0 RX
 	ICR = (95 << 8) | 3;	// UART0 TX
+#ifdef PLATA_OC9
+	ICR = (96 << 8) | 3;   /* LIN-UART 1 RX                */
+	ICR = (97 << 8) | 3;   /* LIN-UART 1 TX                */
+	ICR = (98 << 8) | 3;   /* LIN-UART 2 RX                */
+	ICR = (99 << 8) | 3;   /* LIN-UART 2 TX                */
+	ICR = (100 << 8) | 3;  /* LIN-UART 3 RX                */
+	ICR = (101 << 8) | 3;  /* LIN-UART 3 TX                */
+	ICR = (102 << 8) | 3;  /* LIN-UART 5 RX                */
+	ICR = (103 << 8) | 3;  /* LIN-UART 5 TX                */
+	ICR = (108 << 8) | 3;  /* LIN-UART 9 RX                */
+	ICR = (109 << 8) | 3;  /* LIN-UART 9 TX                */
+#endif
 	//----------------------------------
 	// CAN
 	ICR = (33 << 8) | 4;	// CAN0
@@ -94,7 +115,12 @@ void InitIrqLevels(void)
 -----------------------------------------------------------------------------*/
 
 __interrupt void DefaultIRQHandler (void);
-
+#ifdef PLATA_OC9
+	__interrupt void IRQHandler_EI1 (void);
+	__interrupt void IRQHandler_EI2 (void);
+	__interrupt void IRQHandler_EI3 (void);
+	__interrupt void IRQHandler_EI4 (void);
+#endif
 /*---------------------------------------------------------------------------
    Vector definiton for MB9633x
    Use following statements to define vectors. All resource related
@@ -111,10 +137,17 @@ __interrupt void DefaultIRQHandler (void);
 #pragma intvect DefaultIRQHandler 15   /* Sub Clock Timer              */
 #pragma intvect DefaultIRQHandler 16   /* Reserved                     */
 #pragma intvect DefaultIRQHandler 17   /* EXT0                         */
-#pragma intvect DefaultIRQHandler 18   /* EXT1                         */
-#pragma intvect DefaultIRQHandler 19   /* EXT2                         */
-#pragma intvect DefaultIRQHandler 20   /* EXT3                         */
-#pragma intvect DefaultIRQHandler 21   /* EXT4                         */
+#ifdef PLATA_OC9
+	#pragma intvect IRQHandler_EI1	  18   /* EXT1                         */
+	#pragma intvect IRQHandler_EI2	  19   /* EXT2                         */
+	#pragma intvect IRQHandler_EI3	  20   /* EXT3                         */
+	#pragma intvect IRQHandler_EI4	  21   /* EXT4                         */
+#else
+	#pragma intvect DefaultIRQHandler	  18   /* EXT1                         */
+	#pragma intvect DefaultIRQHandler	  19   /* EXT2                         */
+	#pragma intvect DefaultIRQHandler	  20   /* EXT3                         */
+	#pragma intvect DefaultIRQHandler	  21   /* EXT4                         */
+#endif
 #pragma intvect DefaultIRQHandler 22   /* EXT5                         */
 #pragma intvect DefaultIRQHandler 23   /* EXT6                         */
 #pragma intvect DefaultIRQHandler 24   /* EXT7                         */
@@ -189,6 +222,16 @@ __interrupt void DefaultIRQHandler (void);
 #pragma intvect DefaultIRQHandler 93   /* ALARM1                       */
 #pragma intvect irq_uart0_rx	  94   /* LIN-UART 0 RX                */
 #pragma intvect irq_uart0_tx	  95   /* LIN-UART 0 TX                */
+#ifdef PLATA_OC9
+#pragma intvect irq_uart1_rx	  96   /* LIN-UART 1 RX                */
+#pragma intvect irq_uart1_tx	  97   /* LIN-UART 1 TX                */
+#pragma intvect irq_uart2_rx	  98   /* LIN-UART 2 RX                */
+#pragma intvect irq_uart2_tx	  99   /* LIN-UART 2 TX                */
+#pragma intvect irq_uart3_rx	  100  /* LIN-UART 3 RX                */
+#pragma intvect irq_uart3_tx	  101  /* LIN-UART 3 TX                */
+#pragma intvect irq_uart5_rx	  102  /* LIN-UART 5 RX                */
+#pragma intvect irq_uart5_tx	  103  /* LIN-UART 5 TX                */
+#else
 #pragma intvect DefaultIRQHandler 96   /* LIN-UART 1 RX                */
 #pragma intvect DefaultIRQHandler 97   /* LIN-UART 1 TX                */
 #pragma intvect DefaultIRQHandler 98   /* LIN-UART 2 RX                */
@@ -197,12 +240,18 @@ __interrupt void DefaultIRQHandler (void);
 #pragma intvect DefaultIRQHandler 101  /* LIN-UART 3 TX                */
 #pragma intvect DefaultIRQHandler 102  /* LIN-UART 5 RX                */
 #pragma intvect DefaultIRQHandler 103  /* LIN-UART 5 TX                */
+#endif
 #pragma intvect DefaultIRQHandler 104  /* LIN-UART 7 RX                */
 #pragma intvect DefaultIRQHandler 105  /* LIN-UART 7 TX                */
 #pragma intvect DefaultIRQHandler 106  /* LIN-UART 8 RX                */
 #pragma intvect DefaultIRQHandler 107  /* LIN-UART 8 TX                */
+#ifdef PLATA_OC9
+#pragma intvect irq_uart9_rx	  108  /* LIN-UART 9 RX                */
+#pragma intvect irq_uart9_tx	  109  /* LIN-UART 9 TX                */
+#else
 #pragma intvect DefaultIRQHandler 108  /* LIN-UART 9 RX                */
 #pragma intvect DefaultIRQHandler 109  /* LIN-UART 9 TX                */
+#endif
 #pragma intvect DefaultIRQHandler 110  /* Main Flash IRQ               */
 #pragma intvect DefaultIRQHandler 111  /* Reserved                     */
 #pragma intvect DefaultIRQHandler 112  /* USB EP0 IN  (only MB9633xU)  */

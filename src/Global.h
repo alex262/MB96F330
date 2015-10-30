@@ -10,7 +10,7 @@
 //Включаем работу по протоколу CanOpen
 #define CAN_OPEN_ENABLE
 //---------------------------------------
-//#define TERMINAL_EN	// резрешение работы терминала по COM1
+#define TERMINAL_EN	// резрешение работы терминала по COM1
 //---------------------------------------
 #define ADDR		((EPSR12>>2)&0x1F)
 #define ADDR_DIR_IN	DDR12 = DDR12&0x83;
@@ -25,8 +25,11 @@
 //#define	PLATA_KCU4
 //#define	PLATA_ADC8
 //#define 	PLATA_FSU_29_30
-#define	PLATA_NDD22
+//#define	PLATA_NDD22
 //#define	PLATA_DAC11
+//#define	PLATA_OK6
+#define	PLATA_OC9
+//#define	PLATA_RAV7
 //==============================================================================
 #define BUFFER_LEN_UART		300				//Размер буффера порта
 #define MAX_IN_PAK 			290				//Макcимальна  длина входящего пакета
@@ -63,6 +66,24 @@
 #ifdef 	PLATA_DAC11
 	#define	INCLUDE_H		"DAC11.h"
 	#define	NEED_WORK_CAN	2	//необходимое количество работающих CAN - для отображения индикации
+#endif
+#ifdef 	PLATA_OK6
+	#define	INCLUDE_H		"OK6.h"
+	#define	NEED_WORK_CAN	1	//необходимое количество работающих CAN - для отображения индикации
+	#define	SPEED_CAN_0	0
+	#define	SPEED_CAN_1	0
+#endif
+#ifdef 	PLATA_OC9
+	#define	INCLUDE_H		"OC9.h"
+	#define	NEED_WORK_CAN	1	//необходимое количество работающих CAN - для отображения индикации
+	//#define	SPEED_CAN_0	0
+	//#define	SPEED_CAN_2	0
+#endif
+#ifdef 	PLATA_RAV7
+	#define	INCLUDE_H		"RAV7.h"
+	#define	NEED_WORK_CAN	1	//необходимое количество работающих CAN - для отображения индикации
+	#define	SPEED_CAN_0	0
+	#define	SPEED_CAN_1	0
 #endif
 //------------------------------------------------------------------------------
 #ifndef	INCLUDE_H
@@ -168,6 +189,7 @@ typedef char         char_t;
 #define	ind_TEST		5		//Блок выведен из работы: те тирование, отладка ПО блока
 #define	ind_FATERR		6		//Обнаружение неу транимо  ошибки, не допу ка  е  продолжение работы блока.
 #define	ind_RESET		7		//Блок в режиме программировани  
+#define	ind_BREST		8		//Индикация брест
 
 #define	Err_CAN1		1		//
 #define	Err_CAN2		2		//
@@ -258,10 +280,10 @@ typedef struct
 
 #ifdef POWER_BLOCK_ENABLE
 	TYPE_DATA_TIMER	TimerPwr;
-	BYTE	stERR1;	//0 – провал напряжения питания АЦП // 1-16 канал 
+	BYTE	stERR1;	//0 – провал напряжения питания 
 					//1 — все в порядке
 	BYTE	stERR2; // 17-32 канал
-	BYTE	stFLT1;
+	BYTE	stFLT1; //неисправность блока питания	1-исправен
 	BYTE	stFLT2;
 	BYTE	setON1;
 	BYTE	setON2;

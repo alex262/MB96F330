@@ -390,6 +390,10 @@ void Indicate(WORD *pCount, WORD BLINK)
 				LEDR=~LEDR;
 			}
 			break;
+		case ind_BREST:
+			LEDR_ON;
+			LEDG_ON;
+			break;		
 	}	
 }
 

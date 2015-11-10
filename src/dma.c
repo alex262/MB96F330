@@ -67,6 +67,9 @@ void DMA_change_BAP_restart(BYTE nCH, DWORD	adrBAP, WORD	Count)
 	
 	if(nCH >= COUNT_DMA_CH) return;
 	
+	CLEARBIT(DER,nCH);	// DMA ch disable
+	CLEARBIT(DSR,nCH);	// Clear transfer end interrupt, if any
+	
 	pDmaDescr_t = &pDmaDescr[nCH];
 	
 	pDmaDescr_t->BAPL = (BYTE)(adrBAP);
@@ -76,7 +79,6 @@ void DMA_change_BAP_restart(BYTE nCH, DWORD	adrBAP, WORD	Count)
 	pDmaDescr_t->DCTL = (BYTE)Count;
 	pDmaDescr_t->DCTH = (BYTE)(Count>>8);
 
-	CLEARBIT(DSR,nCH);	// Clear transfer end interrupt, if any
 	SETBIT(DER,nCH);	// DMA ch enable
 }
 //---------------------------------------------------------------------------
@@ -85,16 +87,31 @@ void DMA_restart(BYTE nCH, WORD	Count)
 	volatile DMA_Descriptor * pDmaDescr_t;
 	
 	if(nCH >= COUNT_DMA_CH) return;
-
+	
+	CLEARBIT(DER,nCH);	// DMA ch enable
+	CLEARBIT(DSR,nCH);	// Clear transfer end interrupt, if any
+	
 	pDmaDescr_t = &pDmaDescr[nCH];
 	
 	pDmaDescr_t->DCTL = (BYTE)Count;
 	pDmaDescr_t->DCTH = (BYTE)(Count>>8);
 
-	CLEARBIT(DSR,nCH);	// Clear transfer end interrupt, if any
 	SETBIT(DER,nCH);	// DMA ch enable
 }
 //---------------------------------------------------------------------------
+void DMA_ClearRequest(BYTE nCH)
+{
+	if(nCH == 0) DSR_DTE0 = 0;
+	if(nCH == 1) DSR_DTE1 = 0;
+	if(nCH == 2) DSR_DTE2 = 0;
+	if(nCH == 3) DSR_DTE3 = 0;
+	if(nCH == 4) DSR_DTE4 = 0;
+	if(nCH == 5) DSR_DTE5 = 0;
+	if(nCH == 6) DSR_DTE6 = 0;
+	if(nCH == 7) DSR_DTE7 = 0;
+	if(nCH == 8) DSR_DTE8 = 0;
+	if(nCH == 9) DSR_DTE9 = 0;
+}
 WORD DMA_GetCnt(BYTE nCH)
 {
 	if(nCH == 0) return DCT0;
@@ -137,23 +154,23 @@ void DrawDMAStatus(void)
 	sprintf(B_Out,"0:DCT - 0x%04X, IOA - 0x%04X, BAP - 0x%02X %02X %02X, DMACS - ", DCT0, IOA0, BAPH0, BAPM0, BAPL0);	puts(B_Out);
 	puts_bin_byte(DMACS0); puts("\n\r");
 	sprintf(B_Out,"1:DCT - 0x%04X, IOA - 0x%04X, BAP - 0x%02X %02X %02X, DMACS - ", DCT1, IOA1, BAPH1, BAPM1, BAPL1);	puts(B_Out);
-	puts_bin_byte(DMACS0); puts("\n\r");
+	puts_bin_byte(DMACS1); puts("\n\r");
 	sprintf(B_Out,"2:DCT - 0x%04X, IOA - 0x%04X, BAP - 0x%02X %02X %02X, DMACS - ", DCT2, IOA2, BAPH2, BAPM2, BAPL2);	puts(B_Out);
-	puts_bin_byte(DMACS0); puts("\n\r");
+	puts_bin_byte(DMACS2); puts("\n\r");
 	sprintf(B_Out,"3:DCT - 0x%04X, IOA - 0x%04X, BAP - 0x%02X %02X %02X, DMACS - ", DCT3, IOA3, BAPH3, BAPM3, BAPL3);	puts(B_Out);
-	puts_bin_byte(DMACS0); puts("\n\r");
+	puts_bin_byte(DMACS3); puts("\n\r");
 	sprintf(B_Out,"4:DCT - 0x%04X, IOA - 0x%04X, BAP - 0x%02X %02X %02X, DMACS - ", DCT4, IOA4, BAPH4, BAPM4, BAPL4);	puts(B_Out);
-	puts_bin_byte(DMACS0); puts("\n\r");
+	puts_bin_byte(DMACS4); puts("\n\r");
 	sprintf(B_Out,"5:DCT - 0x%04X, IOA - 0x%04X, BAP - 0x%02X %02X %02X, DMACS - ", DCT5, IOA5, BAPH5, BAPM5, BAPL5);	puts(B_Out);
-	puts_bin_byte(DMACS0); puts("\n\r");
+	puts_bin_byte(DMACS5); puts("\n\r");
 	sprintf(B_Out,"6:DCT - 0x%04X, IOA - 0x%04X, BAP - 0x%02X %02X %02X, DMACS - ", DCT6, IOA6, BAPH6, BAPM6, BAPL6);	puts(B_Out);
-	puts_bin_byte(DMACS0); puts("\n\r");
+	puts_bin_byte(DMACS6); puts("\n\r");
 	sprintf(B_Out,"7:DCT - 0x%04X, IOA - 0x%04X, BAP - 0x%02X %02X %02X, DMACS - ", DCT7, IOA7, BAPH7, BAPM7, BAPL7);	puts(B_Out);
-	puts_bin_byte(DMACS0); puts("\n\r");
+	puts_bin_byte(DMACS7); puts("\n\r");
 	sprintf(B_Out,"8:DCT - 0x%04X, IOA - 0x%04X, BAP - 0x%02X %02X %02X, DMACS - ", DCT8, IOA8, BAPH8, BAPM8, BAPL8);	puts(B_Out);
-	puts_bin_byte(DMACS0); puts("\n\r");
+	puts_bin_byte(DMACS8); puts("\n\r");
 	sprintf(B_Out,"9:DCT - 0x%04X, IOA - 0x%04X, BAP - 0x%02X %02X %02X, DMACS - ", DCT9, IOA9, BAPH9, BAPM9, BAPL9);	puts(B_Out);
-	puts_bin_byte(DMACS0); puts("\n\r");
+	puts_bin_byte(DMACS9); puts("\n\r");
 	
 	EnInterrupt();
 	

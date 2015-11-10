@@ -78,6 +78,8 @@ void DMA_Disable(BYTE nCH);
 void DMA_change_BAP_restart(BYTE nCH, DWORD	adrBAP, WORD Count);
 void DrawDMAStatus(void);
 WORD DMA_GetCnt(BYTE nCH);
+void DMA_ClearRequest(BYTE nCH);
+
 
 //-------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------

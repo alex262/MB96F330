@@ -1,11 +1,6 @@
 /*This file is prepared for Doxygen automatic documentation generation.*/
 /*! \file *********************************************************************
  *
- *
- * - Compiler:           IAR EWAVR32 and GNU GCC for AVR32
- * - Supported devices:  All AVR32 devices with a USB module can be used.
- * - AppNote:
- *
  * \author               Lyapin A.V.
  *
  ******************************************************************************/
@@ -48,6 +43,8 @@
 #define CMD_CAN1					6
 #define CMD_CAN2					7
 #define CMD_DMA						8
+#define CMD_RESET					9
+#define CMD_UART					10
 //! @}
 /*! \name String Values for Commands
  */
@@ -59,7 +56,10 @@
 #define STR_CAN0					"can0"
 #define STR_CAN1					"can1"
 #define STR_CAN2					"can2"
-#define STR_DMA					"dma"
+#define STR_DMA						"dma"
+#define STR_RESET					"reset"
+#define STR_UART					"uart"
+
 //! @}
 /*! \name String Messages
  */
@@ -76,7 +76,9 @@
                               " addr  - вывод адреса блока \r\n" \
                               " timers- таймеры системы \r\n"\
                               " canx  - отображение регистров can (x-номер 0,1,2) \r\n"\
-                              " dma   - отображение регистров DMA \r\n"
+                              " dma   - отображение регистров DMA \r\n"\
+                              " reset - перезагрузка микроконтроллера \r\n"\
+                              " uart x - отображает регистры UART \r\n"
 
 //! @}
 
@@ -126,6 +128,8 @@ static void parse_cmd_t(void)
 	else if (!strcmp(cmd_str, STR_CAN1    			    )) cmd_type = CMD_CAN1;
 	else if (!strcmp(cmd_str, STR_CAN2    			    )) cmd_type = CMD_CAN2;
 	else if (!strcmp(cmd_str, STR_DMA    			    )) cmd_type = CMD_DMA;
+	else if (!strcmp(cmd_str, STR_RESET    			    )) cmd_type = CMD_RESET;
+	else if (!strcmp(cmd_str, STR_UART    			    )) cmd_type = CMD_UART;
 #ifdef EN_SR_ZN_CYKL
 	else if (!strcmp(cmd_str, STR_CYKLE    				)) cmd_type = CMD_CYKLE;
 #endif
@@ -259,6 +263,12 @@ void Terminal (void)
 	{
 		switch (cmd_type)
 		{
+			case CMD_UART:
+				DrawUartReg(par_str1[0]-0x30);
+				break;
+			case CMD_RESET:
+				RESET;
+				break;
 			case CMD_DMA:
 				DrawDMAStatus();
 				break;

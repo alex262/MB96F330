@@ -247,7 +247,7 @@ __near int write_MHX_com(BYTE * pData)
 
 	if(pData[0] != 'S') return (-1); // error input
 		
-		
+	
 	if (pData[1] == '2')
 	{// S-Record type 2
 		// reading record length 
@@ -1384,7 +1384,7 @@ __far volatile unsigned int *dst=(__far unsigned int *)((unsigned long)(BOOTLOAD
 typedef __far void can_start(BYTE bus_id);
 
 // CAN Open код функции 0xD
-unsigned char ServiceBootloadUpd(BYTE bus_id,TMsgCan *m)
+unsigned char ServiceBootloadCan(BYTE bus_id,TMsgCan *m)
 {
 static BYTE bus_id_saved=0;
 can_start *f;

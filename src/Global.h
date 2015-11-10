@@ -24,11 +24,11 @@
 //Выбираем блок для  конкретной реализации
 //#define	PLATA_KCU4
 //#define	PLATA_ADC8
-//#define 	PLATA_FSU_29_30
+#define 	PLATA_FSU_29_30
 //#define	PLATA_NDD22
 //#define	PLATA_DAC11
 //#define	PLATA_OK6
-#define	PLATA_OC9
+//#define	PLATA_OC9
 //#define	PLATA_RAV7
 //==============================================================================
 #define BUFFER_LEN_UART		300				//Размер буффера порта
@@ -76,8 +76,8 @@
 #ifdef 	PLATA_OC9
 	#define	INCLUDE_H		"OC9.h"
 	#define	NEED_WORK_CAN	1	//необходимое количество работающих CAN - для отображения индикации
-	//#define	SPEED_CAN_0	0
-	//#define	SPEED_CAN_2	0
+	#define	SPEED_CAN_0	0
+	#define	SPEED_CAN_2	0
 #endif
 #ifdef 	PLATA_RAV7
 	#define	INCLUDE_H		"RAV7.h"
@@ -314,6 +314,7 @@ void Indicate(WORD *pCount, WORD BLINK);
 void msDelay(WORD ms);
 BYTE check_NaN_Inf( float x );
 void CyclicModules(void);
+
 
 //-----------------------------------------------
 //---------------------------------------------------

@@ -10,7 +10,9 @@ typedef struct
 	unsigned char data[8];	// data 
 }TMsgCan;
 
+extern unsigned char ServiceBootloadCan(unsigned char bus_id, TMsgCan *m);
 extern unsigned char ServiceBootloadUpd(unsigned char bus_id, TMsgCan *m);
+
 extern void ServiceBootloadUart(void);
 
 extern const char START_BOOT[];

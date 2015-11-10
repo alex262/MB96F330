@@ -76,6 +76,9 @@ void puts_bin_word(uint16_t data);
 BYTE GetNumRxIRQUart(BYTE ch);
 BYTE GetNumTxIRQUart(BYTE ch);
 void UartESIR_TDRE_Clear(BYTE ch);
+void DrawUartReg(BYTE ch);
+void SetUartSMR_UPCL(BYTE ch, BYTE data);
+void UART_ESIR_SSR_TDRE(BYTE ch);
 
 
 __interrupt void irq_uart0_rx(void);

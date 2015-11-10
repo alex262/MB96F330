@@ -278,6 +278,17 @@ void SetUartTRD_Reg(BYTE ch, BYTE data)
 	if(ch == 8){TDR8 = data;	return;}
 	if(ch == 9){TDR9 = data;	return;}
 }
+void SetUartSMR_UPCL(BYTE ch, BYTE data)
+{
+	if(ch == 0){SMR0_UPCL = data;	return;}
+	if(ch == 1){SMR1_UPCL = data;	return;}
+	if(ch == 2){SMR2_UPCL = data;	return;}
+	if(ch == 3){SMR3_UPCL = data;	return;}
+	if(ch == 5){SMR5_UPCL = data;	return;}
+	if(ch == 7){SMR7_UPCL = data;	return;}
+	if(ch == 8){SMR8_UPCL = data;	return;}
+	if(ch == 9){SMR9_UPCL = data;	return;}
+}
 void UART_RX_IntSet(BYTE ch, BYTE st)
 {
 	if(ch == 0){SSR0_RIE	= st&1;	return;}
@@ -299,6 +310,18 @@ void UART_TX_IntSet(BYTE ch, BYTE st)
 	if(ch == 7){SSR7_TIE	= st&1;	return;}
 	if(ch == 8){SSR8_TIE	= st&1;	return;}
 	if(ch == 9){SSR9_TIE	= st&1;	return;}
+}
+
+void UART_ESIR_SSR_TDRE(BYTE ch)
+{
+	if(ch == 0){if(SSR0_TDRE == 0) ESIR0_TDRE = 0; 	return;}
+	if(ch == 1){if(SSR1_TDRE == 0) ESIR1_TDRE = 0;	return;}
+	if(ch == 2){if(SSR2_TDRE == 0) ESIR2_TDRE = 0;	return;}
+	if(ch == 3){if(SSR3_TDRE == 0) ESIR3_TDRE = 0;	return;}
+	if(ch == 5){if(SSR5_TDRE == 0) ESIR5_TDRE = 0;	return;}
+	if(ch == 7){if(SSR7_TDRE == 0) ESIR7_TDRE = 0;	return;}
+	if(ch == 8){if(SSR8_TDRE == 0) ESIR8_TDRE = 0;	return;}
+	if(ch == 9){if(SSR9_TDRE == 0) ESIR9_TDRE = 0;	return;}
 }
 /*
 void InitUART0( void )
@@ -407,7 +430,7 @@ __interrupt void irq_uart1_rx(void)
 }
 __interrupt void irq_uart1_tx(void)
 {
-	ESIR1_TDRE = 0;
+	//ESIR1_TDRE = 0;
 	#ifdef	PLATA_OC9
 		IRQ_TX_OC9(1);
 	#endif
@@ -431,7 +454,7 @@ __interrupt void irq_uart2_rx(void)
 }
 __interrupt void irq_uart2_tx(void)
 {
-	ESIR2_TDRE = 0;
+	//ESIR2_TDRE = 0;
 	#ifdef	PLATA_OC9
 		IRQ_TX_OC9(2);
 	#endif
@@ -456,7 +479,7 @@ __interrupt void irq_uart3_rx(void)
 }
 __interrupt void irq_uart3_tx(void)
 {
-	ESIR3_TDRE = 0;
+	//ESIR3_TDRE = 0;
 	#ifdef	PLATA_OC9
 		IRQ_TX_OC9(3);
 	#endif
@@ -480,7 +503,7 @@ __interrupt void irq_uart5_rx(void)
 }
 __interrupt void irq_uart5_tx(void)
 {
-	ESIR5_TDRE = 0;
+	//ESIR5_TDRE = 0;
 	#ifdef	PLATA_OC9
 		IRQ_TX_OC9(5);
 	#endif
@@ -504,7 +527,7 @@ __interrupt void irq_uart7_rx(void)
 }
 __interrupt void irq_uart7_tx(void)
 {
-	ESIR7_TDRE = 0;
+	//ESIR7_TDRE = 0;
 	#ifdef	PLATA_OC9
 		IRQ_TX_OC9(7);
 	#endif
@@ -528,7 +551,7 @@ __interrupt void irq_uart8_rx(void)
 }
 __interrupt void irq_uart8_tx(void)
 {
-	ESIR8_TDRE = 0;
+	//ESIR8_TDRE = 0;
 	#ifdef	PLATA_OC9
 		IRQ_TX_OC9(8);
 	#endif
@@ -551,7 +574,7 @@ __interrupt void irq_uart9_rx(void)
 }
 __interrupt void irq_uart9_tx(void)
 {
-	ESIR9_TDRE = 0;
+	//ESIR9_TDRE = 0;
 	#ifdef	PLATA_OC9
 		IRQ_TX_OC9(9);
 	#endif
@@ -900,6 +923,56 @@ BYTE upcase(BYTE k)
   if ((k > 96) & (k < 123)) d = k - 32; /* a..f */
   if (k == 27) d = k;                   /* ESC  */ 
   return d;
+}
+//============================================================================
+void DrawUartReg(BYTE ch)
+{
+	DisInterrupt();
+	
+	sprintf(B_Out,"-----------S T A T U S   U A R T %d-----------\n\r\n\r", ch);	
+	puts((BYTE *)B_Out);
+	
+	if(ch == 0)
+	{
+		sprintf(B_Out,"BGR - 0x%04X, SCR - 0x%04X, SMR - 0x%04X, SSR - 0x%04X, ESIR - 0x%04X\n\r", BGR0, SCR0, SMR0, SSR0, ESIR0);	
+		puts((BYTE *)B_Out);
+	}		
+	if(ch == 1)
+	{
+		sprintf(B_Out,"BGR - 0x%04X, SCR - 0x%04X, SMR - 0x%04X, SSR - 0x%04X, ESIR - 0x%04X\n\r", BGR1, SCR1, SMR1, SSR1, ESIR1);	
+		puts((BYTE *)B_Out);
+	}	
+	if(ch == 2)
+	{
+		sprintf(B_Out,"BGR - 0x%04X, SCR - 0x%04X, SMR - 0x%04X, SSR - 0x%04X, ESIR - 0x%04X\n\r", BGR2, SCR2, SMR2, SSR2, ESIR2);	
+		puts((BYTE *)B_Out);
+	}	
+	if(ch == 3)
+	{
+		sprintf(B_Out,"BGR - 0x%04X, SCR - 0x%04X, SMR - 0x%04X, SSR - 0x%04X, ESIR - 0x%04X\n\r", BGR3, SCR3, SMR3, SSR3, ESIR3);	
+		puts((BYTE *)B_Out);
+	}	
+	if(ch == 5)
+	{
+		sprintf(B_Out,"BGR - 0x%04X, SCR - 0x%04X, SMR - 0x%04X, SSR - 0x%04X, ESIR - 0x%04X\n\r", BGR5, SCR5, SMR5, SSR5, ESIR5);	
+		puts((BYTE *)B_Out);
+	}	
+	if(ch == 7)
+	{
+		sprintf(B_Out,"BGR - 0x%04X, SCR - 0x%04X, SMR - 0x%04X, SSR - 0x%04X, ESIR - 0x%04X\n\r", BGR7, SCR7, SMR7, SSR7, ESIR7);	
+		puts((BYTE *)B_Out);
+	}	
+	if(ch == 8)
+	{
+		sprintf(B_Out,"BGR - 0x%04X, SCR - 0x%04X, SMR - 0x%04X, SSR - 0x%04X, ESIR - 0x%04X\n\r", BGR8, SCR8, SMR8, SSR8, ESIR8);	
+		puts((BYTE *)B_Out);
+	}	
+	if(ch == 9)
+	{
+		sprintf(B_Out,"BGR - 0x%04X, SCR - 0x%04X, SMR - 0x%04X, SSR - 0x%04X, ESIR - 0x%04X\n\r", BGR9, SCR9, SMR9, SSR9, ESIR9);	
+		puts((BYTE *)B_Out);
+	}	
+	EnInterrupt();
 }
 //============================================================================
 // ----------------------- End of Procedure ---------------------------------

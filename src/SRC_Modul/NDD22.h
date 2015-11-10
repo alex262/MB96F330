@@ -5,8 +5,8 @@
 
 #include "can.h"
 
-//#define PLATA_NDD22_ 
-#define PLATA_NDD23_ 
+#define PLATA_NDD22_ 
+//#define PLATA_NDD23_ 
 
 #define DEVICE_TYPE 1
 

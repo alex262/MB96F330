@@ -737,12 +737,12 @@ Revision 0.1  2006/01/25 15:37:46  phu
 #set      INTROM_EXTBUS   1        ; mask ROM or FLASH memory used
 #set      EXTROM_EXTBUS   2        ; full external bus (INROM not used)
 
-#set      BUSMODE SINGLE_CHIP      ; <<< set bus mode (see mode pins)
+#set      BUSMODE INTROM_EXTBUS    ; <<< set bus mode (see mode pins)
 
 #set      MULTIPLEXED     0        ;
 #set      NON_MULTIPLEXED 1        ; only if supported by the device
 
-#set      ADDRESSMODE MULTIPLEXED  ; <<< set address-mode
+#set      ADDRESSMODE NON_MULTIPLEXED  ; <<< set address-mode
 
 ; Some devices support multiplexed and/or non-multiplexed Bus mode
 ; please refer to the related datasheet/hardwaremanual
@@ -751,10 +751,10 @@ Revision 0.1  2006/01/25 15:37:46  phu
 ; If BUSMODE is "SINGLE_CHIP", ignore remaining bus settings.
 
 ; Select the used Chip Select areas
-#set      CHIP_SELECT0       OFF   ; <<< enable chip select area
-#set      CHIP_SELECT1       OFF   ; <<< enable chip select area
-#set      CHIP_SELECT2       OFF   ; <<< enable chip select area
-#set      CHIP_SELECT3       OFF   ; <<< enable chip select area
+#set      CHIP_SELECT0       ON   ; <<< enable chip select area
+#set      CHIP_SELECT1       ON   ; <<< enable chip select area
+#set      CHIP_SELECT2       ON    ; <<< enable chip select area
+#set      CHIP_SELECT3       ON   ; <<< enable chip select area
 #set      CHIP_SELECT4       OFF   ; <<< enable chip select area
 #set      CHIP_SELECT5       OFF   ; <<< enable chip select area
 
@@ -762,7 +762,7 @@ Revision 0.1  2006/01/25 15:37:46  phu
 #set      EXT_READY          OFF   ; <<< select external Ready function
 #set      EXT_CLOCK_ENABLE   OFF   ; <<< select external bus clock output
 #set      EXT_CLOCK_INVERT   OFF   ; <<< select clock inversion
-#set      EXT_CLOCK_SUSPEND  OFF   ; <<< select if external clock is suspended when no transfer in progress
+#set      EXT_CLOCK_SUSPEND  OFF    ; <<< select if external clock is suspended when no transfer in progress
 
 ; The external bus clock is derived from core clock CLKB. Select the divider for the external bus clock.
 
@@ -775,25 +775,25 @@ Revision 0.1  2006/01/25 15:37:46  phu
 #set      EXT_CLOCK_DIV64    6
 #set      EXT_CLOCK_DIV128   7
 
-#set      EXT_CLOCK_DIVISION  EXT_CLOCK_DIV1 ; <<< select clock divider
+#set      EXT_CLOCK_DIVISION  EXT_CLOCK_DIV16 ; <<< select clock divider
 
 #set      ADDR_PINS_23_16    B'00000000     ; <<< select used address lines
                                             ;     A23..A16 to be output.
 #set      ADDR_PINS_15_8     B'00000000     ; <<< select used address lines
                                             ;     A15..A8 to be output.
-#set      ADDR_PINS_7_0      B'00000000     ; <<< select used address lines
+#set      ADDR_PINS_7_0      B'00000111     ; <<< select used address lines
                                             ;     A7..A0 to be output.
 
-#set      LOW_BYTE_SIGNAL    OFF   ; <<< select low byte signal LBX
-#set      HIGH_BYTE_SIGNAL   OFF   ; <<< select high byte signal UBX
-#set      LOW_WRITE_STROBE   OFF   ; <<< select write strobe signal WRLX/WRX
-#set      HIGH_WRITE_STROBE  OFF   ; <<< select write strobe signal WRHX
-#set      READ_STROBE        OFF   ; <<< select read strobe signal RDX
+#set      LOW_BYTE_SIGNAL    OFF     ; <<< select low byte signal LBX
+#set      HIGH_BYTE_SIGNAL   OFF     ; <<< select high byte signal UBX
+#set      LOW_WRITE_STROBE   ON      ; <<< select write strobe signal WRLX/WRX
+#set      HIGH_WRITE_STROBE  OFF     ; <<< select write strobe signal WRHX
+#set      READ_STROBE        ON      ; <<< select read strobe signal RDX
 #set      ADDRESS_STROBE     OFF   ; <<< select address strobe signal ALE/ASX
 #set      ADDRESS_STROBE_LVL OFF   ; <<< select address strobe function: OFF - active low; ON - active high
 
 
-#set      CS0_CONFIG  B'0000000000000000    ; <<< select Chip Select Area 0 configuration
+#set      CS0_CONFIG  B'0000100010000000    ; <<< select Chip Select Area 0 configuration
 ;                       |||||||||||||+++-- Automatic wait cycles (0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 8, 6: 16, 7: 32)
 ;                       ||||||||||||+----- Address Cycle Extension (0: not extended, 1: extension by 1 cycle)
 ;                       |||||||||||+------ Strobe timing (0: scheme 0, 1: scheme 1)
@@ -806,7 +806,7 @@ Revision 0.1  2006/01/25 15:37:46  phu
 ;                       ||+--------------- Access type limitation (0: code and data, 1: data only)
 ;                       ++---------------- ignored
 
-#set      CS1_CONFIG  B'0000000000000000    ; <<< select Chip Select Area 1 configuration
+#set      CS1_CONFIG  B'0000100010000000    ; <<< select Chip Select Area 1 configuration
 ;                       |||||||||||||+++-- Automatic wait cycles (0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 8, 6: 16, 7: 32)
 ;                       ||||||||||||+----- Address Cycle Extension (0: not extended, 1: extension by 1 cycle)
 ;                       |||||||||||+------ Strobe timing (0: scheme 0, 1: scheme 1)
@@ -818,8 +818,8 @@ Revision 0.1  2006/01/25 15:37:46  phu
 ;                       |||+-------------- Chip Select level (0: low active, 1: high active)
 ;                       ||+--------------- Access type limitation (0: code and data, 1: data only)
 ;                       ++---------------- ignored
-
-#set      CS2_CONFIG  B'0000011000000000    ; <<< select Chip Select Area 2 configuration
+;                            ---
+#set      CS2_CONFIG  B'0000100010000000    ; <<< select Chip Select Area 1 configuration
 ;                       |||||||||||||+++-- Automatic wait cycles (0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 8, 6: 16, 7: 32)
 ;                       ||||||||||||+----- Address Cycle Extension (0: not extended, 1: extension by 1 cycle)
 ;                       |||||||||||+------ Strobe timing (0: scheme 0, 1: scheme 1)
@@ -832,7 +832,7 @@ Revision 0.1  2006/01/25 15:37:46  phu
 ;                       ||+--------------- Access type limitation (0: code and data, 1: data only)
 ;                       ++---------------- ignored
 
-#set      CS3_CONFIG  B'0000011000000000    ; <<< select Chip Select Area 3 configuration
+#set      CS3_CONFIG  B'0000100010000000    ; <<< select Chip Select Area 3 configuration
 ;                       |||||||||||||+++-- Automatic wait cycles (0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 8, 6: 16, 7: 32)
 ;                       ||||||||||||+----- Address Cycle Extension (0: not extended, 1: extension by 1 cycle)
 ;                       |||||||||||+------ Strobe timing (0: scheme 0, 1: scheme 1)
@@ -872,7 +872,7 @@ Revision 0.1  2006/01/25 15:37:46  phu
 ;                       ++---------------- ignored
 
 
-#set      CS2_START  0x00       ; <<< select start bank of chip select area; valid values: 0x00..0xFF
+#set      CS2_START  0x10       ; <<< select start bank of chip select area; valid values: 0x00..0xFF
 #set      CS3_START  0x40       ; <<< select start bank of chip select area; valid values: 0x00..0xFF
 #set      CS4_START  0x80       ; <<< select start bank of chip select area; valid values: 0x00..0xFF
 #set      CS5_START  0xC0       ; <<< select start bank of chip select area; valid values: 0x00..0xFF

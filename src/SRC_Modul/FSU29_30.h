@@ -7,8 +7,8 @@
 
 #define DEVICE_TYPE 2
 
-//#define NAME_MODUL "FSU29"
-#define NAME_MODUL "FSU30"
+#define NAME_MODUL "FSU29"
+//#define NAME_MODUL "FSU30"
 
 extern const char SoftwareVer[20]; 
 

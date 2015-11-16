@@ -21,7 +21,7 @@ void	(*SERVICE_PAK_UART)(BYTE, BYTE*, WORD) = ServiceUart;
 
 WORD	(*STATE_BLOCK)		= &Fsu.Info.word;
 //====================================================================
-static TYPE_DATA_TIMER TimerStartBlock = 1000/TIMER_RESOLUTION_MS;
+static TYPE_DATA_TIMER TimerStartBlock = 5000/TIMER_RESOLUTION_MS;
 static BYTE stStartBlock = FALSE;
 //====================================================================
 static BYTE BuffUart[BUFFER_LEN_UART];
@@ -142,7 +142,23 @@ void DriverFSU()
 			for(i=0; i<6; i++)
 			{
 				ChipSelekt(i, CS_ON);
-				obmen_spi(i/3, 0xFF);
+				obmen_spi(i/3, 0); // Обнуление всех флагов ошибок
+				ChipSelekt(i, CS_OFF);
+			}
+			msDelay(50);
+			for(i=0; i<6; i++)
+			{
+				ChipSelekt(i, CS_ON);
+				obmen_spi(i/3, 0xFF); // Выключение реле
+				ChipSelekt(i, CS_OFF);
+			}
+		}else
+		{
+			msDelay(10);
+			for(i=0; i<6; i++)
+			{
+				ChipSelekt(i, CS_ON);
+				obmen_spi(i/3, 0xFF); // Выключение реле
 				ChipSelekt(i, CS_OFF);
 			}
 		}
@@ -209,7 +225,13 @@ void DriverFSU()
 		}
 	}	
 	//========================================================
+	for(i=0; i<3; i++)
+	{
+		if(Fsu.DiagSum[i]) SetError(ind_FATERR);
+	}
+	//========================================================
 	// обмен данными по COM
+#ifndef TERMINAL_EN
 	if (GetRxByte(&i) == FIFO_OK)
 	{
 		BuffUart[CountDataUart] = i;
@@ -224,6 +246,7 @@ void DriverFSU()
 		Fsu.SendPak	= FALSE;
 		CreateAndSend_Pkt_UART0(&Fsu.K[0], 15, NumPak++, 1);
 	}
+#endif
 	//--------------------------------------------------
 }
 //====================================================================

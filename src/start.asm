@@ -737,7 +737,8 @@ Revision 0.1  2006/01/25 15:37:46  phu
 #set      INTROM_EXTBUS   1        ; mask ROM or FLASH memory used
 #set      EXTROM_EXTBUS   2        ; full external bus (INROM not used)
 
-#set      BUSMODE INTROM_EXTBUS    ; <<< set bus mode (see mode pins)
+//#set      BUSMODE INTROM_EXTBUS    ; <<< set bus mode (see mode pins)	 ---------------------- for OC9
+#set      BUSMODE SINGLE_CHIP      ; <<< set bus mode (see mode pins)
 
 #set      MULTIPLEXED     0        ;
 #set      NON_MULTIPLEXED 1        ; only if supported by the device

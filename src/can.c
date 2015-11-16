@@ -29,7 +29,7 @@ WORD GetCountRX_MSG(U8 nCAN)
 	return ptrMsgRcv[nCAN].count;
 }
 
-void ClearTX_B_OutF(U8 nCAN)
+void ClearTX_BUFF(U8 nCAN)
 {
 	if(nCAN>(NB_LINE_CAN-1)) return;
 	DisInterrupt();
@@ -38,7 +38,7 @@ void ClearTX_B_OutF(U8 nCAN)
 	ptrMsgSend[nCAN].count=0;
 	EnInterrupt();
 }
-void ClearRX_B_OutF(U8 nCAN)
+void ClearRX_BUFF(U8 nCAN)
 { 
 	if(nCAN>(NB_LINE_CAN-1)) return;
 	DisInterrupt();
@@ -47,7 +47,7 @@ void ClearRX_B_OutF(U8 nCAN)
 	ptrMsgRcv[nCAN].count=0;
 	EnInterrupt();
 }
-void InitCanFifoB_Out(void)
+void InitCanFifoBuf(void)
 {
 	BYTE i;
 	
@@ -149,7 +149,7 @@ void CAN_init(U8 NumCan, U16 BaudRate)
 //---------------------------------------------------------------------------------
 void SetupCAN(U16 BaudRate0, U16 BaudRate1, U16 BaudRate2)
 {
-	InitCanFifoB_Out();
+	InitCanFifoBuf();
 
 	if(BaudRate0)
 	{
@@ -190,15 +190,15 @@ void SetupCAN(U16 BaudRate0, U16 BaudRate1, U16 BaudRate2)
 	}
 }
 //---------------------------------------------------------------------------------
-void CAN0_B_Outfer(U8 Num, U8 Dir, U16 setID, U8 irq_rx, U32 mask, U8 EndFifo)
+void CAN0_buffer(U8 Num, U8 Dir, U16 setID, U8 irq_rx, U32 mask, U8 EndFifo)
 {
 	if((Num==0)||(Num>32)) return;
 	
 	// Prepare Arbitration Interface Register
 	IF1ARB0 = MSG2STD(setID);	// <<< Define message id: Use MSG2STD() for 11bit IDs / Use MSG2EXT() for 29bit IDs
 	IF1ARB0_XTD		= 0;		// <<< 0: 11bit ID / 1: 29bit ID 
-	IF1ARB0_DIR		= Dir&1;	// <<< 0: RX B_Outfer / 1: TX B_Outfer 
-	IF1ARB0_MSGVAL	= 1;		// <<< 0: B_Outfer invalid / 1: B_Outfer valid 
+	IF1ARB0_DIR		= Dir&1;	// <<< 0: RX Buffer / 1: TX Buffer 
+	IF1ARB0_MSGVAL	= 1;		// <<< 0: Buffer invalid / 1: Buffer valid 
 
 	// Prepare Mask Interface Register 
 	IF1MSK0			= MSG2STD(mask);// <<< Setup Mask corresponding to your application 
@@ -213,7 +213,7 @@ void CAN0_B_Outfer(U8 Num, U8 Dir, U16 setID, U8 irq_rx, U32 mask, U8 EndFifo)
 	IF1MCTR0_RXIE	= irq_rx&1;// <<< 0: Disable Rx-Interrupt / 1: Enable Rx-Interrupt 
 	IF1MCTR0_RMTEN	= 0;		// <<< 0: Disable Remote / 1: Enable Remote 
 	IF1MCTR0_TXRQST	= 0;		// Clear Transmission Request 
-	IF1MCTR0_EOB	= EndFifo;		// <<< 0: B_Outfer is part of FiFo / 1: Single message B_Outfer  
+	IF1MCTR0_EOB	= EndFifo;		// <<< 0: Buffer is part of FiFo / 1: Single message buffer  
 
 	IF1CMSK0  = 0xF0;	// Prepare Interface Command Mask Register: 
 						// WRRD    = 1 : Write information from interface to object
@@ -225,17 +225,17 @@ void CAN0_B_Outfer(U8 Num, U8 Dir, U16 setID, U8 irq_rx, U32 mask, U8 EndFifo)
 						// DATAA   = 0 : Do not change Data A register
 						// DATAB   = 0 : Do not change Data B register
 
-	IF1CREQ0 = Num;		// Transfer the Interface Register Content to the Message B_Outfer
+	IF1CREQ0 = Num;		// Transfer the Interface Register Content to the Message Buffer
 }
-void CAN1_B_Outfer(U8 Num, U8 Dir, U16 setID, U8 irq_rx, U32 mask, U8 EndFifo)
+void CAN1_buffer(U8 Num, U8 Dir, U16 setID, U8 irq_rx, U32 mask, U8 EndFifo)
 {
 	if((Num==0)||(Num>32)) return;
 	
 	// Prepare Arbitration Interface Register
 	IF1ARB1 = MSG2STD(setID);	// <<< Define message id: Use MSG2STD() for 11bit IDs / Use MSG2EXT() for 29bit IDs
 	IF1ARB1_XTD		= 0;		// <<< 0: 11bit ID / 1: 29bit ID 
-	IF1ARB1_DIR		= Dir&1;	// <<< 0: RX B_Outfer / 1: TX B_Outfer 
-	IF1ARB1_MSGVAL	= 1;		// <<< 0: B_Outfer invalid / 1: B_Outfer valid 
+	IF1ARB1_DIR		= Dir&1;	// <<< 0: RX Buffer / 1: TX Buffer 
+	IF1ARB1_MSGVAL	= 1;		// <<< 0: Buffer invalid / 1: Buffer valid 
 
 	// Prepare Mask Interface Register 
 	IF1MSK1			= MSG2STD(mask);// <<< Setup Mask corresponding to your application 
@@ -250,7 +250,7 @@ void CAN1_B_Outfer(U8 Num, U8 Dir, U16 setID, U8 irq_rx, U32 mask, U8 EndFifo)
 	IF1MCTR1_RXIE	= irq_rx&1;// <<< 0: Disable Rx-Interrupt / 1: Enable Rx-Interrupt 
 	IF1MCTR1_RMTEN	= 0;		// <<< 0: Disable Remote / 1: Enable Remote 
 	IF1MCTR1_TXRQST	= 0;		// Clear Transmission Request 
-	IF1MCTR1_EOB	= EndFifo;		// <<< 0: B_Outfer is part of FiFo / 1: Single message B_Outfer  
+	IF1MCTR1_EOB	= EndFifo;		// <<< 0: Buffer is part of FiFo / 1: Single message buffer  
 
 	IF1CMSK1  = 0xF0;	// Prepare Interface Command Mask Register: 
 						// WRRD    = 1 : Write information from interface to object
@@ -262,17 +262,17 @@ void CAN1_B_Outfer(U8 Num, U8 Dir, U16 setID, U8 irq_rx, U32 mask, U8 EndFifo)
 						// DATAA   = 0 : Do not change Data A register
 						// DATAB   = 0 : Do not change Data B register
 
-	IF1CREQ1 = Num;		// Transfer the Interface Register Content to the Message B_Outfer
+	IF1CREQ1 = Num;		// Transfer the Interface Register Content to the Message Buffer
 }
-void CAN2_B_Outfer(U8 Num, U8 Dir, U16 setID, U8 irq_rx, U32 mask, U8 EndFifo)
+void CAN2_buffer(U8 Num, U8 Dir, U16 setID, U8 irq_rx, U32 mask, U8 EndFifo)
 {
 	if((Num==0)||(Num>32)) return;
 	
 	// Prepare Arbitration Interface Register
 	IF1ARB2 = MSG2STD(setID);	// <<< Define message id: Use MSG2STD() for 11bit IDs / Use MSG2EXT() for 29bit IDs
 	IF1ARB2_XTD		= 0;		// <<< 0: 11bit ID / 1: 29bit ID 
-	IF1ARB2_DIR		= Dir&1;	// <<< 0: RX B_Outfer / 1: TX B_Outfer 
-	IF1ARB2_MSGVAL	= 1;		// <<< 0: B_Outfer invalid / 1: B_Outfer valid 
+	IF1ARB2_DIR		= Dir&1;	// <<< 0: RX Buffer / 1: TX Buffer 
+	IF1ARB2_MSGVAL	= 1;		// <<< 0: Buffer invalid / 1: Buffer valid 
 
 	// Prepare Mask Interface Register 
 	IF1MSK2			= MSG2STD(mask);		// <<< Setup Mask corresponding to your application 
@@ -287,7 +287,7 @@ void CAN2_B_Outfer(U8 Num, U8 Dir, U16 setID, U8 irq_rx, U32 mask, U8 EndFifo)
 	IF1MCTR2_RXIE	= irq_rx&1;	// <<< 0: Disable Rx-Interrupt / 1: Enable Rx-Interrupt 
 	IF1MCTR2_RMTEN	= 0;		// <<< 0: Disable Remote / 1: Enable Remote 
 	IF1MCTR2_TXRQST	= 0;		// Clear Transmission Request 
-	IF1MCTR2_EOB	= EndFifo;	// <<< 0: B_Outfer is part of FiFo / 1: Single message B_Outfer  
+	IF1MCTR2_EOB	= EndFifo;	// <<< 0: Buffer is part of FiFo / 1: Single message buffer  
 
 	IF1CMSK2  = 0xF0;	// Prepare Interface Command Mask Register: 
 						// WRRD    = 1 : Write information from interface to object
@@ -299,17 +299,17 @@ void CAN2_B_Outfer(U8 Num, U8 Dir, U16 setID, U8 irq_rx, U32 mask, U8 EndFifo)
 						// DATAA   = 0 : Do not change Data A register
 						// DATAB   = 0 : Do not change Data B register
 
-	IF1CREQ2 = Num;		// Transfer the Interface Register Content to the Message B_Outfer
+	IF1CREQ2 = Num;		// Transfer the Interface Register Content to the Message Buffer
 }
 
-void CAN_B_Outfer(U8 NumCan, U8 Num, U8 Dir, U16 setID, U8 irq_rx, U32 mask,  U8 EndFifo)
+void CAN_buffer(U8 NumCan, U8 Num, U8 Dir, U16 setID, U8 irq_rx, U32 mask,  U8 EndFifo)
 {
 	if(NumCan == 0)
-		CAN0_B_Outfer(Num, Dir, setID, irq_rx, mask, EndFifo);
+		CAN0_buffer(Num, Dir, setID, irq_rx, mask, EndFifo);
 	else if(NumCan == 1)
-		CAN1_B_Outfer(Num, Dir, setID, irq_rx, mask, EndFifo);
+		CAN1_buffer(Num, Dir, setID, irq_rx, mask, EndFifo);
 	else if(NumCan == 2)
-		CAN2_B_Outfer(Num, Dir, setID, irq_rx, mask, EndFifo);
+		CAN2_buffer(Num, Dir, setID, irq_rx, mask, EndFifo);
 }
 void CAN_ConfigMsgBox(U8 NumCan)
 {
@@ -319,21 +319,21 @@ void CAN_ConfigMsgBox(U8 NumCan)
 	{
 		#ifdef CAN_OPEN_ENABLE	
 			if(i == 0)
-				CAN_B_Outfer(NumCan, 1  , MSGBOX_RX, (NMT<<7)   , TRUE, 0x7FF, 1);// про маску - 1 - бит должен совпадать 0 - сравнивается
+				CAN_buffer(NumCan, 1  , MSGBOX_RX, (NMT<<7)   , TRUE, 0x7FF, 1);// про маску - 1 - бит должен совпадать 0 - сравнивается
 			else if(i == 1)
-				CAN_B_Outfer(NumCan, 2  , MSGBOX_RX, (SYNC<<7)  , TRUE, 0x7FF, 1); 
+				CAN_buffer(NumCan, 2  , MSGBOX_RX, (SYNC<<7)  , TRUE, 0x7FF, 1); 
 			else if(i > 1)
 				{
 					if(i<30)
-						CAN_B_Outfer(NumCan, i+1, MSGBOX_RX, getNodeId(), TRUE, 0x1F, 0); 
+						CAN_buffer(NumCan, i+1, MSGBOX_RX, getNodeId(), TRUE, 0x1F, 0); 
 					else
-						CAN_B_Outfer(NumCan, i+1, MSGBOX_RX, getNodeId(), TRUE, 0x1F, 1); 
+						CAN_buffer(NumCan, i+1, MSGBOX_RX, getNodeId(), TRUE, 0x1F, 1); 
 				}
 		#else
 			if(i<30)
-				CAN_B_Outfer(NumCan, i+1, MSGBOX_RX, 0, TRUE, 0, 0); // приём всего подряд
+				CAN_buffer(NumCan, i+1, MSGBOX_RX, 0, TRUE, 0, 0); // приём всего подряд
 			else
-				CAN_B_Outfer(NumCan, i+1, MSGBOX_RX, 0, TRUE, 0, 1); // приём всего подряд
+				CAN_buffer(NumCan, i+1, MSGBOX_RX, 0, TRUE, 0, 1); // приём всего подряд
 		#endif
 	}
 }
@@ -353,10 +353,10 @@ U8 CAN0_SendMessage(U8 msgBox, Message *msg)
 	IF1ARB0 = MSG2STD(msg->cob_id);		// <<< MSG2STD: 11bit ID / MSG2EXT: 29bit ID 
 	IF1ARB0_XTD    = 0;					// <<< 0: 11bit ID / 1: 29bit ID 
 	if(msg->rtr == 0)
-		IF1ARB0_DIR    = 1;				// <<< 0: RX B_Outfer / 1: TX B_Outfer 
+		IF1ARB0_DIR    = 1;				// <<< 0: RX Buffer / 1: TX Buffer 
 	else
-		IF1ARB0_DIR    = 0;				// <<< 0: RX B_Outfer / 1: TX B_Outfer 
-	IF1ARB0_MSGVAL = 1;					// <<< 0: B_Outfer invalid / 1: B_Outfer valid 
+		IF1ARB0_DIR    = 0;				// <<< 0: RX Buffer / 1: TX Buffer 
+	IF1ARB0_MSGVAL = 1;					// <<< 0: Buffer invalid / 1: Buffer valid 
 
 	// Prepare Mask Interface Register 
 //	IF1MSK0			= 0x1FFFFFFF;// <<< Setup Mask corresponding to your application 
@@ -371,7 +371,7 @@ U8 CAN0_SendMessage(U8 msgBox, Message *msg)
 	IF1MCTR0_RXIE	= 0;		// <<< 0: Disable Rx-Interrupt / 1: enable Rx-Interrupt 
 	IF1MCTR0_RMTEN	= 0;		// <<< 0: Disable Remote / 1: enable Remote 
 	IF1MCTR0_TXRQST	= 0;		// Don't set Transmission Request here 
-	IF1MCTR0_EOB	= 1;		// <<< 0: B_Outfer is part of FiFo / 1: Single message B_Outfer   
+	IF1MCTR0_EOB	= 1;		// <<< 0: Buffer is part of FiFo / 1: Single message buffer   
 	IF1MCTR0_DLC	= msg->len;	// Set number of Data to be transmitted 
 */
 	if(msg->rtr == 0)
@@ -393,7 +393,7 @@ U8 CAN0_SendMessage(U8 msgBox, Message *msg)
 								// DATAA   = 1 : Write Data A register
 								// DATAB   = 1 : Write Data B register
 
-	IF1CREQ0 = msgBox+1;		// Transfer the Interface Register Content to the Message B_Outfer 
+	IF1CREQ0 = msgBox+1;		// Transfer the Interface Register Content to the Message Buffer 
 	
 	return TRUE;
 }
@@ -411,10 +411,10 @@ U8 CAN1_SendMessage(U8 msgBox, Message *msg)
 	IF1ARB1 = MSG2STD(msg->cob_id);		// <<< MSG2STD: 11bit ID / MSG2EXT: 29bit ID 
 	IF1ARB1_XTD    = 0;			// <<< 0: 11bit ID / 1: 29bit ID 
 	if(msg->rtr == 0)
-	IF1ARB1_DIR    = 1;			// <<< 0: RX B_Outfer / 1: TX B_Outfer 
+	IF1ARB1_DIR    = 1;			// <<< 0: RX Buffer / 1: TX Buffer 
 	else
-		IF1ARB1_DIR    = 0;			// <<< 0: RX B_Outfer / 1: TX B_Outfer 
-	IF1ARB1_MSGVAL = 1;			// <<< 0: B_Outfer invalid / 1: B_Outfer valid 
+		IF1ARB1_DIR    = 0;			// <<< 0: RX Buffer / 1: TX Buffer 
+	IF1ARB1_MSGVAL = 1;			// <<< 0: Buffer invalid / 1: Buffer valid 
 
 	// Prepare Mask Interface Register 
 //	IF1MSK0			= 0x1FFFFFFF;// <<< Setup Mask corresponding to your application 
@@ -429,7 +429,7 @@ U8 CAN1_SendMessage(U8 msgBox, Message *msg)
 	IF1MCTR1_RXIE	= 0;		// <<< 0: Disable Rx-Interrupt / 1: enable Rx-Interrupt 
 	IF1MCTR1_RMTEN	= 0;		// <<< 0: Disable Remote / 1: enable Remote 
 	IF1MCTR1_TXRQST	= 0;		// Don't set Transmission Request here 
-	IF1MCTR1_EOB	= 1;		// <<< 0: B_Outfer is part of FiFo / 1: Single message B_Outfer   
+	IF1MCTR1_EOB	= 1;		// <<< 0: Buffer is part of FiFo / 1: Single message buffer   
 	IF1MCTR1_DLC	= msg->len;	// Set number of Data to be transmitted 
 */
 
@@ -452,7 +452,7 @@ U8 CAN1_SendMessage(U8 msgBox, Message *msg)
 								// DATAA   = 1 : Write Data A register
 								// DATAB   = 1 : Write Data B register
 
-	IF1CREQ1 = msgBox+1;		// Transfer the Interface Register Content to the Message B_Outfer 
+	IF1CREQ1 = msgBox+1;		// Transfer the Interface Register Content to the Message Buffer 
 	
 	return TRUE;
 }
@@ -468,10 +468,10 @@ U8 CAN2_SendMessage(U8 msgBox, Message *msg)
 	IF1ARB2 = MSG2STD(msg->cob_id);		// <<< MSG2STD: 11bit ID / MSG2EXT: 29bit ID 
 	IF1ARB2_XTD    = 0;			// <<< 0: 11bit ID / 1: 29bit ID 
 	if(msg->rtr == 0)
-	IF1ARB2_DIR    = 1;			// <<< 0: RX B_Outfer / 1: TX B_Outfer 
+	IF1ARB2_DIR    = 1;			// <<< 0: RX Buffer / 1: TX Buffer 
 	else
-		IF1ARB2_DIR    = 0;			// <<< 0: RX B_Outfer / 1: TX B_Outfer 
-	IF1ARB2_MSGVAL = 1;			// <<< 0: B_Outfer invalid / 1: B_Outfer valid 
+		IF1ARB2_DIR    = 0;			// <<< 0: RX Buffer / 1: TX Buffer 
+	IF1ARB2_MSGVAL = 1;			// <<< 0: Buffer invalid / 1: Buffer valid 
 
 	// Prepare Mask Interface Register 
 //	IF1MSK0			= 0x1FFFFFFF;// <<< Setup Mask corresponding to your application 
@@ -486,7 +486,7 @@ U8 CAN2_SendMessage(U8 msgBox, Message *msg)
 	IF1MCTR2_RXIE	= 0;		// <<< 0: Disable Rx-Interrupt / 1: enable Rx-Interrupt 
 	IF1MCTR2_RMTEN	= 0;		// <<< 0: Disable Remote / 1: enable Remote 
 	IF1MCTR2_TXRQST	= 0;		// Don't set Transmission Request here 
-	IF1MCTR2_EOB	= 1;		// <<< 0: B_Outfer is part of FiFo / 1: Single message B_Outfer   
+	IF1MCTR2_EOB	= 1;		// <<< 0: Buffer is part of FiFo / 1: Single message buffer   
 	IF1MCTR2_DLC	= msg->len;	// Set number of Data to be transmitted 
 */
 	if(msg->rtr == 0)
@@ -508,7 +508,7 @@ U8 CAN2_SendMessage(U8 msgBox, Message *msg)
 								// DATAA   = 1 : Write Data A register
 								// DATAB   = 1 : Write Data B register
 
-	IF1CREQ2 = msgBox+1;		// Transfer the Interface Register Content to the Message B_Outfer 
+	IF1CREQ2 = msgBox+1;		// Transfer the Interface Register Content to the Message Buffer 
 	
 	return TRUE;
 }
@@ -533,11 +533,13 @@ U8 CAN_ReceiveMessage(U8 nCAN, Message *m)
 	*((U32 *)(m->data+4))	= *((U32 *)(pM->data+4));
 
 	/* Increment the reading pointer of the stack */
+	DisInterrupt();
 	ptrMsgRcv[nCAN].st++;
 	if (ptrMsgRcv[nCAN].st == MAX_STACK_MSG_RX) 
 		ptrMsgRcv[nCAN].st = 0;
 
 	ptrMsgRcv[nCAN].count--;
+	EnInterrupt();
 	return TRUE;
 }
 //--------------------------------------------------------------------------------------------------------
@@ -548,35 +550,37 @@ U8 CAN_SendMessage(U8 NumCan, Message *msg)
 
 	if(NumCan>(NB_LINE_CAN-1)) return FALSE;
 //-------------------------------------------------------------------------	
+	DisInterrupt();
+	ret = FALSE;
 	if (ptrMsgSend[NumCan].count == 0)
 	{
-		DisInterrupt();
 		if(NumCan == 0) ret = CAN0_SendMessage(31, msg);
 		if(NumCan == 1) ret = CAN1_SendMessage(31, msg);
 		if(NumCan == 2) ret = CAN2_SendMessage(31, msg);
-		EnInterrupt();
-		
-		if(ret == TRUE) return TRUE;
 	}
-				
-	if(ptrMsgSend[NumCan].count == (MAX_STACK_MSG_TX-2)) return FALSE;
-			
-	// добавляем в буфер на отправку
-	pM = (Message *)&stackMsgSend[NumCan][ptrMsgSend[NumCan].end];
-	pM->cob_id 		= msg->cob_id;
-	pM->len 		= msg->len;
-	pM->rtr 		= msg->rtr;
-	*((U32 *)pM->data)		= *((U32 *)msg->data);
-	*((U32 *)(pM->data+4))	= *((U32 *)(msg->data+4));
-	
-	DisInterrupt();
-	ptrMsgSend[NumCan].count++;
-	ptrMsgSend[NumCan].end++;
-	if(ptrMsgSend[NumCan].end	==	MAX_STACK_MSG_TX)
-		ptrMsgSend[NumCan].end = 0;
+	if(ret == TRUE) 
+	{
+		EnInterrupt();		
+		return TRUE;
+	}
+	if(ptrMsgSend[NumCan].count == (MAX_STACK_MSG_TX-2)) ret = FALSE;
+	else
+	{
+		// добавляем в буфер на отправку
+		pM = (Message *)&stackMsgSend[NumCan][ptrMsgSend[NumCan].end];
+		pM->cob_id 		= msg->cob_id;
+		pM->len 		= msg->len;
+		pM->rtr 		= msg->rtr;
+		*((U32 *)pM->data)		= *((U32 *)msg->data);
+		*((U32 *)(pM->data+4))	= *((U32 *)(msg->data+4));
+		
+		ptrMsgSend[NumCan].count++;
+		ptrMsgSend[NumCan].end++;
+		if(ptrMsgSend[NumCan].end	==	MAX_STACK_MSG_TX)
+			ptrMsgSend[NumCan].end = 0;
+	}
 	EnInterrupt();		
-
-	return TRUE;
+	return ret;
 }
 //--------------------------------------------------------------------------------------------------------
 void ResetCan(U8 nCan)
@@ -601,7 +605,7 @@ void ResetCan(U8 nCan)
 	}
 }
 //--------------------------------------------------------------------------------------------------------
-U8  CAN_GetRxB_Outfer(U8 nCan)
+U8  CAN_GetRxBuffer(U8 nCan)
 {
 	U8 number=1;
 	
@@ -643,7 +647,7 @@ U8  CAN_GetRxB_Outfer(U8 nCan)
 void __interrupt CAN_0_IRQ(void)
 {
 	U16 MsgNbr;
-	U32 MsgB_Outfer;
+	U32 MsgBuffer;
 	Message *pM;
 	//Message msg;
 
@@ -676,17 +680,17 @@ void __interrupt CAN_0_IRQ(void)
 	}
 	else
 	{
-		if( (MsgNbr>=1) && (MsgNbr<=0x20) ) // valid B_Outfer number
+		if( (MsgNbr>=1) && (MsgNbr<=0x20) ) // valid buffer number
 		{
-			MsgB_Outfer = ((U32)0x01) << (MsgNbr-1);
+			MsgBuffer = ((U32)0x01) << (MsgNbr-1);
 			
-			//Check whether the interrupt source is a valid B_Outfer
-			if(((MSGVAL0 & MsgB_Outfer) != 0) && ((INTPND0 & MsgB_Outfer) != 0))
+			//Check whether the interrupt source is a valid buffer
+			if(((MSGVAL0 & MsgBuffer) != 0) && ((INTPND0 & MsgBuffer) != 0))
 			{
 				// Check whether the interrupt cause is receive or transmit
-				if( (NEWDT0 & MsgB_Outfer) != 0 ) // is a receive interrupt
+				if( (NEWDT0 & MsgBuffer) != 0 ) // is a receive interrupt
 				{
-					while( (NEWDT0 & MsgB_Outfer) != 0 )
+					while( (NEWDT0 & MsgBuffer) != 0 )
 					{
 //						putch('R');
 //						putch('0');
@@ -695,7 +699,7 @@ void __interrupt CAN_0_IRQ(void)
 						// call the receive handler (must clear NEWDAT & INTPND)
 						//fetch data from msg RAM
 						IF2CMSK0	= 0x003F;	
-	                              //   Receive Control Information, Message data and Arbitration from Message B_Outfer
+	                              //   Receive Control Information, Message data and Arbitration from Message Buffer
 	                              // WRRD    = 0 : Write information from object to interface
 	                              // MASK    = 0 : Do not transfer Mask regsiter
 	                              // ARB     = 1 : Transfer Arbitration Register (ID Register)
@@ -739,12 +743,12 @@ void __interrupt CAN_0_IRQ(void)
 						//else // буфер полон
 						if(IF2MCTR0_EOB == 1) break;
 						
-						MsgB_Outfer = MsgB_Outfer<<1;
+						MsgBuffer = MsgBuffer<<1;
 						MsgNbr++;
 					}
 				}
 				else 
-				if ((TREQR0 & MsgB_Outfer) == 0 ) // is transmission done
+				if ((TREQR0 & MsgBuffer) == 0 ) // is transmission done
 				{
 					IF1CMSK0 = 0x0018; // =>
 					// WRRD = 0 // read
@@ -774,7 +778,7 @@ void __interrupt CAN_0_IRQ(void)
 void __interrupt CAN_1_IRQ(void)
 {
 	U16 MsgNbr;
-	U32 MsgB_Outfer;
+	U32 MsgBuffer;
 	Message *pM;
 //	Message msg;
 //	U32 tmp;
@@ -782,7 +786,7 @@ void __interrupt CAN_1_IRQ(void)
 //putch('0');
 //	putch('2');putch(0x20);
 
-	DisInterrupt();
+	DisInterrupt(); // 14uc
 	MsgNbr = INTR1;			//stor MsgNbr
 	
 	if(INTR1 == 0x8000)		/* status int */
@@ -809,17 +813,17 @@ void __interrupt CAN_1_IRQ(void)
 	}
 			else
 	{
-		if( (MsgNbr>=1) && (MsgNbr<=0x20) ) // valid B_Outfer number
+		if( (MsgNbr>=1) && (MsgNbr<=0x20) ) // valid buffer number
 		{
-			MsgB_Outfer = ((U32)0x01) << (MsgNbr-1);
+			MsgBuffer = ((U32)0x01) << (MsgNbr-1);
 			//putch(0x30+MsgNbr/10);putch(0x30+MsgNbr%10);putch(0x20);
-			// Check whether the interrupt source is a valid B_Outfer
-			if(((MSGVAL1 & MsgB_Outfer) != 0) && ((INTPND1 & MsgB_Outfer) != 0))
+			// Check whether the interrupt source is a valid buffer
+			if(((MSGVAL1 & MsgBuffer) != 0) && ((INTPND1 & MsgBuffer) != 0))
 			{
 				// Check whether the interrupt cause is receive or transmit
-				if( (NEWDT1 & MsgB_Outfer) != 0 ) // is a receive interrupt
+				if( (NEWDT1 & MsgBuffer) != 0 ) // is a receive interrupt
 				{
-					while( (NEWDT1 & MsgB_Outfer) != 0 )
+					while( (NEWDT1 & MsgBuffer) != 0 )
 					{
 						
 //						putch(0x30+MsgNbr);
@@ -885,12 +889,12 @@ void __interrupt CAN_1_IRQ(void)
 						
 						if(IF2MCTR1_EOB == 1) break;
 						
-						MsgB_Outfer = MsgB_Outfer<<1;
+						MsgBuffer = MsgBuffer<<1;
 						MsgNbr++;
 						
 					}
 				}
-				else if ((TREQR1 & MsgB_Outfer) == 0 ) // is transmission done
+				else if ((TREQR1 & MsgBuffer) == 0 ) // is transmission done
 				{
 					IF1CMSK1 = 0x0018; // =>
 					// WRRD = 0 // read
@@ -920,7 +924,7 @@ void __interrupt CAN_1_IRQ(void)
 void __interrupt CAN_2_IRQ(void)
 {
 	U16 MsgNbr;
-	U32 MsgB_Outfer;
+	U32 MsgBuffer;
 	Message *pM;
 	//Message msg;
 
@@ -952,24 +956,24 @@ void __interrupt CAN_2_IRQ(void)
 	}
 	else
 	{
-		if( (MsgNbr>=1) && (MsgNbr<=0x20) ) // valid B_Outfer number
+		if( (MsgNbr>=1) && (MsgNbr<=0x20) ) // valid buffer number
 		{
 			//putch(0x30+MsgNbr/10);putch(0x30+MsgNbr%10);putch(0x20);
-			MsgB_Outfer = ((U32)0x01) << (MsgNbr-1);
-			// Check whether the interrupt source is a valid B_Outfer
-			if(((MSGVAL2 & MsgB_Outfer) != 0) && ((INTPND2 & MsgB_Outfer) != 0))
+			MsgBuffer = ((U32)0x01) << (MsgNbr-1);
+			// Check whether the interrupt source is a valid buffer
+			if(((MSGVAL2 & MsgBuffer) != 0) && ((INTPND2 & MsgBuffer) != 0))
 			{
 				// Check whether the interrupt cause is receive or transmit
-				if( (NEWDT2 & MsgB_Outfer) != 0 ) // is a receive interrupt
+				if( (NEWDT2 & MsgBuffer) != 0 ) // is a receive interrupt
 				{
 					
-					while( (NEWDT2 & MsgB_Outfer) != 0 )
+					while( (NEWDT2 & MsgBuffer) != 0 )
 					{
 						//putch('R');
 						// call the receive handler (must clear NEWDAT & INTPND)
 						/*fetch data from msg RAM*/
 						IF2CMSK2	= 0x003F;	
-	                              //   Receive Control Information, Message data and Arbitration from Message B_Outfer
+	                              //   Receive Control Information, Message data and Arbitration from Message Buffer
 	                              // WRRD    = 0 : Write information from object to interface
 	                              // MASK    = 0 : Do not transfer Mask regsiter
 	                              // ARB     = 1 : Transfer Arbitration Register (ID Register)
@@ -1020,11 +1024,11 @@ void __interrupt CAN_2_IRQ(void)
 						setTimer(&program.TimerCan2, TIME_OUT_CAN);
 						
 						if(IF2MCTR2_EOB == 1) break;
-						MsgB_Outfer = MsgB_Outfer<<1;
+						MsgBuffer = MsgBuffer<<1;
 						MsgNbr++;
 					}	
 				}
-				else if ((TREQR2 & MsgB_Outfer) == 0 ) // is transmission done
+				else if ((TREQR2 & MsgBuffer) == 0 ) // is transmission done
 				{
 					
 					IF1CMSK2 = 0x0018; // =>

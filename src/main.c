@@ -92,16 +92,9 @@ void main(void)
 		//========================================
 		#ifdef CAN_OPEN_ENABLE
 			
-			DisInterrupt();
 			receiveMsgHandler(0);
-			EnInterrupt();
-			DisInterrupt();
 			receiveMsgHandler(1);
-			EnInterrupt();
-			DisInterrupt();
 			receiveMsgHandler(2);
-			EnInterrupt();
-			
 			DriverCanOpen();
 			#ifdef CASH_PDO_DATA
 				if(getTimer(&TimerCashCan)==0)

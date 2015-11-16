@@ -22,13 +22,18 @@ void DisInterrupt(void)
 {
 	DisInt++;
 	__DI();
+	//LEDT1 = 1;
 }
 #pragma inline EnInterrupt
 void EnInterrupt(void)
 {
 	if(DisInt>0) DisInt--;
 	
-	if(DisInt == 0) __EI();
+	if(DisInt == 0) 
+	{
+		__EI();
+		//LEDT1 = 0;
+	}
 }
 //------------------------------------------------------------------------------
 // ¬озвращает true, если x = NaN или +-Inf
@@ -162,8 +167,18 @@ void InitProgrammVar(void)
 		program.setPPG2ch_en = TRUE;
 	#endif
 	//===================================
-	LEDR_DIR	= PIN_DIR_OUT;
-	LEDG_DIR	= PIN_DIR_OUT;
+	#ifdef LEDR
+		LEDR_DIR	= PIN_DIR_OUT;
+	#endif
+	#ifdef LEDG
+		LEDG_DIR	= PIN_DIR_OUT;
+	#endif
+	#ifdef LEDT1
+		LEDT1_DIR	= PIN_DIR_OUT;
+	#endif
+	#ifdef LEDT2
+		LEDT2_DIR	= PIN_DIR_OUT;
+	#endif
 	ADDR_DIR_IN;
 	ADDR_EN;
 	//===================================
@@ -340,6 +355,8 @@ BYTE GetError()
 //------------------------------------------------------------------------------
 void Indicate(WORD *pCount, WORD BLINK)
 {
+	#ifdef LEDG
+	#ifdef LEDR
 	if ((*pCount) < BLINK ) return;
 	switch (GetError())
 	{
@@ -396,6 +413,8 @@ void Indicate(WORD *pCount, WORD BLINK)
 			LEDG_ON;
 			break;		
 	}	
+	#endif
+	#endif
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -1085,8 +1104,10 @@ BYTE ServiceBootloadUpd(BYTE bus_id, Message *m)
 		/* =============================================================== */
 		__DI();	//запрещ€ем все прерывани€
 		/* =============================================================== */
+		#ifdef LEDG
 		LEDR_ON;
 		LEDG_OFF;
+		#endif
 		/* =============================================================== */
 		/* Enable Sectors for FLASH writing and erasing                    */
 		/* =============================================================== */

@@ -45,14 +45,20 @@ void StopContMode(BYTE ch);
 //====================================================================
 BYTE ServiceMaster(BYTE bus_id, Message *m)
 {
+	m;
+	bus_id;
 	return 0;
 }
 BYTE ServiceObmenData1(BYTE bus_id, Message *m)
 {
+	m;
+	bus_id;
 	return 0;
 }
 BYTE ServiceObmenData2(BYTE bus_id, Message *m)
 {
+	m;
+	bus_id;
 	return 0;
 }
 
@@ -174,7 +180,12 @@ void InitADC8()
 	InitSPI_1();
 	InitSPI_2();
 	InitFreeTimer16_0();
-	InitOCU_01(11, 25) ;
+	//InitOCU_01(11, 25); // 2MHz
+	//InitOCU_01(22, 44); 
+	InitOCU_01(30, 60); 
+	//InitOCU_01(2400, 4800); // 10 kHz
+	
+	
 }
 //====================================================================
 static WORD	w_adc_data[ADC_CH_ON_CHIP];
@@ -208,6 +219,111 @@ void ChipSelekt(BYTE nADC, BYTE State)
 		CS22 = State;
 }
 //-------------------------------------
+WORD DataN=0;
+//-------------------------------------
+BYTE WaitReadyAdc(BYTE ch)
+{
+	TYPE_DATA_TIMER Timer;
+	
+	add_timer(&Timer);
+	
+	if(ch == 0)
+	{
+		setTimer(&Timer, 2);	
+		while(DRDY11 == 0)
+		{
+			if(getTimer(&Timer) == 0)
+			{
+				del_timer(&Timer);
+				return FALSE;
+			}
+		}		
+		setTimer(&Timer, 2);	
+		while(DRDY11 == 1)
+		{
+			if(getTimer(&Timer) == 0)
+			{
+				del_timer(&Timer);
+				return FALSE;
+			}
+		}
+		del_timer(&Timer);
+		return TRUE;
+	}
+	//---------------------
+	if(ch == 1)
+	{
+		setTimer(&Timer, 2);	
+		while(DRDY12 == 0)
+		{
+			if(getTimer(&Timer) == 0)
+			{
+				del_timer(&Timer);
+				return FALSE;
+			}
+		}		
+		setTimer(&Timer, 2);	
+		while(DRDY12 == 1)
+		{
+			if(getTimer(&Timer) == 0)
+			{
+				del_timer(&Timer);
+				return FALSE;
+			}
+		}
+		del_timer(&Timer);
+		return TRUE;
+	}
+	//---------------------
+	if(ch == 2)
+	{
+		setTimer(&Timer, 2);	
+		while(DRDY21 == 0)
+		{
+			if(getTimer(&Timer) == 0)
+			{
+				del_timer(&Timer);
+				return FALSE;
+			}
+		}		
+		setTimer(&Timer, 2);	
+		while(DRDY21 == 1)
+		{
+			if(getTimer(&Timer) == 0)
+			{
+				del_timer(&Timer);
+				return FALSE;
+			}
+		}
+		del_timer(&Timer);
+		return TRUE;
+	}
+	//---------------------
+	if(ch == 3)
+	{
+		setTimer(&Timer, 2);	
+		while(DRDY22 == 0)
+		{
+			if(getTimer(&Timer) == 0)
+			{
+				del_timer(&Timer);
+				return FALSE;
+			}
+		}		
+		setTimer(&Timer, 2);	
+		while(DRDY22 == 1)
+		{
+			if(getTimer(&Timer) == 0)
+			{
+				del_timer(&Timer);
+				return FALSE;
+			}
+		}
+		del_timer(&Timer);
+		return TRUE;
+	}
+}
+static BYTE CurChipGetData = 0;
 void DriverADC8()
 {
 	BYTE j,i, READY_ADC[ADC_CHIP_COUNT];
@@ -223,7 +339,7 @@ void DriverADC8()
 	{
 		if(getTimer(&TimerStartBlock) == 0)	
 		{
-			del_timer(&TimerStartBlock);
+			//del_timer(&TimerStartBlock);
 			stStartBlock = TRUE;
 			//========================================================
 			// Читаем тарировки из EEPROM в RAM
@@ -371,84 +487,100 @@ void DriverADC8()
 			}
 		}
 		//-------------------------------------------------------------
-		for(j=0;j<ADC_CHIP_COUNT;j++)
+		if(getTimer(&TimerStartBlock) == 0)	
 		{
+			
 			READY_ADC[0] = DRDY11;
 			READY_ADC[1] = DRDY12;
 			READY_ADC[2] = DRDY21;
 			READY_ADC[3] = DRDY22;
-			if(READY_ADC[j] == 0)
+			DataN++;	
+			for(j=0;j<ADC_CHIP_COUNT;j++)
 			{
-				
-				ChipSelekt(j, CS_ON);
-				
-				st = read_spi_rdata(j, &Adc8.stADC[j], &w_adc_data[0]);
-				
-				ChipSelekt(j, CS_OFF);
-				
-				if((st == TRUE)&&(Adc8.stADC[j]&0xF00000) == 0xC00000)
+				//if(READY_ADC[j] == 0)
+				if(WaitReadyAdc(j) == TRUE)
 				{
-					for(i=0;i<ADC_CH_ON_CHIP;i++)
+					DisInterrupt();
+					CurChipGetData++; 
+					if(j==(ADC_CHIP_COUNT-1))
 					{
-						input = (float)ConvertCodToInt(w_adc_data[i]);
-						NumCh = ChipToCh[j*ADC_CH_ON_CHIP+i];
-						pTar = &TarRam[NumCh];
+						setTimer(&TimerStartBlock, 30);
+					}
 						
-						if(Adc8.adc_mux_set[j][i] == MUX_INPUT)	// работа по измерению входного напряжения
+					ChipSelekt(j, CS_ON);
+					
+					st = read_spi_rdata(j, &Adc8.stADC[j], &w_adc_data[0]);
+					
+					ChipSelekt(j, CS_OFF);
+					
+					if((st == TRUE)&&(Adc8.stADC[j]&0xF00000) == 0xC00000)
+					{
+						for(i=0;i<ADC_CH_ON_CHIP;i++)
 						{
-							Adc8.f_adc_data[NumCh] = pTar->k*input + pTar->ofs;
-						}else
+							input = (float)ConvertCodToInt(w_adc_data[i]);
+							NumCh = ChipToCh[j*ADC_CH_ON_CHIP+i];
+							pTar = &TarRam[NumCh];
+							
+							if(Adc8.adc_mux_set[j][i] == MUX_INPUT)	// работа по измерению входного напряжения
 							{
-							if(Adc8.adc_mux_set[j][i] == MUX_TEMPERATURE)// измерение температуры
-							{
-								Adc8.f_adc_data[NumCh] = (input*2.5)/(32767*0.00049) - (0.145300/0.00049)+25.0;
+								Adc8.f_adc_data[NumCh] = pTar->k*input + pTar->ofs;
+								//Adc8.f_adc_data[NumCh] = DataN;
 							}else
-							{
-								if(Adc8.adc_mux_set[j][i] == MUX_TEST) // тестовый вход
 								{
-									Adc8.f_adc_data[NumCh] = input*(2.5/32767);
+								if(Adc8.adc_mux_set[j][i] == MUX_TEMPERATURE)// измерение температуры
+								{
+									Adc8.f_adc_data[NumCh] = (input*2.5)/(32767*0.00049) - (0.145300/0.00049)+25.0;
 								}else
 								{
-									if(Adc8.adc_mux_set[j][i] == MUX_MVDD) // напряжение питания микросхемы
+									if(Adc8.adc_mux_set[j][i] == MUX_TEST) // тестовый вход
 									{
-										input *= (2.5/32767);
-										if((i == 2)||(i == 3))
-										{
-											Adc8.f_adc_data[NumCh] = input*4.0;
-										}else
-										{
-											Adc8.f_adc_data[NumCh] = input*2.0;
-										}
+										Adc8.f_adc_data[NumCh] = input*(2.5/32767);
 									}else
 									{
-										if(Adc8.adc_mux_set[j][i] == MUX_INPUT_SHORTED) // закорачиваем входы
+										if(Adc8.adc_mux_set[j][i] == MUX_MVDD) // напряжение питания микросхемы
 										{
-											Adc8.f_adc_data[NumCh] = input;
+											input *= (2.5/32767);
+											if((i == 2)||(i == 3))
+											{
+												Adc8.f_adc_data[NumCh] = input*4.0;
+											}else
+											{
+												Adc8.f_adc_data[NumCh] = input*2.0;
+											}
+										}else
+										{
+											if(Adc8.adc_mux_set[j][i] == MUX_INPUT_SHORTED) // закорачиваем входы
+											{
+												Adc8.f_adc_data[NumCh] = input;
+											}
 										}
 									}
 								}
 							}
 						}
 					}
+					
+					/*msDelay(1);
+					ChipSelekt(j, CS_ON);
+					read_spi_reg(j, 0, 13, &Adc8.reg_adc[j][0]);
+					ChipSelekt(j, CS_OFF);
+					msDelay(1);
+					
+					ChipSelekt(j, CS_ON);
+					read_spi_reg(j, 0x12, 3, &Adc8.reg_adc[j][13]);
+					ChipSelekt(j, CS_OFF);*/
+					EnInterrupt();
 				}
-				
-				msDelay(1);
-				ChipSelekt(j, CS_ON);
-				read_spi_reg(j, 0, 13, &Adc8.reg_adc[j][0]);
-				ChipSelekt(j, CS_OFF);
-				msDelay(1);
-				
-				ChipSelekt(j, CS_ON);
-				read_spi_reg(j, 0x12, 3, &Adc8.reg_adc[j][13]);
-				ChipSelekt(j, CS_OFF);
 			}
 		}
+		
 	}
 	//========================================================
 	Adc8.Info.bits.Flt1 = program.stFLT1;
 	Adc8.Info.bits.Flt2 = program.stFLT1;
 	//========================================================
 	// обмен данными по COM
+#ifndef TERMINAL_EN
 	if (GetRxByte(&i) == FIFO_OK)
 	{
 		BuffUart[CountDataUart] = i;
@@ -471,6 +603,7 @@ void DriverADC8()
 	
 		CreateAndSend_Pkt_UART0(&Adc8.stFLT1, 150+64, 2, 1);
 	}
+#endif
 	//----------------------------------------------------
 	// работа с eeprom 
 	if(program.StEEPROM_Write == TRUE)
@@ -512,6 +645,7 @@ void DriverADC8()
 //====================================================================
 void ServiceUart(BYTE Id, BYTE* pData, WORD Len)
 {
+	Len;
 	if(Id == 0x01)
 	{	
 		Adc8.SendPak = TRUE;
@@ -624,7 +758,7 @@ BYTE read_spi_rdata(BYTE ch, DWORD *status, WORD * pDataADC)
 
 		return TRUE;
 	}
-	return FALSE;
+//	return FALSE;
 }
 //=========================================================================================
 void write_spi_reg(BYTE ch, BYTE Addr, BYTE Len, BYTE * pData)

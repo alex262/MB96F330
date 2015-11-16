@@ -639,6 +639,7 @@ void DriverDAC11(void)
 	}
 	//========================================================
 	// обмен данными по COM
+#ifndef TERMINAL_EN
 	if (GetRxByte(&i) == FIFO_OK)
 	{
 		BuffUart[CountDataUart] = i;
@@ -658,6 +659,7 @@ void DriverDAC11(void)
 		Dac11.SendPakTar = FALSE;
 		CreateAndSend_Pkt_UART0((U8 *)(&TarRam), COUNT_DAC_CH*4*2*2, 2, 2);
 	}
+#endif
 	//----------------------------------------------------
 }
 //========================================================================

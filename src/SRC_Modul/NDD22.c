@@ -456,12 +456,13 @@ void DriverNDD()
 	Ndd.Info.bits.Flt2 = program.stFLT2;
 	//========================================================
 	// обмен данными по COM
-//	if (GetRxByte(&i) == FIFO_OK)
-//	{
-//		BuffUart[CountDataUart] = i;
-//		if(CountDataUart < BUFFER_LEN_UART-1)	
-//			CountDataUart++;
-//	}
+#ifndef TERMINAL_EN
+	if (GetRxByte(&i) == FIFO_OK)
+	{
+		BuffUart[CountDataUart] = i;
+		if(CountDataUart < BUFFER_LEN_UART-1)	
+			CountDataUart++;
+	}
 	
 	GetPak_Uart(&CountDataUart, BuffUart);
 	
@@ -470,6 +471,7 @@ void DriverNDD()
 		Ndd.SendPak	= 0;
 		CreateAndSend_Pkt_UART0(&Ndd.State[0][0], 24+88, 2, 1);
 	}
+#endif
 	//----------------------------------------------------
 }
 //====================================================================

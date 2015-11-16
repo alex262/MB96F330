@@ -247,20 +247,22 @@ void DriverOK6()
 	}	
 	//========================================================
 	// обмен данными по COM
-	if (GetRxByte(&i) == FIFO_OK)
-	{
-		BuffUart[CountDataUart] = i;
-		if(CountDataUart < BUFFER_LEN_UART-1)	
-			CountDataUart++;
-	}
-	
-	GetPak_Uart(&CountDataUart, BuffUart);
-	
-	if(OK6.SendPak == TRUE)
-	{
-		OK6.SendPak	= FALSE;
-		//CreateAndSend_Pkt_UART0(&Fsu.K[0], 15, NumPak++, 1);
-	}
+	#ifndef TERMINAL_EN
+		if (GetRxByte(&i) == FIFO_OK)
+		{
+			BuffUart[CountDataUart] = i;
+			if(CountDataUart < BUFFER_LEN_UART-1)	
+				CountDataUart++;
+		}
+		
+		GetPak_Uart(&CountDataUart, BuffUart);
+		
+		if(OK6.SendPak == TRUE)
+		{
+			OK6.SendPak	= FALSE;
+			//CreateAndSend_Pkt_UART0(&Fsu.K[0], 15, NumPak++, 1);
+		}
+	#endif
 	//--------------------------------------------------
 }
 //====================================================================

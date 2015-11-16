@@ -144,6 +144,7 @@ void DriverKCU()
 	}
 	//========================================================
 	// обмен данными по COM
+#ifndef TERMINAL_EN
 	if (GetRxByte(&i) == FIFO_OK)
 	{
 		BuffUart[CountDataUart] = i;
@@ -158,6 +159,7 @@ void DriverKCU()
 		Kcu.SendPak	= FALSE;
 		CreateAndSend_Pkt_UART0(Kcu.FC, 11, 2, 1);
 	}
+#endif
 }
 //====================================================================
 void ServiceUart(BYTE Id, BYTE* pData, WORD Len)

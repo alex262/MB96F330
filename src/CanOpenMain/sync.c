@@ -110,7 +110,7 @@ UNS8 sendSYNC(UNS8 bus_id, UNS32 cob_id)
 /*****************************************************************************/
 #ifdef CASH_PDO_DATA
 extern CASH_PDO process_PDO_CASH;
-extern s_PDO Cash_Pdo_Data[18];
+extern s_PDO Cash_Pdo_Data[MAX_COUNT_OF_PDO_TRANSMIT];
 #endif;
 UNS8 proceedSYNC(UNS8 bus_id, Message *m)
 {

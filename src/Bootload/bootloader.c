@@ -1370,14 +1370,18 @@ int i;
 __far unsigned int *src=(__far unsigned int *)BOOTLOADER_CODE_ADDR; 
 __far volatile unsigned int *dst=(__far unsigned int *)((unsigned long)(BOOTLOADER_CODE_ADDR & 0xFFFF));
 	__DI();	//запрещ€ем все прерывани€
+	#ifdef LEDG
 	LEDR_ON;
 	LEDG_ON;
+	#endif
 	clrwdt_;	
 	for (i=0;i<(BOOTLOADER_CODE_SIZE >> 1);i++)
 		*(dst++)=*(src++);
 	clrwdt_;	
+	#ifdef LEDG
 	LEDR_ON;
 	LEDG_OFF;
+	#endif
 }
 
 
@@ -1487,7 +1491,9 @@ __near unsigned char erase(__far unsigned int *sector_adr)
 
 	MTCRA = MTCRA_save;    // restore Flash settings
 	MCSRA = MCSRA_save;
+	#ifdef LEDG
 	LEDG=~LEDG;	
+	#endif
 	return(flag);
 }
 
@@ -1550,7 +1556,9 @@ __near unsigned char write(__far unsigned int *adr, unsigned int wdata)
 	fwait(100);	
 	MCSRA_WE = 0;        // reset write enable flag
 	fwait(100);
+	#ifdef LEDG
 	LEDG=~LEDG;
+	#endif
 	return(flag);
 }
 

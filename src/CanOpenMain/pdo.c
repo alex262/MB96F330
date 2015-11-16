@@ -96,7 +96,7 @@ UNS8 PDOmGR(UNS8 bus_id, UNS32 cobId) //PDO Manager
 /**************************************************************************/
 #ifdef CASH_PDO_DATA
 CASH_PDO process_PDO_CASH;
-s_PDO Cash_Pdo_Data[30];
+s_PDO Cash_Pdo_Data[MAX_COUNT_OF_PDO_TRANSMIT];
 UNS8 buildPDO_CASH(UNS16 index)
 {
 	UNS16 	ind;
@@ -155,10 +155,10 @@ UNS8 buildPDO_CASH(UNS16 index)
 			if( objDict == OD_SUCCESSFUL )
 			{
 				size = (*pMappingParameter & (UNS32)0x000000FF) >> 3 ; // in bytes
-	  			DisInterrupt();
-				for(i=0;i<size;i++)	
+	  			//DisInterrupt();	 // 4.7 uc
+	  			for(i=0;i<size;i++)	
 	  				process_PDO_CASH.msg[offset+i]=((UNS8 *)pMappedAppObject)[i];
-				EnInterrupt();
+	  			//EnInterrupt();
 				offset += size;
 				process_PDO_CASH.count = offset;
 				subInd++;
@@ -175,13 +175,17 @@ UNS8 buildPDO_CASH(UNS16 index)
 			}
 			else 
 			{
-				DisInterrupt();
-				for(status=0;status<offset;status++)
+				//DisInterrupt();
+				pMappingCount = Cash_Pdo_Data[ind].data;
+				pSize = process_PDO_CASH.msg;
+				
+	  			for(i=0;i<offset;i++)
 				{
-					Cash_Pdo_Data[ind].data[status]=process_PDO_CASH.msg[status];	
+					pMappingCount[i] = pSize[i];
+					//Cash_Pdo_Data[ind].data[i]=process_PDO_CASH.msg[i];	
 				}
 				Cash_Pdo_Data[ind].len=offset;
-				EnInterrupt();
+				//EnInterrupt();
 				return 0;
 			}
 		}
@@ -623,6 +627,7 @@ UNS8 proceedPDO(UNS8 bus_id, Message *m)
 						Cash_Pdo_Data[numPdo].cob_id=*pwCobId;
 						sendPDO(bus_id, &Cash_Pdo_Data[numPdo], DONNEES);
 						process_var.state |= TS_WAIT_SERVER;
+						//putch(0x30+numPdo);
 						return 0;
 						#endif
 						//================================================================

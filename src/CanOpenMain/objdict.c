@@ -391,7 +391,7 @@ __far const indextable   clientSDOParameter[] =
 /**************************************************************************/
 /* Computed by strPdoReceive */
 #define INDEX_LAST_PDO_RECEIVE  0x141F
-#define MAX_COUNT_OF_PDO_RECEIVE 31
+//#define MAX_COUNT_OF_PDO_RECEIVE 31 ----> global.h
 
 #define _CREATE_RXPDO_(RXPDO) \
 static  s_pdo_communication_parameter RxPDO ## RXPDO = \
@@ -482,7 +482,8 @@ __far const indextable   receivePDOParameter[] =
 /**************************************************************************/
 /* Computed by strPdoTransmit */
 #define INDEX_LAST_PDO_TRANSMIT  0x181F
-#define MAX_COUNT_OF_PDO_TRANSMIT 31
+//#define MAX_COUNT_OF_PDO_TRANSMIT 31 ----> global.h
+
 /** Usually the ID of a transmitting PDO is 0x180 + device_node_id,
 *  but the node_id is not known during compilation... so what to do?!
 *  the correct values have to be setted up during bootup of the device...

@@ -6,11 +6,15 @@
 //Кеширование данных TX PDO для 
 //ускорения отправки при приходе запроса
 #define	CASH_PDO_DATA
+#define MAX_COUNT_OF_PDO_RECEIVE	31
+#define MAX_COUNT_OF_PDO_TRANSMIT	31
 //--------------------------------
 //Включаем работу по протоколу CanOpen
 #define CAN_OPEN_ENABLE
 //---------------------------------------
-#define TERMINAL_EN	// резрешение работы терминала по COM1
+// резрешение работы терминала по COM1 
+// если резрешон терминал запрещен прием пакетов в блоке
+//#define TERMINAL_EN	
 //---------------------------------------
 #define ADDR		((EPSR12>>2)&0x1F)
 #define ADDR_DIR_IN	DDR12 = DDR12&0x83;
@@ -23,12 +27,12 @@
 //==============================================================================
 //Выбираем блок для  конкретной реализации
 //#define	PLATA_KCU4
-//#define	PLATA_ADC8
-#define 	PLATA_FSU_29_30
+#define	PLATA_ADC8
+//#define 	PLATA_FSU_29_30
 //#define	PLATA_NDD22
 //#define	PLATA_DAC11
 //#define	PLATA_OK6
-//#define	PLATA_OC9
+//#define	PLATA_OC9	// вкл в Start.asm BUSMODE INTROM_EXTBUS строка 740
 //#define	PLATA_RAV7
 //==============================================================================
 #define BUFFER_LEN_UART		300				//Размер буффера порта
@@ -122,13 +126,28 @@
 	#define LEDR_ON		LEDR = 0;
 	#define LEDR_OFF	LEDR = 1;
 #endif
-
 #ifndef LEDG
 	#define LEDG		PDR15_P3
 	#define LEDG_DIR	DDR15_D3
 	#define LEDG_ON		LEDG = 0;
 	#define LEDG_OFF	LEDG = 1;
 #endif
+
+#ifndef LEDT1
+	#define LEDT1		PDR15_P2
+	#define LEDT1_DIR	DDR15_D2
+	#define LEDT1_ON	LEDR = 0;
+	#define LEDT1_OFF	LEDR = 1;
+#endif
+
+#ifndef LEDT2
+	#define LEDT2		PDR15_P3
+	#define LEDT2_DIR	DDR15_D3
+	#define LEDT2_ON	LEDT2 = 0;
+	#define LEDT2_OFF	LEDT2 = 1;
+#endif
+
+
 //------------------------------------------------------------------------------
 typedef unsigned char	BOOL;
 typedef unsigned char	BYTE;

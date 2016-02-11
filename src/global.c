@@ -258,7 +258,7 @@ void CyclicModules(void)
 				CreateAndSend_Pkt_UART0(program.BufEEPROM, program.Len, 2, 0xFD);
 			}
 		}
-		if(program.RW_EEPROM == 1)
+		if(program.RW_EEPROM == 1) //write
 		{
 			if(program.Len>0)
 			{
@@ -941,7 +941,9 @@ static BOOL cmd = FALSE;
 #define CMD_REBOOT					0x04
 #define CMD_READ					0x05
 #define CMD_WRITE					0x06
+#define CMD_BOOTUPD					0x07
 
+#define STR_BOOTUPD					"BOOTUPD"
 #define STR_EXIT					"EXIT"
 #define STR_ERASE					"ERASE"
 #define STR_REBOOT					"REBOOT"
@@ -989,7 +991,7 @@ static void parse_cmd(void)
 		else if (!strcmp(cmd_str, STR_REBOOT	)) cmd_type = CMD_REBOOT;
 		else if (!strcmp(cmd_str, STR_READ		)) cmd_type = CMD_READ;
 		else if (!strcmp(cmd_str, STR_WRITE		)) cmd_type = CMD_WRITE;
-
+		else if (!strcmp(cmd_str, STR_BOOTUPD	)) cmd_type = CMD_BOOTUPD;
 
 		else
 		{
@@ -1056,7 +1058,6 @@ static void parse_cmd(void)
 		par_str2[j] = '\0';
 	}
 }
-
 //------------------------------------------------------------------------------------------------------------------
 
 void build_cmd_b_R(int c)
@@ -1331,6 +1332,9 @@ void ObrCmd_R(U8 nCAN, U16 id)
 	
 	switch (cmd_type)
 	{
+		case CMD_BOOTUPD:
+			SendCanBuf_R(nCAN, (U8 *)STR_OK_R, 3, id);
+			break;
 		case CMD_ERASE:
 			//if(StBootloader == 1)
 			/* =============================================================== */

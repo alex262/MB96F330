@@ -305,7 +305,7 @@ void InitOC9()
 //*******************************************************************************************************************
 //*******************************************************************************************************************
 //*******************************************************************************************************************
-BYTE Test[16]={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+BYTE Test[16]={0x55,0xAA,0x55,0xAA,0x55,0xAA,0x55,0xAA,0x55,0xAA,0x55,0xAA,0x55,0xAA,0x55,0xAA};
 void DriverOC9()
 {
 	BYTE i;
@@ -322,12 +322,6 @@ void DriverOC9()
 		}
 	}else
 	{
-		//if(getTimer(&TimerStartBlock) == 0)	
-		//	setTimer(&TimerStartBlock,20);
-		//AddDataToSendUart(0, Test, 16);
-		//StartSendUart(0);
-		//		CreatePkt(1, Test, 6, 1, 2);
-		//		StartSendUart(1);
 		//========================================================
 		for(i=0; i<COUNT_UART_MK; i++)	DMA_ServiceTX(i);	
 					
@@ -338,6 +332,8 @@ void DriverOC9()
 			{
 				if(i<COUNT_UART_MK)
 				{
+/*TEST*/			DMA_AddDataToTxBuff(i, Test, 4, TIMEOUT_TX_UART);
+
 					wLen = DMA_GetCountRxBuff(i);
 					wLen_free = SIZE_BUFFER_UART_RX_OC9-CountDataUart[i];
 					if(wLen>wLen_free)	wLen=wLen_free;

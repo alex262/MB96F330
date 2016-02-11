@@ -27,13 +27,15 @@
 //==============================================================================
 //Выбираем блок для  конкретной реализации
 //#define	PLATA_KCU4
-#define	PLATA_ADC8
+//#define	PLATA_ADC8
 //#define 	PLATA_FSU_29_30
-//#define	PLATA_NDD22
+#define	PLATA_NDD22			// НДД22 НДД23
 //#define	PLATA_DAC11
 //#define	PLATA_OK6
 //#define	PLATA_OC9	// вкл в Start.asm BUSMODE INTROM_EXTBUS строка 740
 //#define	PLATA_RAV7
+//#define	PLATA_DAC12
+//#define	PLATA_ADC9
 //==============================================================================
 #define BUFFER_LEN_UART		300				//Размер буффера порта
 #define MAX_IN_PAK 			290				//Макcимальна  длина входящего пакета
@@ -57,7 +59,6 @@
 	#define POWER_BLOCK_ENABLE
 	#define	NEED_WORK_CAN	2	//необходимое количество работающих CAN - для отображения индикации
 #endif
-
 #ifdef 	PLATA_FSU_29_30
 	#define	INCLUDE_H	"FSU29_30.h"
 	#define	NEED_WORK_CAN	2	//необходимое количество работающих CAN - для отображения индикации
@@ -88,6 +89,17 @@
 	#define	NEED_WORK_CAN	1	//необходимое количество работающих CAN - для отображения индикации
 	#define	SPEED_CAN_0	0
 	#define	SPEED_CAN_1	0
+#endif
+#ifdef 	PLATA_DAC12
+	#define	INCLUDE_H		"DAC12.h"
+	#define	NEED_WORK_CAN	1	//необходимое количество работающих CAN - для отображения индикации
+	#define	SPEED_CAN_0	0
+	#define	SPEED_CAN_1	0
+#endif
+#ifdef	PLATA_ADC9
+	#define	INCLUDE_H	"ADC9.h"
+	#define POWER_BLOCK_ENABLE
+	#define	NEED_WORK_CAN	2	//необходимое количество работающих CAN - для отображения индикации
 #endif
 //------------------------------------------------------------------------------
 #ifndef	INCLUDE_H

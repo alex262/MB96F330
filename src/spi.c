@@ -84,4 +84,22 @@ void InitSPI_2_inv(void)
 	ECCR3		= 0x00;	// SCDE = 0 => CPHA = 0
 }
 
+void InitSPI_5(void)
+{
+	
+
+	PIER10_IE4	= 1;	// enable SIN5
+	DDR10_D4	= 0;	// SIN5 = input
+	DDR10_D3	= 1;	// SOT5 = output
+	DDR10_D2	= 1;	// SCLK = output
+
+	BGR5		= 23;	// 2M Baud @ 48 MHz
+	SCR5		= 0x03;	// reception and transmission enable
+	SSR5		= 0x04;	// MSB first, no interrupts
+	SMR5		= 0x83;	// Mode 2, SCLK enable, SOT enable
+
+	ESCR5		= 0x01;	// SCES = 1 => CPOL = 0
+	ECCR5		= 0x00;	// SCDE = 0 => CPHA = 0
+}
+
 //*******************************************************************

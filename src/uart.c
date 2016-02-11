@@ -84,8 +84,8 @@ void InitUART(BYTE ch)
 			PIER08_IE2	= 1;	// enable SIN0
 			DDR08_D2	= 0;	
 			DDR08_D3	= 1;	// SOT0 = output
-			//BGR0		= 417;	// 115200 Baud @ 48 MHz
-			BGR0		= 104;	// 460800 Baud @ 48 MHz
+			BGR0		= 417;	// 115200 Baud @ 48 MHz
+			//BGR0		= 104;	// 460800 Baud @ 48 MHz
 			SCR0		= 0x17;	// 8N1
 			SMR0		= 0x0d;	// enable SOT0, Reset, normal mode
 			SSR0		= 0x00;	// LSB first
@@ -378,7 +378,6 @@ static BYTE	UART_START_BOOT_n = 0;
 __interrupt void irq_uart0_rx(void)
 {
 	BYTE ch;
-
 	if (SSR0_ORE | SSR0_FRE)
 	{
 		SCR0_TXE = 0;
